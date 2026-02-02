@@ -1,19 +1,26 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
+import useAuth from "../../hooks/useAuth";
 import "../../styles/auth.css";
 import "../../styles/globle.css";
+
+
 const Login = () => {
+  const { login } = useAuth();
   const navigate = useNavigate();
 
-  const handleLogin = () => {
-    localStorage.setItem("token", "dummy-token");
-    navigate("/dashboard");
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    login(); // Example user data on login
+
+    navigate("/home");
   };
   return (
     <div className="auth-container">
       <div className="login-card">
         <h2>Login</h2>
 
-        <form>
+        <form onSubmit={handleSubmit}>
           <div className="form-group">
             <label>Email</label>
             <input type="email" placeholder="Enter your email" required />
@@ -24,14 +31,12 @@ const Login = () => {
             <input type="password" placeholder="Enter your password" required />
           </div>
 
-          <button type="submit" onClick={handleLogin}>
-            Login
-          </button>
+          <button type="submit">Login</button>
         </form>
 
         <div className="login-links">
           Don’t have an account?
-          <a href="/register">Register</a>
+          <Link to="/register">Register</Link>
         </div>
       </div>
     </div>
