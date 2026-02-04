@@ -3,13 +3,13 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  background: #f0f2f5;
 }
 
+/* for login and register cards */
 .login-card,
 .register-card {
   background: #fff;
-  width: 100%;
+  width: 300px;
   max-width: 480px;
   padding: 30px;
   border-radius: 14px;

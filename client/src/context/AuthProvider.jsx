@@ -12,16 +12,20 @@ const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [role, setRole] = useState(localStorage.getItem("role") || null);
 
-  const login = () => {
+  const login = (role) => {
     // login function to update authentication state
     setIsAuthenticated(true);
     setUser({ name: "Test User" });
-    // setRole("user");
-    setRole("admin");
-    // setRole("publisher");
-
+    
+    // const storedRole = "user";
+    // const storedRole = "admin";
+    // const storedRole = "publisher";
+    
+    setRole(role);
+   
     localStorage.setItem("isAuthenticated", "true");
-    localStorage.setItem("role", "admin");
+    localStorage.setItem("role", role);
+    return role;
   };
   const logout = () => {
     // logout function to clear authentication state
