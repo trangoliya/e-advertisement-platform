@@ -63,7 +63,7 @@
           role: user.role,
         },
         process.env.JWT_SECRET,
-        { expiresIN: "1d" },
+        { expiresIn: "1d" },
       );
       return res.status(200).json({
         token,
@@ -77,6 +77,7 @@
     } catch (error) {
       return res.status(500).json({
         message: "Server error",
+        error: error.message 
       });
     }
   };
