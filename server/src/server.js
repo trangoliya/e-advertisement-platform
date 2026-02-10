@@ -1,9 +1,10 @@
 import dotenv from "dotenv";
-dotenv.config(); // 👈 MUST be first line
+dotenv.config(); // MUST be first line
 
+console.log("PORT: ", process.env.PORT);
+console.log("JWT_SECRET: ", process.env.JWT_SECRET);
 import app from "./app.js";
 import connectDB from "./config/db.js";
-
 
 const PORT = process.env.PORT || 5000;
 
