@@ -1,7 +1,6 @@
 import jwt from "jsonwebtoken";
 
 const authMiddleware = (req, res, next) => {
-  console.log("Auth Middleware hit")
   try {
     // get authorization header
     const authHeader = req.headers.authorization;
@@ -15,17 +14,16 @@ const authMiddleware = (req, res, next) => {
 
     // if token exist then extract token
     const token = authHeader.split(" ")[1];
-   
+
     // verify token
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    console.log("DECODED TOKEN: ", decoded)
 
     // attach user data to request
     req.user = {
       id: decoded.id,
       role: decoded.role,
     };
-    
+
     next(); //allow request (valid user-->allow)
   } catch (error) {
     return res.status(401).json({

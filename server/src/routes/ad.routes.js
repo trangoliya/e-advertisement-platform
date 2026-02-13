@@ -44,7 +44,7 @@ export default router;
 //    "email": "publisher2@gmail.com",
 //    "password": "123456",
 //    "role": "publisher"
-// } 
+// }
 
 // 2)
 // for login [POST] - http://localhost:5000/api/auth/login
@@ -52,9 +52,8 @@ export default router;
 // {
 //    "email": "publisher2@gmail.com",   // same as your registraion
 //    "password": "123456"
-// } 
+// }
 //  copy the token from response.
-
 
 // 3) set token in postman
 // Authorization --> Bearer {token - paste token}
@@ -67,7 +66,7 @@ export default router;
 //    "description": "Testing",
 //    "imageUrl": "https://test.com/img.jpg",
 //    "targetUrl": "https://test.com"
-// } 
+// }
 // copy _id from this response.
 
 // 5) update status
@@ -75,5 +74,4 @@ export default router;
 // body -> raw -> JSON
 // {
 //    "status": "active"
-// } 
-
+// }

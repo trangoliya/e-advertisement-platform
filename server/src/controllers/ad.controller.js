@@ -97,8 +97,7 @@ export const updateAdStatus = async (req, res) => {
       { status },
       { new: true },
     );
-    console.log("found:", ad); //
-    console.log("param id: ", JSON.stringify(req.params.id));
+
     if (!ad) {
       return res.status(404).json("Ad not found");
     }
