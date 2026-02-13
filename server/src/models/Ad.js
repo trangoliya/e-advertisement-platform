@@ -5,7 +5,7 @@ const adSchema = new mongoose.Schema(
     title: String,
     description: String,
     imageUrl: String,
-    targerUrl: String,
+    targetUrl: String,
     status: {
       type: String,
       enum: ["draft", "active", "paused"],

@@ -1,4 +1,5 @@
 import Ad from "../models/Ad.js";
+import mongoose from "mongoose";
 
 // use for create a Ad
 export const createAd = async (req, res) => {
@@ -69,21 +70,28 @@ export const incrementImpression = async (req, res) => {
 // increment function for click event - how many user click button
 export const incrementClick = async (req, res) => {
   try {
+    const { id } = req.params;
+
     const ad = await Ad.findByIdAndUpdate(
-      req.params._id,
+      id,
       { $inc: { clicks: 1 } },
       { new: true },
     );
-
+    
     if (!ad) {
       return res.status(404).json({
+        success: false,
         message: "Ad not found",
       });
     }
-    res.status(200).json(ad);
+    res.status(200).json({
+      success: true,
+      data: ad,
+    });
   } catch (error) {
     res.status(500).json({
-      message: "Server error",
+      success: false,
+      message: error.message,
     });
   }
 };
@@ -105,6 +113,61 @@ export const updateAdStatus = async (req, res) => {
   } catch (error) {
     console.log("status error:", error);
     res.status(500).json({
+      message: error.message,
+    });
+  }
+};
+
+export const getActiveAds = async (req, res) => {
+  try {
+    const ads = await Ad.find({ status: "active" });
+
+    res.status(200).json({
+      success: true,
+      count: ads.length,
+      data: ads,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "server error",
+    });
+  }
+};
+
+export const getAdById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    // validate objectId
+    console.log("before update id: ", id);
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid Ad Id",
+      });
+    }
+    // increment impression and return updated ad
+    const ad = await Ad.findByIdAndUpdate(
+      id,
+      { $inc: { impressions: 1 } },
+      { new: true },
+    );
+    console.log("update ad: ", ad);
+
+    if (!ad) {
+      return res.status(404).js({
+        success: false,
+        message: "ad not found",
+      });
+    }
+    res.status(200).json({
+      success: true,
+      data: ad,
+    });
+  } catch (error) {
+    console.error("getAdById Error:", error);
+    res.status(500).json({
+      success: false,
       message: error.message,
     });
   }
