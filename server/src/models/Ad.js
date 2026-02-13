@@ -22,7 +22,7 @@ const adSchema = new mongoose.Schema(
       default: 0,
     },
 
-    click: {
+    clicks: {
       type: Number,
       default: 0,
     },
