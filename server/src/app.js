@@ -1,19 +1,17 @@
-import testRoutes from "./routes/test.routers.js";
 import express from "express";
 import authRoutes from "./routes/auth.routers.js";
-import adRouters from "./routes/ad.routes.js";
-import viewerRouters from "./routes/viewer.routes.js";
+import testRoutes from "./routes/test.routers.js";
+import adRoutes from "./routes/ad.routes.js";
+import viewerRoutes from "./routes/viewer.routes.js";
+import adminRoutes from "./routes/admin.routes.js";
 
 const app = express();
 
 app.use(express.json());
 app.use("/api/auth", authRoutes);
 app.use("/api/test", testRoutes);
-app.use("/api/ads", adRouters);
-app.use("/api/viewer", viewerRouters);
+app.use("/api/ads", adRoutes);
+app.use("/api/viewer", viewerRoutes);
+app.use("/api/admin", adminRoutes);
 
-//
-app.get("/test", (req, res) => {
-  res.send("server working");
-});
 export default app;
