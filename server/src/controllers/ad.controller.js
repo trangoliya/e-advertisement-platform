@@ -2,7 +2,7 @@ import Ad from "../models/Ad.js";
 import mongoose from "mongoose";
 
 // use for create a Ad
-export const createAd = async (req, res) => {
+export const createAd = async (req, res, next) => {
   try {
     const { title, description, imageUrl, targetUrl, status } = req.body;
     const ad = await Ad.create({
@@ -19,15 +19,12 @@ export const createAd = async (req, res) => {
       data: ad,
     });
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: error.message,
-    });
+    next(error);
   }
 };
 
 // For get Ad
-export const getMyAds = async (req, res) => {
+export const getMyAds = async (req, res, next) => {
   try {
     const ads = await Ad.find({
       createdBy: req.user._id,
@@ -38,15 +35,12 @@ export const getMyAds = async (req, res) => {
       data: ads,
     });
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Server error",
-    });
+    next(error);
   }
 };
 
 // increment function for Impression - how many user see your add
-export const incrementImpression = async (req, res) => {
+export const incrementImpression = async (req, res, next) => {
   try {
     const ad = await Ad.findByIdAndUpdate(
       req.params._id,
@@ -61,14 +55,12 @@ export const incrementImpression = async (req, res) => {
     }
     res.status(200).json(ad);
   } catch (error) {
-    res.status(500).json({
-      message: "Server error",
-    });
+    next(error);
   }
 };
 
 // increment function for click event - how many user click button
-export const incrementClick = async (req, res) => {
+export const incrementClick = async (req, res, next) => {
   try {
     const { id } = req.params;
 
@@ -77,7 +69,7 @@ export const incrementClick = async (req, res) => {
       { $inc: { clicks: 1 } },
       { new: true },
     );
-    
+
     if (!ad) {
       return res.status(404).json({
         success: false,
@@ -89,15 +81,12 @@ export const incrementClick = async (req, res) => {
       data: ad,
     });
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: error.message,
-    });
+    next(error);
   }
 };
 
 // update status in Ad
-export const updateAdStatus = async (req, res) => {
+export const updateAdStatus = async (req, res, next) => {
   try {
     const { status } = req.body;
     const ad = await Ad.findByIdAndUpdate(
@@ -111,14 +100,11 @@ export const updateAdStatus = async (req, res) => {
     }
     res.status(200).json(ad);
   } catch (error) {
-    console.log("status error:", error);
-    res.status(500).json({
-      message: error.message,
-    });
+    next(error);
   }
 };
 
-export const getActiveAds = async (req, res) => {
+export const getActiveAds = async (req, res, next) => {
   try {
     const ads = await Ad.find({ status: "active" });
 
@@ -128,14 +114,11 @@ export const getActiveAds = async (req, res) => {
       data: ads,
     });
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "server error",
-    });
+    next(error);
   }
 };
 
-export const getAdById = async (req, res) => {
+export const getAdById = async (req, res, next) => {
   try {
     const { id } = req.params;
     // validate objectId
@@ -165,10 +148,6 @@ export const getAdById = async (req, res) => {
       data: ad,
     });
   } catch (error) {
-    console.error("getAdById Error:", error);
-    res.status(500).json({
-      success: false,
-      message: error.message,
-    });
+    next(error);
   }
 };

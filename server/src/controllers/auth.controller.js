@@ -3,7 +3,7 @@ import jwt from "jsonwebtoken";
 import User from "../models/user.model.js";
 
 // for register function
-export const register = async (req, res) => {
+export const register = async (req, res, next) => {
   try {
     const { name, email, password, role } = req.body;
 
@@ -30,15 +30,11 @@ export const register = async (req, res) => {
       message: "User registered successfully",
     });
   } catch (error) {
-    console.error("Register error:", error);
-    res.status(500).json({
-      // message: "Server error",
-      message: error.message,
-    });
+    next(error);
   }
 };
 
-export const login = async (req, res) => {
+export const login = async (req, res, next) => {
   try {
     const { email, password } = req.body || {};
 
@@ -63,7 +59,7 @@ export const login = async (req, res) => {
       });
     }
 
-    //make token for loging
+    //make token for login
     const token = jwt.sign(
       {
         id: user._id,
@@ -83,9 +79,6 @@ export const login = async (req, res) => {
       },
     });
   } catch (error) {
-    return res.status(500).json({
-      message: "Server error",
-      error: error.message,
-    });
+    next(error);
   }
 };

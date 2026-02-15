@@ -1,7 +1,7 @@
 import User from "../models/user.model.js";
 import Ad from "../models/Ad.js";
 
-export const getAllUsers = async (req, res) => {
+export const getAllUsers = async (req, res, next) => {
   try {
     const users = await User.find().select("-password").sort({ createdAt: -1 });
 
@@ -11,14 +11,12 @@ export const getAllUsers = async (req, res) => {
       data: users,
     });
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: error.message,
-    });
+        next(error);
+
   }
 };
 
-export const getAllAds = async (req, res) => {
+export const getAllAds = async (req, res, next) => {
   try {
     const ads = await Ad.find().populate("createdBy", "name email role").sort({ createdAt: -1 });
 
@@ -28,14 +26,12 @@ export const getAllAds = async (req, res) => {
       data: ads,
     });
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: error.message,
-    });
+        next(error);
+
   }
 };
 
-export const updateAdStatusByAdmin = async (req, res) => {
+export const updateAdStatusByAdmin = async (req, res, next) => {
   try {
     const { status } = req.body;
 
@@ -64,9 +60,7 @@ export const updateAdStatusByAdmin = async (req, res) => {
       data: ad,
     });
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: error.message,
-    });
+        next(error);
+
   }
 };
