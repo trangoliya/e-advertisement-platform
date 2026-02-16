@@ -13,7 +13,7 @@ const router = express.Router();
 
 // Post&get only when publisher login
 router.post("/", authMiddleware, roleMiddleware("publisher"), createAd);
-router.get("/my", authMiddleware, roleMiddleware("publisher"), getMyAds);
+router.get("/my-ads", authMiddleware, roleMiddleware("publisher"), getMyAds);
 
 router.patch(
   "/:id/status",
