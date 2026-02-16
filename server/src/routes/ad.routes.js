@@ -50,7 +50,7 @@ export default router;
 // for login [POST] - http://localhost:5000/api/auth/login
 // body -> raw -> JSON
 // {
-//    "email": "publisher2@gmail.com",   // same as your registraion
+//    "email": "publisher2@gmail.com",   // same as your registration
 //    "password": "123456"
 // }
 //  copy the token from response.
@@ -70,7 +70,7 @@ export default router;
 // copy _id from this response.
 
 // 5) update status
-// [PATCH] - htpp://localhost:5000/api/ads/{_id}/status
+// [PATCH] - http://localhost:5000/api/ads/{_id}/status
 // body -> raw -> JSON
 // {
 //    "status": "active"

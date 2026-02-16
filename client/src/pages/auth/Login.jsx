@@ -19,7 +19,15 @@ const Login = () => {
       password,
     });
     if (result.success) {
-      navigate("/home");
+      const storedUser = JSON.parse(localStorage.getItem("user"));
+
+      if (storedUser.role === "publisher") {
+        navigate("/publisher");
+      } else if (storedUser.role === "admin") {
+        navigate("/admin");
+      } else {
+        navigate("/home");
+      }
     } else {
       console.log(result.message);
     }
