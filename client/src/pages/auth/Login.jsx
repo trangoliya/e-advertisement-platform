@@ -1,20 +1,28 @@
-import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import useAuth from "../../hooks/useAuth";
 import "../../styles/auth.css";
-import "../../styles/globle.css";
+import "../../styles/global.css";
 
 const Login = () => {
-  const [role, setRole] = useState("user");
   const { login } = useAuth();
   const navigate = useNavigate();
 
-  const handleSubmit = () => {
-    
-    login(role); // Example user data on login
-    if (role === "admin") navigate("/admin");
-    else if (role === "publisher") navigate("/publisher");
-    else navigate("/home");
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const email = e.target.email.value;
+    const password = e.target.password.value;
+
+    console.log("Email:", email);
+    console.log("Password:", password);
+    const result = await login({
+      email,
+      password,
+    });
+    if (result.success) {
+      navigate("/home");
+    } else {
+      console.log(result.message);
+    }
   };
   return (
     <div className="auth-container">
@@ -22,16 +30,15 @@ const Login = () => {
         <h2>Login</h2>
 
         <form onSubmit={handleSubmit}>
-          {/* <div className="form-group">
-            <label htmlFor="email">Email:</label>
+          <div className="form-group">
+            <label>Email:</label>
             <input type="email" id="email" name="email" required />
           </div>
 
           <div className="form-group">
-            <label htmlFor="password">Password:</label>
+            <label>Password:</label>
             <input type="password" id="password" name="password" required />
-          </div> */}
-
+          </div>
 
           {/* <select value={role} onChange={(e) => setRole(e.target.value)} required>
             <option value="admin">Admin</option>
@@ -39,8 +46,8 @@ const Login = () => {
             <option value="user">User</option>
           </select> */}
 
-            {/* temporary radio buttons for role selection */}
-          <div style={{display:"flex", gap:"10px", marginBottom:"10px"}}>
+          {/* temporary radio buttons for role selection */}
+          {/* <div style={{display:"flex", gap:"10px", marginBottom:"10px"}}>
             <label> 
             <input type="radio" value="user" name="role" checked={role === "user"} onChange={() => setRole("user")} /> User </label>
             <label>
@@ -49,9 +56,8 @@ const Login = () => {
             <label>
               <input   type="radio" value="publisher" name="role" checked={role === "publisher"} onChange={() => setRole("publisher")} /> Publisher
             </label>
-          </div>
+          </div> */}
 
-          
           <button type="submit">Login</button>
         </form>
 
