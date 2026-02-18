@@ -6,7 +6,7 @@ import Admin from "../pages/admin/AdminPage.jsx";
 import Publisher from "../pages/publisher/PublisherPage.jsx";
 import MyAds from "../pages/publisher/MyAds.jsx";
 import CreateAd from "../pages/publisher/CreateAd.jsx";
-
+import AdDetails from "../pages/user/AdDetails.jsx";
 import AuthLayout from "../layouts/AuthLayout.jsx";
 import ProtectedRoute from "./ProtectedRoute.jsx";
 import RoleRoute from "./RoleRoute.jsx";
@@ -26,10 +26,10 @@ function AppRoutes() {
       {/* Protected routes */}
       <Route element={<ProtectedRoute />}>
         <Route element={<MainLayout />}>
-
           {/* USER */}
           <Route element={<RoleRoute allowedRoles={["user"]} />}>
             <Route path="/home" element={<Home />} />
+            <Route path="/ads/:id" element={<AdDetails />} />
           </Route>
 
           {/* ADMIN */}
@@ -43,7 +43,6 @@ function AppRoutes() {
             <Route path="/publisher/my-ads" element={<MyAds />} />
             <Route path="/publisher/create-ad" element={<CreateAd />} />
           </Route>
-
         </Route>
       </Route>
     </Routes>
