@@ -34,24 +34,18 @@ const AdminPage = () => {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-gray-800 mb-6">
-        Admin Dashboard
-      </h1>
+      <h1 className="text-2xl font-bold text-gray-800 mb-6">Admin Dashboard</h1>
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
         <div className="bg-white rounded-xl p-6 shadow-sm">
           <p className="text-sm text-gray-500">Total Users</p>
-          <p className="text-3xl font-bold text-gray-800">
-            {users.length}
-          </p>
+          <p className="text-3xl font-bold text-gray-800">{users.length}</p>
         </div>
 
         <div className="bg-white rounded-xl p-6 shadow-sm">
           <p className="text-sm text-gray-500">Total Ads</p>
-          <p className="text-3xl font-bold text-gray-800">
-            {ads.length}
-          </p>
+          <p className="text-3xl font-bold text-gray-800">{ads.length}</p>
         </div>
       </div>
     </div>

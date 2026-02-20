@@ -24,9 +24,9 @@ import ProtectedRoute from "./ProtectedRoute.jsx";
 import RoleRoute from "./RoleRoute.jsx";
 
 import AdminLayout from "../layouts/AdminLayout.jsx";
-// import AllUserList from "../pages/admin/AllUserList.jsx";
-// import AdminAds from "../pages/admin/AdminAds";
-// import AdminSettings from "../pages/admin/AdminSettings";
+import AllUserList from "../pages/admin/AllUserList.jsx";
+import AdminAds from "../pages/admin/AdminAds.jsx";
+// import AdminSettings from "../pages/admin/AdminSettings.jsx";
 
 const router = createBrowserRouter([
   /* Redirect root */
@@ -70,8 +70,8 @@ const router = createBrowserRouter([
             element: <AdminLayout />,
             children: [
               { path: "/admin", element: <Admin /> },
-              // { path: "/admin/users", element: <AllUserList /> },
-              // { path: "/admin/ads", element: <AdminAds /> }, // optional
+              { path: "/admin/users", element: <AllUserList /> },
+              { path: "/admin/ads", element: <AdminAds /> }, 
               // { path: "/admin/settings", element: <AdminSettings /> }, // optional
             ],
           },
