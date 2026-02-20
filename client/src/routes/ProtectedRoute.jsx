@@ -4,16 +4,21 @@ import useAuth from "../hooks/useAuth";
 const ProtectedRoute = () => {
   const { user, loading } = useAuth();
 
-  // Wait until auth check completes
+  /* Loading state */
   if (loading) {
-    return null; // or a loader component
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="animate-spin rounded-full h-10 w-10 border-4 border-blue-600 border-t-transparent" />
+      </div>
+    );
   }
 
-  // If no user after loading finished → redirect
+  /* Not authenticated */
   if (!user) {
     return <Navigate to="/login" replace />;
   }
 
+  /* Authenticated */
   return <Outlet />;
 };
 

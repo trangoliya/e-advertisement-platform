@@ -1,33 +1,29 @@
-// import { Navigate, Outlet } from "react-router-dom";
-// import useRole from "../hooks/useRole.js";
-
-// const RoleRoute = ({ allowedRoles }) => {
-//   const role = useRole();
-
-//   if (!role) {
-//     return <Navigate to="/login" replace />;
-//   }
-
-//   if (!allowedRoles.includes(role)) {
-//     return <Navigate to="/login" replace />;
-//   }
-
-//   return <Outlet />;
-// };
-
-// export default RoleRoute;
 import { Navigate, Outlet } from "react-router-dom";
 import useAuth from "../hooks/useAuth";
 
 const RoleRoute = ({ allowedRoles }) => {
   const { user, loading } = useAuth();
 
-  if (loading) return null;
+  /* Loading state */
+  if (loading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="animate-spin rounded-full h-10 w-10 border-4 border-blue-600 border-t-transparent" />
+      </div>
+    );
+  }
 
-  if (!user || !allowedRoles.includes(user.role)) {
+  /* Not logged in */
+  if (!user) {
     return <Navigate to="/login" replace />;
   }
 
+  /* Logged in but wrong role */
+  if (!allowedRoles.includes(user.role)) {
+    return <Navigate to="/home" replace />;
+  }
+
+  /* Authorized */
   return <Outlet />;
 };
 

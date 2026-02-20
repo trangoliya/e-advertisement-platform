@@ -5,9 +5,8 @@ function App() {
   return (
     <div>
       {/* <h1>Welcome to the E-Advertisement Project</h1> */}
-      <BrowserRouter>
         <AppRoutes />
-      </BrowserRouter>
+      
     </div>
   );
 }
