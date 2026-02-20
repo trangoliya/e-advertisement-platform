@@ -12,7 +12,8 @@ import AdDetails from "../pages/user/AdDetails.jsx";
 
 import Admin from "../pages/admin/AdminPage.jsx";
 
-import Publisher from "../pages/publisher/PublisherPage.jsx";
+import PublisherLayout from "../layouts/PublisherLayout.jsx";
+import PublisherPage from "../pages/publisher/PublisherPage.jsx";
 import MyAds from "../pages/publisher/MyAds.jsx";
 import CreateAd from "../pages/publisher/CreateAd.jsx";
 
@@ -33,14 +34,8 @@ const router = createBrowserRouter([
   {
     element: <AuthLayout />,
     children: [
-      {
-        path: "/login",
-        element: <Login />,
-      },
-      {
-        path: "/register",
-        element: <Register />,
-      },
+      { path: "/login", element: <Login /> },
+      { path: "/register", element: <Register /> },
     ],
   },
 
@@ -48,51 +43,41 @@ const router = createBrowserRouter([
   {
     element: <ProtectedRoute />,
     children: [
+      /* ================= USER ================= */
       {
-        element: <MainLayout />,
+        element: <RoleRoute allowedRoles={["user"]} />,
         children: [
-          /* USER */
           {
-            element: <RoleRoute allowedRoles={["user"]} />,
+            element: <MainLayout />, // ✅ Navbar ONLY for user
             children: [
-              {
-                path: "/home",
-                element: <Home />,
-              },
-              {
-                path: "/ads/:id",
-                element: <AdDetails />,
-              },
+              { path: "/home", element: <Home /> },
+              { path: "/ads/:id", element: <AdDetails /> },
             ],
           },
+        ],
+      },
 
-          /* ADMIN */
+      /* ================= ADMIN ================= */
+      {
+        element: <RoleRoute allowedRoles={["admin"]} />,
+        children: [
           {
-            element: <RoleRoute allowedRoles={["admin"]} />,
-            children: [
-              {
-                path: "/admin",
-                element: <Admin />,
-              },
-            ],
+            path: "/admin",
+            element: <Admin />,
           },
+        ],
+      },
 
-          /* PUBLISHER */
+      /* ================= PUBLISHER ================= */
+      {
+        element: <RoleRoute allowedRoles={["publisher"]} />,
+        children: [
           {
-            element: <RoleRoute allowedRoles={["publisher"]} />,
+            element: <PublisherLayout />, // ✅ Sidebar ONLY
             children: [
-              {
-                path: "/publisher",
-                element: <Publisher />,
-              },
-              {
-                path: "/publisher/my-ads",
-                element: <MyAds />,
-              },
-              {
-                path: "/publisher/create-ad",
-                element: <CreateAd />,
-              },
+              { path: "/publisher", element: <PublisherPage /> },
+              { path: "/publisher/my-ads", element: <MyAds /> },
+              { path: "/publisher/create-ad", element: <CreateAd /> },
             ],
           },
         ],
