@@ -18,7 +18,7 @@ export const getAllUsers = async (req, res, next) => {
 
 export const getAllAds = async (req, res, next) => {
   try {
-    const ads = await Ad.find().populate("createdBy", "name email role").sort({ createdAt: -1 });
+    const ads = await Ad.find().populate("createBy", "name email role").sort({ createdAt: -1 });
 
     res.status(200).json({
       success: true,

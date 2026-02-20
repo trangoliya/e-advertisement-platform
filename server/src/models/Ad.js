@@ -14,7 +14,7 @@ const adSchema = new mongoose.Schema(
 
     createBy: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "user",
+      ref: "User",
     },
 
     impressions: {
