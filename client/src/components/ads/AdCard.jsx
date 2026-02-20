@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import defaultAvatar from "../../assets/default-avatar.png";
 import {
   getLikedAds,
   getSavedAds,
@@ -43,7 +42,7 @@ const AdCard = ({
       <div className="flex items-center justify-between px-4 py-3">
         <div className="flex items-center gap-3">
           <img
-            src={publisherAvatar || defaultAvatar}
+            src={publisherAvatar}
             alt={publisherName}
             className="w-9 h-9 rounded-full object-cover"
           />
@@ -90,12 +89,11 @@ const AdCard = ({
           {description}
         </p>
 
-        {/* Actions */}
         <div className="flex items-center justify-between">
-          <div className="flex gap-4 items-center">
+          <div className="flex items-center gap-4">
             <button
               onClick={handleLike}
-              className={`text-xl transition ${
+              className={`text-xl ${
                 liked ? "text-red-500" : "text-gray-600"
               }`}
             >
