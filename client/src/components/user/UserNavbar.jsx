@@ -20,7 +20,7 @@ const UserNavbar = () => {
             to="/home"
             className="text-xl font-bold text-blue-600"
           >
-            AdSocial
+            Ad-vision
           </Link>
 
           {/* Desktop Menu */}

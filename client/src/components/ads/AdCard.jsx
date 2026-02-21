@@ -100,7 +100,7 @@ const AdCard = ({
               {liked ? "❤️" : "🤍"}
             </button>
 
-            <span className="text-xs text-gray-500">
+            <span className="text-xl text-gray-500">
               👁 {impressions} · 👆 {clicks}
             </span>
           </div>

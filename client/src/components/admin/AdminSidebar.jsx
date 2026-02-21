@@ -34,7 +34,7 @@ const AdminSidebar = () => {
           onClick={() => setCollapsed(!collapsed)}
           className="text-gray-600 hover:text-gray-900"
         >
-          ☰
+          &nbsp;&nbsp;☰
         </button>
       </div>
 
