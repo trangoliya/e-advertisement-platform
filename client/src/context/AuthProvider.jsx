@@ -7,12 +7,13 @@ import {
   login as loginUser,
   register as registerUser,
 } from "../services/auth.service";
+// import useAuth from "../hooks/useAuth";
 
 // provider component for authentication context
 const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-
+  
   // load user from localstorage on refresh page
   useEffect(() => {
     const initAuth = () => {
