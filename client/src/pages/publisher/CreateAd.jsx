@@ -38,18 +38,21 @@ const CreateAd = () => {
     <div className="max-w-3xl">
       {/* Header */}
       <div className="mb-6">
-        <h2 className="text-2xl font-bold text-gray-800">Create New Ad</h2>
-        <p className="text-sm text-gray-500">
+        <h2 className="text-2xl font-semibold text-textPrimary">
+          Create New Ad
+        </h2>
+        <p className="text-sm text-textSecondary">
           Fill in the details below to publish your advertisement
         </p>
       </div>
 
       {/* Form Card */}
-      <div className="bg-white rounded-2xl shadow-sm p-6">
+      <div className="bg-bgSecondary border border-borderColorCustom rounded-2xl p-6">
         <form onSubmit={handleSubmit} className="space-y-6">
+          
           {/* Title */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-textSecondary mb-1">
               Ad Title
             </label>
             <input
@@ -59,16 +62,17 @@ const CreateAd = () => {
               onChange={handleChange}
               required
               placeholder="Summer Sale Campaign"
-              className="w-full rounded-lg border border-gray-300 px-4 py-2.5
+              className="w-full rounded-lg bg-bgPrimary border border-borderColorCustom
+                         px-4 py-2.5 text-textPrimary placeholder:text-textSecondary
                          outline-none transition
-                         focus:border-blue-500 focus:ring-2
-                         focus:ring-blue-500/30"
+                         focus:border-accent focus:ring-2
+                         focus:ring-accent/30"
             />
           </div>
 
           {/* Description */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-textSecondary mb-1">
               Description
             </label>
             <textarea
@@ -78,16 +82,17 @@ const CreateAd = () => {
               required
               rows={4}
               placeholder="Describe your ad and what users should know..."
-              className="w-full rounded-lg border border-gray-300 px-4 py-2.5
+              className="w-full rounded-lg bg-bgPrimary border border-borderColorCustom
+                         px-4 py-2.5 text-textPrimary placeholder:text-textSecondary
                          outline-none resize-none transition
-                         focus:border-blue-500 focus:ring-2
-                         focus:ring-blue-500/30"
+                         focus:border-accent focus:ring-2
+                         focus:ring-accent/30"
             />
           </div>
 
           {/* Image URL */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-textSecondary mb-1">
               Image URL
             </label>
             <input
@@ -97,10 +102,11 @@ const CreateAd = () => {
               onChange={handleChange}
               required
               placeholder="https://example.com/ad-image.jpg"
-              className="w-full rounded-lg border border-gray-300 px-4 py-2.5
+              className="w-full rounded-lg bg-bgPrimary border border-borderColorCustom
+                         px-4 py-2.5 text-textPrimary placeholder:text-textSecondary
                          outline-none transition
-                         focus:border-blue-500 focus:ring-2
-                         focus:ring-blue-500/30"
+                         focus:border-accent focus:ring-2
+                         focus:ring-accent/30"
             />
           </div>
 
@@ -109,8 +115,9 @@ const CreateAd = () => {
             <button
               type="button"
               onClick={() => navigate("/publisher/my-ads")}
-              className="rounded-lg border border-gray-300 px-5 py-2.5
-                         text-gray-700 hover:bg-gray-100 transition"
+              className="rounded-lg border border-borderColorCustom
+                         px-5 py-2.5 text-textSecondary
+                         hover:bg-bgPrimary transition"
             >
               Cancel
             </button>
@@ -121,8 +128,8 @@ const CreateAd = () => {
               className={`rounded-lg px-6 py-2.5 font-medium text-white transition
                 ${
                   loading
-                    ? "bg-gray-400 cursor-not-allowed"
-                    : "bg-blue-600 hover:bg-blue-700"
+                    ? "bg-borderColorCustom cursor-not-allowed"
+                    : "bg-accent hover:bg-accentHover"
                 }`}
             >
               {loading ? "Creating..." : "Create Ad"}
@@ -134,4 +141,4 @@ const CreateAd = () => {
   );
 };
 
-export default CreateAd;
+export default CreateAd;  

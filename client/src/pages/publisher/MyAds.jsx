@@ -24,7 +24,7 @@ const MyAds = () => {
   const handleStatusChange = async (id, status) => {
     try {
       await updateAdStatus(id, status);
-      fetchAds(); // refresh list
+      fetchAds();
     } catch (error) {
       console.error("Error updating status:", error);
     }
@@ -34,7 +34,7 @@ const MyAds = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <div className="animate-spin h-10 w-10 rounded-full border-4 border-blue-600 border-t-transparent" />
+        <div className="animate-spin h-10 w-10 rounded-full border-4 border-accent border-t-transparent" />
       </div>
     );
   }
@@ -43,18 +43,19 @@ const MyAds = () => {
     <div>
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl font-bold text-gray-800">My Ads</h2>
+        <h2 className="text-2xl font-semibold text-textPrimary">My Ads</h2>
       </div>
 
       {ads.length === 0 ? (
-        <div className="bg-white rounded-xl shadow-sm p-10 text-center text-gray-500">
+        <div className="bg-bgSecondary border border-borderColorCustom rounded-2xl p-10 text-center text-textSecondary">
           No ads found
         </div>
       ) : (
-        <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+        <div className="bg-bgSecondary border border-borderColorCustom rounded-2xl overflow-hidden">
           <table className="w-full border-collapse">
-            <thead className="bg-gray-50 border-b">
-              <tr className="text-left text-sm text-gray-600">
+            {/* Table Head */}
+            <thead className="bg-bgPrimary border-b border-borderColorCustom">
+              <tr className="text-left text-sm text-textSecondary">
                 <th className="px-6 py-3">Title</th>
                 <th className="px-6 py-3">Status</th>
                 <th className="px-6 py-3">Impressions</th>
@@ -67,10 +68,10 @@ const MyAds = () => {
               {ads.map((ad) => (
                 <tr
                   key={ad._id}
-                  className="border-t hover:bg-gray-50 transition"
+                  className="border-t border-borderColorCustom hover:bg-bgPrimary transition"
                 >
                   {/* Title */}
-                  <td className="px-6 py-4 font-medium text-gray-800">
+                  <td className="px-6 py-4 font-medium text-textPrimary">
                     {ad.title}
                   </td>
 
@@ -80,8 +81,8 @@ const MyAds = () => {
                       className={`inline-flex rounded-full px-3 py-1 text-xs font-medium
                         ${
                           ad.status === "active"
-                            ? "bg-green-100 text-green-700"
-                            : "bg-yellow-100 text-yellow-700"
+                            ? "bg-success/20 text-success"
+                            : "bg-warning/20 text-warning"
                         }`}
                     >
                       {ad.status}
@@ -89,14 +90,12 @@ const MyAds = () => {
                   </td>
 
                   {/* Impressions */}
-                  <td className="px-6 py-4 text-gray-600">
+                  <td className="px-6 py-4 text-textSecondary">
                     {ad.impressions}
                   </td>
 
                   {/* Clicks */}
-                  <td className="px-6 py-4 text-gray-600">
-                    {ad.clicks}
-                  </td>
+                  <td className="px-6 py-4 text-textSecondary">{ad.clicks}</td>
 
                   {/* Status Select */}
                   <td className="px-6 py-4">
@@ -105,10 +104,11 @@ const MyAds = () => {
                       onChange={(e) =>
                         handleStatusChange(ad._id, e.target.value)
                       }
-                      className="rounded-lg border border-gray-300 px-3 py-2
-                                 text-sm outline-none
-                                 focus:border-blue-500 focus:ring-2
-                                 focus:ring-blue-500/30"
+                      className="rounded-lg bg-bgPrimary border border-borderColorCustom
+                                 px-3 py-2 text-sm text-textPrimary
+                                 outline-none transition
+                                 focus:border-accent focus:ring-2
+                                 focus:ring-accent/30"
                     >
                       <option value="active">Active</option>
                       <option value="paused">Paused</option>

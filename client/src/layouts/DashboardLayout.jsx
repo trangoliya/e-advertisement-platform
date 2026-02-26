@@ -1,3 +1,7 @@
+import Sidebar from '../components/layout/Sidebar.jsx';
+import Topbar from '../components/layout/Topbar.jsx';
+import { Outlet } from 'react-router-dom';
+
 const DashboardLayout = () => {
   return (
     <div className="min-h-screen flex bg-bgPrimary text-textPrimary">
@@ -14,7 +18,7 @@ const DashboardLayout = () => {
           <Topbar />
         </header>
 
-        <main className="flex-1 p-6 overflow-y-auto">
+        <main className="flex-1 p-6 overflow-y-auto bg-bgPrimary">
           <Outlet />
         </main>
 
