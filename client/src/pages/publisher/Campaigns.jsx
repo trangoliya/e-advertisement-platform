@@ -1,5 +1,8 @@
 import { useEffect, useState } from "react";
-import { createCampaign, getMyCampaigns } from "../../services/campaign.service";
+import {
+  createCampaign,
+  getMyCampaigns,
+} from "../../services/campaign.service";
 
 const Campaigns = () => {
   const [campaigns, setCampaigns] = useState([]);
@@ -44,7 +47,6 @@ const Campaigns = () => {
 
   return (
     <div className="p-6 space-y-8">
-      
       {/* Page Header */}
       <div>
         <h1 className="text-2xl font-bold text-white">Campaigns</h1>
@@ -102,54 +104,87 @@ const Campaigns = () => {
 
       {/* Campaign List */}
       <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 shadow-lg">
-        <h2 className="text-lg font-semibold text-white mb-4">
-          My Campaigns
-        </h2>
+        <h2 className="text-lg font-semibold text-white mb-4">My Campaigns</h2>
 
         <div className="overflow-x-auto">
           <table className="w-full text-sm text-left">
             <thead className="text-gray-400 border-b border-zinc-800">
               <tr>
                 <th className="py-3">Name</th>
-                <th className="py-3">Budget</th>
+                <th className="py-3">Total</th>
+                <th className="py-3">Spent</th>
+                <th className="py-3">Remaining</th>
                 <th className="py-3">Status</th>
+                <th className="py-3">Progress</th>
               </tr>
             </thead>
 
             <tbody>
               {campaigns.length === 0 ? (
                 <tr>
-                  <td colSpan="3" className="py-6 text-center text-gray-500">
+                  <td colSpan="6" className="py-6 text-center text-gray-500">
                     No campaigns created yet
                   </td>
                 </tr>
               ) : (
-                campaigns.map((campaign) => (
-                  <tr
-                    key={campaign._id}
-                    className="border-b border-zinc-800 hover:bg-zinc-800/40 transition"
-                  >
-                    <td className="py-4 text-white font-medium">
-                      {campaign.name}
-                    </td>
-                    <td className="py-4 text-gray-300">
-                      ₹ {campaign.totalBudget}
-                    </td>
-                    <td className="py-4">
-                      <span
-                        className={`px-3 py-1 rounded-full text-xs font-medium ${
-                          campaign.status === "active"
-                            ? "bg-green-500/20 text-green-400"
-                            : campaign.status === "paused"
-                            ? "bg-yellow-500/20 text-yellow-400"
-                            : "bg-red-500/20 text-red-400"
-                        }`}
-                      >
-                        {campaign.status}
-                      </span>
-                    </td>
-                  </tr>
-                ))
+                campaigns.map((campaign) => {
+                  const remaining = campaign.totalBudget - campaign.spentBudget;
+
+                  const percentage =
+                    (campaign.spentBudget / campaign.totalBudget) * 100;
+
+                  return (
+                    <tr
+                      key={campaign._id}
+                      className="border-b border-zinc-800 hover:bg-zinc-800/40 transition"
+                    >
+                      <td className="py-4 text-white font-medium">
+                        {campaign.name}
+                      </td>
+
+                      <td className="py-4 text-gray-300">
+                        ₹ {campaign.totalBudget}
+                      </td>
+
+                      <td className="py-4 text-gray-300">
+                        ₹ {campaign.spentBudget}
+                      </td>
+
+                      <td className="py-4 text-gray-300">₹ {remaining}</td>
+
+                      <td className="py-4">
+                        <span
+                          className={`px-3 py-1 rounded-full text-xs font-medium ${
+                            campaign.status === "active"
+                              ? "bg-green-500/20 text-green-400"
+                              : campaign.status === "paused"
+                                ? "bg-yellow-500/20 text-yellow-400"
+                                : "bg-red-500/20 text-red-400"
+                          }`}
+                        >
+                          {campaign.status}
+                        </span>
+                      </td>
+
+                      <td className="py-4 w-48">
+                        <div className="w-full bg-zinc-800 rounded-full h-2">
+                          <div
+                            className={`h-2 rounded-full ${
+                              percentage >= 100
+                                ? "bg-red-500"
+                                : percentage >= 70
+                                  ? "bg-yellow-500"
+                                  : "bg-blue-500"
+                            }`}
+                            style={{
+                              width: `${Math.min(percentage, 100)}%`,
+                            }}
+                          />
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })
               )}
             </tbody>
           </table>
