@@ -7,6 +7,8 @@ import viewerRoutes from "./routes/viewer.routes.js";
 import adminRoutes from "./routes/admin.routes.js";
 import errorHandler from "./middlewares/error.middleware.js";
 
+import campaignRoutes from "./routes/campaign.routes.js";
+
 const app = express();
 app.use(cors({
   origin: "http://localhost:5173",
@@ -19,6 +21,11 @@ app.use("/api/test", testRoutes);
 app.use("/api/ads", adRoutes);
 app.use("/api/viewer", viewerRoutes);
 app.use("/api/admin", adminRoutes);
+
+app.use("/api/campaigns", campaignRoutes);
+app.get("/test", (req, res) => {
+  res.send("Server working");
+});
 
 app.use(errorHandler);
 

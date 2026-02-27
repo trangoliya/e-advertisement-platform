@@ -26,6 +26,12 @@ const adSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+
+    campaign: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Campaign",
+      required: true,
+    },
   },
   { timestamps: true },
 );

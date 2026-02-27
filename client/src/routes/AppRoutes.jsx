@@ -26,6 +26,8 @@ import AdminAds from "../pages/admin/AdminAds.jsx";
 import PublisherPage from "../pages/publisher/PublisherPage.jsx";
 import MyAds from "../pages/publisher/MyAds.jsx";
 import CreateAd from "../pages/publisher/CreateAd.jsx";
+import Analytics from "../pages/publisher/Analytics.jsx";
+import Campaigns from "../pages/publisher/Campaigns.jsx";
 
 // it's a wrapper for protected routes and role-based access controls
 import ProtectedRoute from "./ProtectedRoute.jsx";
@@ -93,6 +95,8 @@ const router = createBrowserRouter([
               { path: "/publisher/dashboard", element: <PublisherPage /> },
               { path: "/publisher/my-ads", element: <MyAds /> },
               { path: "/publisher/create-ad", element: <CreateAd /> },
+              { path: "/publisher/analytics", element: <Analytics /> },
+              { path: "/publisher/campaigns", element: <Campaigns /> },
             ],
           },
         ],

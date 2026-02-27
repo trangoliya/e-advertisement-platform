@@ -13,7 +13,6 @@ const PublisherPage = () => {
       try {
         const res = await getMyAds();
         setAds(res.data); // adjust based on your response structure
-        
       } catch (err) {
         console.error("Error fetching ads", err);
       }
@@ -91,7 +90,7 @@ const PublisherPage = () => {
       </div>
 
       {/* chart */}
-      {ads.length > 0 && (
+      {ads && ads.length > 0 && (
         <div className="bg-bgSecondary border border-borderColorCustom rounded-2xl p-6 mb-8">
           <h3 className="text-lg font-semibold text-textPrimary mb-4">
             Performance Overview

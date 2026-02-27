@@ -9,10 +9,12 @@ import {
 } from "recharts";
 
 const AnalyticsChart = ({ data }) => {
+  if (!data || data.length === 0) return null;
+
   return (
-    <div className="w-full h-80">
-  <ResponsiveContainer width="100%" height="100%" minWidth={0}>
-    <LineChart data={data}>
+    <div className="w-full">
+      <ResponsiveContainer width="100%" aspect={3}>
+        <LineChart data={data}>
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="name" />
           <YAxis />
@@ -24,5 +26,4 @@ const AnalyticsChart = ({ data }) => {
     </div>
   );
 };
-
 export default AnalyticsChart;

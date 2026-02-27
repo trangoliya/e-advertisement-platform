@@ -43,6 +43,9 @@ const Sidebar = () => {
           <Link to="/publisher/analytics" style={linkStyle}>
             Analytics
           </Link>
+          <Link to="/publisher/campaigns" style={linkStyle}>
+            Campaigns
+          </Link>
         </>
       )}
 
