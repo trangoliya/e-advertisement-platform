@@ -1,7 +1,16 @@
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
 import { useEffect, useState } from "react";
 import {
   createCampaign,
   getMyCampaigns,
+  getCampaignAnalytics,
 } from "../../services/campaign.service";
 
 const Campaigns = () => {
@@ -16,7 +25,22 @@ const Campaigns = () => {
     const loadCampaigns = async () => {
       try {
         const data = await getMyCampaigns();
-        setCampaigns(data);
+
+        // Fetch analytics for each campaign
+        const campaignsWithAnalytics = await Promise.all(
+          data.map(async (campaign) => {
+            const analytics = await getCampaignAnalytics(campaign._id);
+
+            return {
+              ...campaign,
+              totalClicks: analytics.data.totalClicks,
+              totalImpressions: analytics.data.totalImpressions,
+              CTR: analytics.data.CTR,
+            };
+          }),
+        );
+
+        setCampaigns(campaignsWithAnalytics);
       } catch (error) {
         console.error("Error fetching campaigns", error);
       }
@@ -107,15 +131,19 @@ const Campaigns = () => {
         <h2 className="text-lg font-semibold text-white mb-4">My Campaigns</h2>
 
         <div className="overflow-x-auto">
-          <table className="w-full text-sm text-left">
-            <thead className="text-gray-400 border-b border-zinc-800">
+          <table className="w-full text-sm">
+            <thead className="text-gray-500 border-b border-zinc-800 uppercase tracking-wide text-xs">
               <tr>
-                <th className="py-3">Name</th>
-                <th className="py-3">Total</th>
-                <th className="py-3">Spent</th>
-                <th className="py-3">Remaining</th>
-                <th className="py-3">Status</th>
-                <th className="py-3">Progress</th>
+                <th className="py-4 text-left">Name</th>
+                <th className="py-4 text-center">Total</th>
+                <th className="py-4 text-center">Spent</th>
+                <th className="py-4 text-center">Remaining</th>
+                <th className="py-4 text-center">Status</th>
+                <th className="py-4 text-center">Progress</th>
+                <th className="py-4 text-center">Impressions</th>
+                <th className="py-4 text-center">Clicks</th>
+                <th className="py-4 text-center">CTR %</th>
+                <th className="py-4 text-center">Performance</th>
               </tr>
             </thead>
 
@@ -132,27 +160,35 @@ const Campaigns = () => {
 
                   const percentage =
                     (campaign.spentBudget / campaign.totalBudget) * 100;
-
+                  const chartData = [
+                    {
+                      name: "Performance",
+                      impressions: campaign.totalImpressions || 0,
+                      clicks: campaign.totalClicks || 0,
+                    },
+                  ];
                   return (
                     <tr
                       key={campaign._id}
-                      className="border-b border-zinc-800 hover:bg-zinc-800/40 transition"
+                      className="border-b border-zinc-800 hover:bg-zinc-800/40 transition duration-200"
                     >
-                      <td className="py-4 text-white font-medium">
+                      <td className="py-5 text-white font-semibold text-left">
                         {campaign.name}
                       </td>
 
-                      <td className="py-4 text-gray-300">
+                      <td className="py-5 text-gray-300 text-center">
                         ₹ {campaign.totalBudget}
                       </td>
 
-                      <td className="py-4 text-gray-300">
+                      <td className="py-5 text-gray-300 text-center">
                         ₹ {campaign.spentBudget}
                       </td>
 
-                      <td className="py-4 text-gray-300">₹ {remaining}</td>
+                      <td className="py-5 text-gray-300 text-center">
+                        ₹ {remaining}
+                      </td>
 
-                      <td className="py-4">
+                      <td className="py-5 text-center">
                         <span
                           className={`px-3 py-1 rounded-full text-xs font-medium ${
                             campaign.status === "active"
@@ -166,7 +202,7 @@ const Campaigns = () => {
                         </span>
                       </td>
 
-                      <td className="py-4 w-48">
+                      <td className="py-5 text-center">
                         <div className="w-full bg-zinc-800 rounded-full h-2">
                           <div
                             className={`h-2 rounded-full ${
@@ -180,6 +216,30 @@ const Campaigns = () => {
                               width: `${Math.min(percentage, 100)}%`,
                             }}
                           />
+                        </div>
+                      </td>
+                      <td className="py-5 text-gray-300 text-center">
+                        {campaign.totalImpressions || 0}
+                      </td>
+
+                      <td className="py-5 text-gray-300 text-center">
+                        {campaign.totalClicks || 0}
+                      </td>
+
+                      <td className="py-5 text-gray-300 text-center">
+                        {campaign.CTR || 0}%
+                      </td>
+                      <td className="py-5 text-center w-64">
+                        <div className="w-full min-h-25">
+                          <ResponsiveContainer width="100%" height={100}>
+                            <BarChart data={chartData}>
+                              <XAxis dataKey="name" hide />
+                              <YAxis hide />
+                              <Tooltip />
+                              <Bar dataKey="impressions" fill="#3b82f6" />
+                              <Bar dataKey="clicks" fill="#22c55e" />
+                            </BarChart>
+                          </ResponsiveContainer>
                         </div>
                       </td>
                     </tr>
