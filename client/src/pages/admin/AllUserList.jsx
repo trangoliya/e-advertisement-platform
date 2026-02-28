@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { getAllUsers } from "../../services/admin.service";
+import StatusBadge from "../../components/common/StatusBadge";
 
 const AllUserList = () => {
   const [users, setUsers] = useState([]);
@@ -31,25 +32,23 @@ const AllUserList = () => {
   }
 
   return (
-    <div>
+    <div className="p-6 space-y-6">
       {/* Header */}
-      <h1 className="text-2xl font-bold text-gray-800 mb-6">
-        All Users
-      </h1>
+      <h1 className="text-3xl font-bold text-gray-800">All Users</h1>
 
       {users.length === 0 ? (
-        <div className="bg-white rounded-xl p-10 text-center text-gray-500">
+        <div className="bg-white border border-gray-100 rounded-2xl p-10 text-center text-gray-500">
           No users found
         </div>
       ) : (
-        <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+        <div className="bg-white border border-gray-100 rounded-2xl overflow-hidden">
           <table className="w-full border-collapse">
             <thead className="bg-gray-50 border-b">
-              <tr className="text-left text-sm text-gray-600">
-                <th className="px-6 py-3">Name</th>
-                <th className="px-6 py-3">Email</th>
-                <th className="px-6 py-3">Role</th>
-                <th className="px-6 py-3">Status</th>
+              <tr className="text-xs uppercase tracking-wider text-gray-500">
+                <th className="px-6 py-4 text-left">Name</th>
+                <th className="px-6 py-4 text-left">Email</th>
+                <th className="px-6 py-4 text-center">Role</th>
+                <th className="px-6 py-4 text-center">Status</th>
               </tr>
             </thead>
 
@@ -57,46 +56,25 @@ const AllUserList = () => {
               {users.map((user) => (
                 <tr
                   key={user._id}
-                  className="border-t hover:bg-gray-50 transition"
+                  className="border-t hover:bg-gray-50 transition duration-200"
                 >
                   {/* Name */}
-                  <td className="px-6 py-4 font-medium text-gray-800">
+                  <td className="px-6 py-5 font-medium text-gray-800">
                     {user.name}
                   </td>
 
                   {/* Email */}
-                  <td className="px-6 py-4 text-gray-600">
-                    {user.email}
-                  </td>
+                  <td className="px-6 py-5 text-gray-600">{user.email}</td>
 
                   {/* Role */}
-                  <td className="px-6 py-4">
-                    <span
-                      className={`inline-flex rounded-full px-3 py-1 text-xs font-medium
-                        ${
-                          user.role === "admin"
-                            ? "bg-red-100 text-red-700"
-                            : user.role === "publisher"
-                            ? "bg-blue-100 text-blue-700"
-                            : "bg-gray-100 text-gray-700"
-                        }`}
-                    >
-                      {user.role}
-                    </span>
+
+                  <td className="px-6 py-5 text-center">
+                    <StatusBadge status={user.role} />
                   </td>
 
                   {/* Status */}
-                  <td className="px-6 py-4">
-                    <span
-                      className={`inline-flex rounded-full px-3 py-1 text-xs font-medium
-                        ${
-                          user.status === "active"
-                            ? "bg-green-100 text-green-700"
-                            : "bg-yellow-100 text-yellow-700"
-                        }`}
-                    >
-                      {user.status || "active"}
-                    </span>
+                  <td className="px-6 py-5 text-center">
+                    <StatusBadge status={user.status || "active"} />
                   </td>
                 </tr>
               ))}

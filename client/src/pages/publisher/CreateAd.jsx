@@ -35,21 +35,18 @@ const CreateAd = () => {
   };
 
   return (
-    <div className="max-w-3xl">
+    <div className="p-6 space-y-6">
       {/* Header */}
-      <div className="mb-6">
-        <h2 className="text-2xl font-semibold text-textPrimary">
-          Create New Ad
-        </h2>
-        <p className="text-sm text-textSecondary">
+      <div className="max-w-3xl space-y-6">
+        <h1 className="text-3xl font-bold text-textPrimary">Create New Ad</h1>
+        <p className="text-sm text-textSecondary mt-1">
           Fill in the details below to publish your advertisement
         </p>
       </div>
 
       {/* Form Card */}
       <div className="bg-bgSecondary border border-borderColorCustom rounded-2xl p-6">
-        <form onSubmit={handleSubmit} className="space-y-6">
-          
+        <form onSubmit={handleSubmit} className="space-y-5">
           {/* Title */}
           <div>
             <label className="block text-sm font-medium text-textSecondary mb-1">
@@ -115,9 +112,9 @@ const CreateAd = () => {
             <button
               type="button"
               onClick={() => navigate("/publisher/my-ads")}
-              className="rounded-lg border border-borderColorCustom
-                         px-5 py-2.5 text-textSecondary
-                         hover:bg-bgPrimary transition"
+              className="rounded-xl border border-borderColorCustom
+             px-5 py-2.5 text-textSecondary font-medium
+             hover:bg-bgPrimary transition duration-200"
             >
               Cancel
             </button>
@@ -125,12 +122,14 @@ const CreateAd = () => {
             <button
               type="submit"
               disabled={loading}
-              className={`rounded-lg px-6 py-2.5 font-medium text-white transition
-                ${
-                  loading
-                    ? "bg-borderColorCustom cursor-not-allowed"
-                    : "bg-accent hover:bg-accentHover"
-                }`}
+              className={`rounded-xl border border-borderColorCustom
+             px-5 py-2.5 text-textSecondary font-medium
+             hover:bg-bgPrimary transition duration-200
+              ${
+                loading
+                  ? "bg-borderColorCustom cursor-not-allowed"
+                  : "bg-accent hover:bg-accentHover active:scale-[0.98]"
+              }`}
             >
               {loading ? "Creating..." : "Create Ad"}
             </button>
@@ -141,4 +140,4 @@ const CreateAd = () => {
   );
 };
 
-export default CreateAd;  
+export default CreateAd;

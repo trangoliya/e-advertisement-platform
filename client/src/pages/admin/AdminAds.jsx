@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { getAllAds, updateAdStatus } from "../../services/admin.service";
-
+import StatusBadge from "../../components/common/StatusBadge";
 const AdminAds = () => {
   const [ads, setAds] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -55,19 +55,19 @@ const AdminAds = () => {
   }
 
   return (
-    <div>
-      <h1 className="text-2xl font-bold text-gray-800 mb-6">Ads Management</h1>
+    <div className="p-6 space-y-6">
+      <h1 className="text-3xl font-bold text-gray-800">Ads Management</h1>
 
-      <div className="bg-white rounded-xl shadow-sm overflow-hidden">
-        <table className="w-full border-collapse">
+      <div className="bg-white border border-gray-100 rounded-2xl overflow-hidden">
+        <table className="w-full text-sm">
           <thead className="bg-gray-50 border-b">
-            <tr className="text-left text-sm text-gray-600">
-              <th className="px-6 py-3">Title</th>
-              <th className="px-6 py-3">Publisher</th>
-              <th className="px-6 py-3">Status</th>
-              <th className="px-6 py-3">Impressions</th>
-              <th className="px-6 py-3">Clicks</th>
-              <th className="px-6 py-3">Action</th>
+            <tr className="text-xs uppercase tracking-wider text-gray-500">
+              <th className="px-6 py-4">Title</th>
+              <th className="px-6 py-4">Publisher</th>
+              <th className="px-6 py-4">Status</th>
+              <th className="px-6 py-4">Impressions</th>
+              <th className="px-6 py-4">Clicks</th>
+              <th className="px-6 py-4 text-center">Action</th>
             </tr>
           </thead>
 
@@ -78,46 +78,39 @@ const AdminAds = () => {
               return (
                 <tr
                   key={ad._id}
-                  className="border-t hover:bg-gray-50 transition"
+                  className="border-t hover:bg-gray-50 transition duration-200"
                 >
                   {/* Title */}
-                  <td className="px-6 py-4 font-medium text-gray-800">
+                  <td className="px-6 py-5 font-medium text-gray-800">
                     {ad.title}
                   </td>
 
                   {/* Publisher */}
-                  <td className="px-6 py-4 text-gray-600">
+                  <td className="px-6 py-5 text-gray-600">
                     {ad.publisher?.name || "Unknown"}
                   </td>
 
                   {/* Status badge */}
-                  <td className="px-6 py-4">
-                    <span
-                      className={`inline-flex rounded-full px-3 py-1 text-xs font-medium
-                        ${
-                          ad.status === "active"
-                            ? "bg-green-100 text-green-700"
-                            : ad.status === "paused"
-                              ? "bg-yellow-100 text-yellow-700"
-                              : "bg-gray-100 text-gray-700"
-                        }`}
-                    >
-                      {ad.status}
-                    </span>
+                  <td className="px-6 py-5 text-center">
+                    <StatusBadge status={ad.status} />
                   </td>
 
                   {/* Impressions */}
-                  <td className="px-6 py-4 text-gray-600">{ad.impressions}</td>
+                  <td className="px-6 py-5 text-gray-600 text-right">
+                    {ad.impressions}
+                  </td>
 
                   {/* Clicks */}
-                  <td className="px-6 py-4 text-gray-600">{ad.clicks}</td>
+                  <td className="px-6 py-5 text-gray-600 text-right">
+                    {ad.clicks}
+                  </td>
 
                   {/* Action button */}
-                  <td className="px-6 py-4">
+                  <td className="px-6 py-5 text-center">
                     <button
                       onClick={() => handleStatusChange(ad)}
                       disabled={isUpdating}
-                      className={`rounded-lg px-4 py-2 text-sm font-medium transition
+                      className={`rounded-xl px-4 py-2 text-sm font-semibold transition duration-200 active:scale-[0.98]
                         ${
                           ad.status === "active"
                             ? "bg-yellow-50 text-yellow-700 hover:bg-yellow-100"

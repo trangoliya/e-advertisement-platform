@@ -66,13 +66,11 @@ const Analytics = () => {
   ];
 
   return (
-    <div>
-      <h1 className="text-2xl font-semibold text-textPrimary mb-6">
-        Analytics
-      </h1>
+    <div className="p-6 space-y-6">
+      <h1 className="text-3xl font-bold text-textPrimary">Analytics</h1>
 
       {/* Stat Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 ">
         <StatCard title="Total Impressions" value={totalImpressions} />
         <StatCard title="Total Clicks" value={totalClicks} />
         <StatCard title="CTR (%)" value={`${ctr}%`} />
@@ -80,14 +78,14 @@ const Analytics = () => {
 
       {/* Chart */}
       {ads && ads.length > 0 && (
-  <div className="bg-bgSecondary border border-borderColorCustom rounded-2xl p-6">
-    <h3 className="text-lg font-semibold text-textPrimary mb-4">
-      Weekly Performance
-    </h3>
+        <div className="bg-bgSecondary border border-borderColorCustom rounded-2xl p-6">
+          <h3 className="text-lg font-semibold text-textPrimary mb-4">
+            Weekly Performance
+          </h3>
 
-    <AnalyticsChart data={chartData} />
-  </div>
-)}
+          <AnalyticsChart data={chartData} />
+        </div>
+      )}
     </div>
   );
 };

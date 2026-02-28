@@ -33,19 +33,24 @@ const AdminPage = () => {
   }
 
   return (
-    <div>
-      <h1 className="text-2xl font-bold text-gray-800 mb-6">Admin Dashboard</h1>
+    <div className="p-6 space-y-6">
+      <h1 className="text-3xl font-bold text-gray-800">Admin Dashboard</h1>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-        <div className="bg-white rounded-xl p-6 shadow-sm">
-          <p className="text-sm text-gray-500">Total Users</p>
-          <p className="text-3xl font-bold text-gray-800">{users.length}</p>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="bg-white border border-gray-100 rounded-2xl p-6">
+          <p className="text-xs uppercase tracking-wider text-gray-500">
+            Total Users
+          </p>
+          <p className="text-3xl font-bold text-gray-800 mt-2">
+            {users.length}
+          </p>
         </div>
 
-        <div className="bg-white rounded-xl p-6 shadow-sm">
-          <p className="text-sm text-gray-500">Total Ads</p>
-          <p className="text-3xl font-bold text-gray-800">{ads.length}</p>
+        <div className="bg-white border border-gray-100 rounded-2xl p-6">
+          <p className="text-xs uppercase tracking-wider text-gray-500">
+            Total Ads
+          </p>
+          <p className="text-3xl font-bold text-gray-800 mt-2">{ads.length}</p>
         </div>
       </div>
     </div>

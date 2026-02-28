@@ -12,6 +12,7 @@ import {
   getMyCampaigns,
   getCampaignAnalytics,
 } from "../../services/campaign.service";
+import StatusBadge from "../../components/common/StatusBadge";
 
 const Campaigns = () => {
   const [campaigns, setCampaigns] = useState([]);
@@ -73,7 +74,7 @@ const Campaigns = () => {
     <div className="p-6 space-y-8">
       {/* Page Header */}
       <div>
-        <h1 className="text-2xl font-bold text-white">Campaigns</h1>
+        <h1 className="text-3xl font-bold text-black">Campaigns</h1>
         <p className="text-gray-400 text-sm">
           Create and manage your advertising campaigns
         </p>
@@ -132,25 +133,25 @@ const Campaigns = () => {
 
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
-            <thead className="text-gray-500 border-b border-zinc-800 uppercase tracking-wide text-xs">
+            <thead className="bg-zinc-900/60 text-gray-400 border-b border-zinc-800 uppercase tracking-wider text-xs">
               <tr>
-                <th className="py-4 text-left">Name</th>
-                <th className="py-4 text-center">Total</th>
-                <th className="py-4 text-center">Spent</th>
-                <th className="py-4 text-center">Remaining</th>
-                <th className="py-4 text-center">Status</th>
-                <th className="py-4 text-center">Progress</th>
-                <th className="py-4 text-center">Impressions</th>
-                <th className="py-4 text-center">Clicks</th>
-                <th className="py-4 text-center">CTR %</th>
-                <th className="py-4 text-center">Performance</th>
+                <th className="px-6 py-4 text-left">Name</th>
+                <th className="px-6 py-4 text-center">Total</th>
+                <th className="px-6 py-4 text-center">Spent</th>
+                <th className="px-6 py-4 text-center">Remaining</th>
+                <th className="px-6 py-4 text-center">Status</th>
+                <th className="px-6 py-4 text-center">Progress</th>
+                <th className="px-6 py-4 text-center">Impressions</th>
+                <th className="px-6 py-4 text-center">Clicks</th>
+                <th className="px-6 py-4 text-center whitespace-nowrap">CTR %</th>
+                <th className="px-6 py-4 text-center">Performance</th>
               </tr>
             </thead>
 
             <tbody>
               {campaigns.length === 0 ? (
                 <tr>
-                  <td colSpan="6" className="py-6 text-center text-gray-500">
+                  <td colSpan="10" className="py-8 text-center text-gray-500">
                     No campaigns created yet
                   </td>
                 </tr>
@@ -170,42 +171,32 @@ const Campaigns = () => {
                   return (
                     <tr
                       key={campaign._id}
-                      className="border-b border-zinc-800 hover:bg-zinc-800/40 transition duration-200"
+                      className="border-b border-zinc-800 hover:bg-zinc-800/50 transition duration-200"
                     >
-                      <td className="py-5 text-white font-semibold text-left">
+                      <td className="px-6 py-6 text-white font-semibold text-left">
                         {campaign.name}
                       </td>
 
-                      <td className="py-5 text-gray-300 text-center">
+                      <td className="px-6 py-5 text-gray-300 text-right whitespace-nowrap">
                         ₹ {campaign.totalBudget}
                       </td>
 
-                      <td className="py-5 text-gray-300 text-center">
+                      <td className="px-6 py-5 text-gray-300 text-right">
                         ₹ {campaign.spentBudget}
                       </td>
 
-                      <td className="py-5 text-gray-300 text-center">
+                      <td className="px-6 py-5 text-gray-300 text-right">
                         ₹ {remaining}
                       </td>
 
-                      <td className="py-5 text-center">
-                        <span
-                          className={`px-3 py-1 rounded-full text-xs font-medium ${
-                            campaign.status === "active"
-                              ? "bg-green-500/20 text-green-400"
-                              : campaign.status === "paused"
-                                ? "bg-yellow-500/20 text-yellow-400"
-                                : "bg-red-500/20 text-red-400"
-                          }`}
-                        >
-                          {campaign.status}
-                        </span>
+                      <td className="px-6 py-5 text-center">
+                        <StatusBadge status={campaign.status} />
                       </td>
 
-                      <td className="py-5 text-center">
-                        <div className="w-full bg-zinc-800 rounded-full h-2">
+                     <td className="px-6 py-5 text-center w-40">
+                        <div className="w-full bg-zinc-800 rounded-full h-2.5">
                           <div
-                            className={`h-2 rounded-full ${
+                            className={`h-2.5 rounded-full ${
                               percentage >= 100
                                 ? "bg-red-500"
                                 : percentage >= 70
@@ -218,18 +209,18 @@ const Campaigns = () => {
                           />
                         </div>
                       </td>
-                      <td className="py-5 text-gray-300 text-center">
+                      <td className="px-6 py-5 text-gray-300 text-right">
                         {campaign.totalImpressions || 0}
                       </td>
 
-                      <td className="py-5 text-gray-300 text-center">
+                      <td className="px-6 py-5 text-gray-300 text-right">
                         {campaign.totalClicks || 0}
                       </td>
 
-                      <td className="py-5 text-gray-300 text-center">
+                      <td className="px-6 py-5 text-gray-300 text-right">
                         {campaign.CTR || 0}%
                       </td>
-                      <td className="py-5 text-center w-64">
+                      <td className="px-6 py-5 text-center w-64">
                         <div className="w-full min-h-25">
                           <ResponsiveContainer width="100%" height={100}>
                             <BarChart data={chartData}>

@@ -3,6 +3,8 @@ import StatCard from "../../components/common/StatCard.jsx";
 import { useEffect, useState } from "react";
 import AnalyticsChart from "../../components/ads/AnalyticsChart.jsx";
 import { getMyAds } from "../../services/ad.service";
+
+import StatusBadge from "../../components/common/StatusBadge";
 const PublisherPage = () => {
   const navigate = useNavigate();
 
@@ -65,24 +67,26 @@ const PublisherPage = () => {
     },
   ];
   return (
-    <div>
+    <div className="p-6 space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-semibold text-textPrimary">
+      <div className="flex items-center justify-between ">
+        <h1 className="text-3xl font-bold text-textPrimary">
           Publisher Dashboard
         </h1>
 
         <button
           onClick={() => navigate("/publisher/create-ad")}
-          className="rounded-lg bg-accent px-6 py-2
-                     text-white font-medium hover:bg-accentHover transition"
+          className="rounded-xl bg-accent px-6 py-2.5
+           text-blue-400 font-semibold
+           transition duration-200
+           hover:bg-accentHover active:scale-[0.98]"
         >
           + Add New Ad
         </button>
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 ">
         <StatCard title="Total Ads" value={totalAds} />
         <StatCard title="Active Ads" value={activeAds} />
         <StatCard title="Total Clicks" value={totalClicks} />
@@ -91,7 +95,7 @@ const PublisherPage = () => {
 
       {/* chart */}
       {ads && ads.length > 0 && (
-        <div className="bg-bgSecondary border border-borderColorCustom rounded-2xl p-6 mb-8">
+        <div className="bg-bgSecondary border border-borderColorCustom rounded-2xl p-6 ">
           <h3 className="text-lg font-semibold text-textPrimary mb-4">
             Performance Overview
           </h3>
@@ -101,43 +105,32 @@ const PublisherPage = () => {
       )}
       {/* Ads Table */}
       <div className="bg-bgSecondary border border-borderColorCustom rounded-2xl overflow-hidden">
-        <table className="w-full border-collapse">
+        <table className="w-full text-sm">
           <thead className="bg-bgPrimary border-b border-borderColorCustom">
-            <tr className="text-left text-sm text-textSecondary">
-              <th className="px-6 py-3">Ad Title</th>
-              <th className="px-6 py-3">Status</th>
-              <th className="px-6 py-3">Clicks</th>
+            <tr className="text-xs uppercase tracking-wider text-textSecondary">
+              <th className="px-6 py-4 text-left">Ad Title</th>
+              <th className="px-6 py-4 text-center">Status</th>
+              <th className="px-6 py-4 text-right">Clicks</th>
             </tr>
           </thead>
 
           <tbody>
-            {/* Sample Row 1 */}
-            <tr className="border-t border-borderColorCustom hover:bg-bgPrimary transition">
-              <td className="px-6 py-4 text-textPrimary">
-                Summer Sale Campaign
-              </td>
+            {ads.slice(0, 5).map((ad) => (
+              <tr
+                key={ad._id}
+                className="border-t border-borderColorCustom hover:bg-bgPrimary transition duration-200"
+              >
+                <td className="px-6 py-5 text-textPrimary">{ad.title}</td>
 
-              <td className="px-6 py-4">
-                <span className="rounded-full bg-success/20 px-3 py-1 text-xs font-medium text-success">
-                  Active
-                </span>
-              </td>
+                <td className="px-6 py-5 text-center">
+                  <StatusBadge status={ad.status} />
+                </td>
 
-              <td className="px-6 py-4 text-textSecondary">342</td>
-            </tr>
-
-            {/* Sample Row 2 */}
-            <tr className="border-t border-borderColorCustom hover:bg-bgPrimary transition">
-              <td className="px-6 py-4 text-textPrimary">New Product Launch</td>
-
-              <td className="px-6 py-4">
-                <span className="rounded-full bg-warning/20 px-3 py-1 text-xs font-medium text-warning">
-                  Paused
-                </span>
-              </td>
-
-              <td className="px-6 py-4 text-textSecondary">189</td>
-            </tr>
+                <td className="px-6 py-5 text-textSecondary text-right">
+                  {ad.clicks}
+                </td>
+              </tr>
+            ))}
           </tbody>
         </table>
       </div>
