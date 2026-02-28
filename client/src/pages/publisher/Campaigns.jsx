@@ -13,40 +13,49 @@ import {
   getCampaignAnalytics,
 } from "../../services/campaign.service";
 import StatusBadge from "../../components/common/StatusBadge";
+import Button from "../../components/common/Button";
+import Loader from "../../components/common/Loader";
 
 const Campaigns = () => {
   const [campaigns, setCampaigns] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [creating, setCreating] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
+
   const [formData, setFormData] = useState({
     name: "",
     description: "",
     totalBudget: "",
   });
 
+  const loadCampaigns = async () => {
+    try {
+      setLoading(true);
+
+      const data = await getMyCampaigns();
+
+      const campaignsWithAnalytics = await Promise.all(
+        data.map(async (campaign) => {
+          const analytics = await getCampaignAnalytics(campaign._id);
+
+          return {
+            ...campaign,
+            totalClicks: analytics.data.totalClicks || 0,
+            totalImpressions: analytics.data.totalImpressions || 0,
+            CTR: analytics.data.CTR || 0,
+          };
+        }),
+      );
+
+      setCampaigns(campaignsWithAnalytics);
+    } catch (error) {
+      console.error("Error fetching campaigns", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const loadCampaigns = async () => {
-      try {
-        const data = await getMyCampaigns();
-
-        // Fetch analytics for each campaign
-        const campaignsWithAnalytics = await Promise.all(
-          data.map(async (campaign) => {
-            const analytics = await getCampaignAnalytics(campaign._id);
-
-            return {
-              ...campaign,
-              totalClicks: analytics.data.totalClicks,
-              totalImpressions: analytics.data.totalImpressions,
-              CTR: analytics.data.CTR,
-            };
-          }),
-        );
-
-        setCampaigns(campaignsWithAnalytics);
-      } catch (error) {
-        console.error("Error fetching campaigns", error);
-      }
-    };
-
     loadCampaigns();
   }, []);
 
@@ -60,27 +69,43 @@ const Campaigns = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      setCreating(true);
       await createCampaign(formData);
+
       setFormData({ name: "", description: "", totalBudget: "" });
 
-      const data = await getMyCampaigns();
-      setCampaigns(data);
+      await loadCampaigns();
+      document.getElementById("campaign-list")?.scrollIntoView({
+        behavior: "smooth",
+      });
+      setSuccessMessage("Campaign created successfully.");
+
+      setTimeout(() => {
+        setSuccessMessage("");
+      }, 3000);
     } catch (error) {
       console.error("Error creating campaign", error);
+    } finally {
+      setCreating(false);
     }
   };
 
   return (
-    <div className="p-6 space-y-8">
-      {/* Page Header */}
+    <div className="p-6 space-y-8 min-h-150">
+      {/* Header */}
       <div>
         <h1 className="text-3xl font-bold text-black">Campaigns</h1>
+        {successMessage && (
+          <div className="bg-green-500/10 border border-green-500/30 text-green-400 rounded-xl p-4">
+            {successMessage}
+          </div>
+        )}
         <p className="text-gray-400 text-sm">
           Create and manage your advertising campaigns
         </p>
       </div>
 
-      {/* Create Campaign Card */}
+      {/* Create Campaign */}
       <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 shadow-lg">
         <h2 className="text-lg font-semibold text-white mb-4">
           Create New Campaign
@@ -94,7 +119,7 @@ const Campaigns = () => {
             value={formData.name}
             onChange={handleChange}
             required
-            className="bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-2 text-white focus:ring-2 focus:ring-blue-500"
           />
 
           <input
@@ -103,7 +128,7 @@ const Campaigns = () => {
             placeholder="Description"
             value={formData.description}
             onChange={handleChange}
-            className="bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-2 text-white focus:ring-2 focus:ring-blue-500"
           />
 
           <input
@@ -113,71 +138,75 @@ const Campaigns = () => {
             value={formData.totalBudget}
             onChange={handleChange}
             required
-            className="bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-2 text-white focus:ring-2 focus:ring-blue-500"
           />
 
           <div className="md:col-span-3 flex justify-end">
-            <button
-              type="submit"
-              className="bg-blue-600 hover:bg-blue-700 transition px-6 py-2 rounded-xl text-white font-medium"
-            >
-              Create Campaign
-            </button>
+            <Button type="submit" disabled={creating}>
+              {creating ? "Creating..." : "Create Campaign"}
+            </Button>
           </div>
         </form>
       </div>
 
       {/* Campaign List */}
-      <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 shadow-lg">
+      <div id="campaign-list" className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 shadow-lg min-h-75">
         <h2 className="text-lg font-semibold text-white mb-4">My Campaigns</h2>
 
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead className="bg-zinc-900/60 text-gray-400 border-b border-zinc-800 uppercase tracking-wider text-xs">
-              <tr>
-                <th className="px-6 py-4 text-left">Name</th>
-                <th className="px-6 py-4 text-center">Total</th>
-                <th className="px-6 py-4 text-center">Spent</th>
-                <th className="px-6 py-4 text-center">Remaining</th>
-                <th className="px-6 py-4 text-center">Status</th>
-                <th className="px-6 py-4 text-center">Progress</th>
-                <th className="px-6 py-4 text-center">Impressions</th>
-                <th className="px-6 py-4 text-center">Clicks</th>
-                <th className="px-6 py-4 text-center whitespace-nowrap">CTR %</th>
-                <th className="px-6 py-4 text-center">Performance</th>
-              </tr>
-            </thead>
-
-            <tbody>
-              {campaigns.length === 0 ? (
+        {loading ? (
+          <div className="flex justify-center py-20">
+            <Loader />
+          </div>
+        ) : campaigns.length === 0 ? (
+          <div className="py-16 text-center space-y-3">
+            <p className="text-gray-400 font-medium">No campaigns available.</p>
+            <p className="text-xs text-gray-500">
+              Create a campaign to start running ads.
+            </p>
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead className="text-gray-400 border-b border-zinc-800 uppercase tracking-wider text-xs">
                 <tr>
-                  <td colSpan="10" className="py-8 text-center text-gray-500">
-                    No campaigns created yet
-                  </td>
+                  <th className="px-6 py-4 text-left">Name</th>
+                  <th className="px-6 py-4 text-center">Total</th>
+                  <th className="px-6 py-4 text-center">Spent</th>
+                  <th className="px-6 py-4 text-center">Remaining</th>
+                  <th className="px-6 py-4 text-center">Status</th>
+                  <th className="px-6 py-4 text-center">Progress</th>
+                  <th className="px-6 py-4 text-center">Impressions</th>
+                  <th className="px-6 py-4 text-center">Clicks</th>
+                  <th className="px-6 py-4 text-center">CTR %</th>
+                  <th className="px-6 py-4 text-center">Performance</th>
                 </tr>
-              ) : (
-                campaigns.map((campaign) => {
+              </thead>
+
+              <tbody>
+                {campaigns.map((campaign) => {
                   const remaining = campaign.totalBudget - campaign.spentBudget;
 
                   const percentage =
                     (campaign.spentBudget / campaign.totalBudget) * 100;
+
                   const chartData = [
                     {
                       name: "Performance",
-                      impressions: campaign.totalImpressions || 0,
-                      clicks: campaign.totalClicks || 0,
+                      impressions: campaign.totalImpressions,
+                      clicks: campaign.totalClicks,
                     },
                   ];
+
                   return (
                     <tr
                       key={campaign._id}
                       className="border-b border-zinc-800 hover:bg-zinc-800/50 transition duration-200"
                     >
-                      <td className="px-6 py-6 text-white font-semibold text-left">
+                      <td className="px-6 py-6 text-white font-semibold">
                         {campaign.name}
                       </td>
 
-                      <td className="px-6 py-5 text-gray-300 text-right whitespace-nowrap">
+                      <td className="px-6 py-5 text-gray-300 text-right">
                         ₹ {campaign.totalBudget}
                       </td>
 
@@ -193,7 +222,7 @@ const Campaigns = () => {
                         <StatusBadge status={campaign.status} />
                       </td>
 
-                     <td className="px-6 py-5 text-center w-40">
+                      <td className="px-6 py-5 text-center w-40">
                         <div className="w-full bg-zinc-800 rounded-full h-2.5">
                           <div
                             className={`h-2.5 rounded-full ${
@@ -209,37 +238,37 @@ const Campaigns = () => {
                           />
                         </div>
                       </td>
+
                       <td className="px-6 py-5 text-gray-300 text-right">
-                        {campaign.totalImpressions || 0}
+                        {campaign.totalImpressions}
                       </td>
 
                       <td className="px-6 py-5 text-gray-300 text-right">
-                        {campaign.totalClicks || 0}
+                        {campaign.totalClicks}
                       </td>
 
                       <td className="px-6 py-5 text-gray-300 text-right">
-                        {campaign.CTR || 0}%
+                        {campaign.CTR}%
                       </td>
+
                       <td className="px-6 py-5 text-center w-64">
-                        <div className="w-full min-h-25">
-                          <ResponsiveContainer width="100%" height={100}>
-                            <BarChart data={chartData}>
-                              <XAxis dataKey="name" hide />
-                              <YAxis hide />
-                              <Tooltip />
-                              <Bar dataKey="impressions" fill="#3b82f6" />
-                              <Bar dataKey="clicks" fill="#22c55e" />
-                            </BarChart>
-                          </ResponsiveContainer>
-                        </div>
+                        <ResponsiveContainer width="100%" height={100}>
+                          <BarChart data={chartData}>
+                            <XAxis dataKey="name" hide />
+                            <YAxis hide />
+                            <Tooltip />
+                            <Bar dataKey="impressions" fill="#3b82f6" />
+                            <Bar dataKey="clicks" fill="#22c55e" />
+                          </BarChart>
+                        </ResponsiveContainer>
                       </td>
                     </tr>
                   );
-                })
-              )}
-            </tbody>
-          </table>
-        </div>
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
     </div>
   );
