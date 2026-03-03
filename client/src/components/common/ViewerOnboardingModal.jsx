@@ -1,49 +1,64 @@
 import { useState } from "react";
 import { saveViewerProfile } from "../../services/viewer.service";
-import Button from "./Button.jsx";
+import { useAuth } from "../../context/AuthContext";
 
-const interestsOptions = [
+const interestsList = [
   "Technology",
-  "Fitness",
   "Finance",
-  "Travel",
   "Gaming",
+  "Fitness",
+  "Travel",
   "Education",
 ];
 
-const ViewerOnboardingModal = ({ user, onClose, onComplete }) => {
+const ViewerOnboardingModal = () => {
+  const { setUser } = useAuth();
+
   const [age, setAge] = useState("");
   const [city, setCity] = useState("");
   const [interests, setInterests] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
 
-  const handleInterestChange = (value) => {
-    setInterests((prev) =>
-      prev.includes(value)
-        ? prev.filter((item) => item !== value)
-        : [...prev, value],
-    );
+  const handleInterestChange = (interest) => {
+    if (interests.includes(interest)) {
+      setInterests(interests.filter((i) => i !== interest));
+    } else {
+      setInterests([...interests, interest]);
+    }
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    if (!age || !city) {
-      alert("Please fill all required fields.");
-      return;
-    }
-
+  const handleSubmit = async () => {
     try {
+      if (!age || !city) {
+        alert("Age and city are required");
+        return;
+      }
+
+      if (interests.length === 0) {
+        alert("Select at least one interest");
+        return;
+      }
+
       setLoading(true);
 
-      await saveViewerProfile({
+      const response = await saveViewerProfile({
         age: Number(age),
         city: city.trim(),
         interests,
       });
 
-      onComplete(); // updates profileCompleted
-      onClose(); // close modal
+      if (response.data.success) {
+        setSuccessMessage("Profile saved successfully!");
+
+        // Small delay so user sees success
+        setTimeout(() => {
+          setUser((prev) => ({
+            ...prev,
+            profileCompleted: true,
+          }));
+        }, 800);
+      }
     } catch (error) {
       console.error("Profile save error:", error);
     } finally {
@@ -52,57 +67,57 @@ const ViewerOnboardingModal = ({ user, onClose, onComplete }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-2xl w-full max-w-md p-6 shadow-lg">
-        {/* Greeting Section */}
-        <h2 className="text-2xl font-semibold mb-1">
-          Good to see you, {user?.name} 👋
-        </h2>
-        <p className="text-sm text-gray-500 mb-4">
-          Let’s personalize your experience.
-        </p>
+    <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
+      <div
+        className="bg-white w-full max-w-md rounded-2xl p-6 shadow-xl"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <h2 className="text-xl font-semibold mb-4">Complete Your Profile</h2>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <input
-            type="number"
-            placeholder="Your Age"
-            value={age}
-            onChange={(e) => setAge(e.target.value)}
-            className="w-full border rounded-lg p-2"
-          />
+        <input
+          type="number"
+          placeholder="Age"
+          className="w-full mb-3 p-2 border rounded-lg"
+          value={age}
+          onChange={(e) => setAge(e.target.value)}
+          disabled={loading}
+        />
 
-          <input
-            type="text"
-            placeholder="Your City"
-            value={city}
-            onChange={(e) => setCity(e.target.value)}
-            className="w-full border rounded-lg p-2"
-          />
+        <input
+          type="text"
+          placeholder="City"
+          className="w-full mb-3 p-2 border rounded-lg"
+          value={city}
+          onChange={(e) => setCity(e.target.value)}
+          disabled={loading}
+        />
 
-          <div>
-            <p className="mb-2 font-medium">Select Interests:</p>
-            <div className="grid grid-cols-2 gap-2">
-              {interestsOptions.map((interest) => (
-                <label key={interest} className="flex items-center gap-2">
-                  <input
-                    type="checkbox"
-                    checked={interests.includes(interest)}
-                    onChange={() => handleInterestChange(interest)}
-                  />
-                  {interest}
-                </label>
-              ))}
-            </div>
-          </div>
+        <div className="mb-4">
+          <p className="mb-2 font-medium">Interests</p>
+          {interestsList.map((interest) => (
+            <label key={interest} className="block mb-1">
+              <input
+                type="checkbox"
+                checked={interests.includes(interest)}
+                onChange={() => handleInterestChange(interest)}
+                disabled={loading}
+              />
+              <span className="ml-2">{interest}</span>
+            </label>
+          ))}
+        </div>
 
-          <Button
-            type="submit"
-            disabled={loading || !age || !city}
-            
-          >
-            {loading ? "Saving..." : "Save & Continue"}
-          </Button>
-        </form>
+        {successMessage && (
+          <p className="text-green-600 text-sm mb-3">{successMessage}</p>
+        )}
+
+        <button
+          onClick={handleSubmit}
+          disabled={loading}
+          className="w-full bg-black text-white py-2 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {loading ? "Saving..." : "Save & Continue"}
+        </button>
       </div>
     </div>
   );

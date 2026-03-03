@@ -1,53 +1,31 @@
-import Sidebar from "../components/layout/Sidebar.jsx";
-import Topbar from "../components/layout/Topbar.jsx";
-import { Outlet } from "react-router-dom";
-import ViewerOnboardingModal from "../components/common/ViewerOnboardingModal";
+import { useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
+import ViewerOnboardingModal from "../components/common/ViewerOnboardingModal";
 
-const DashboardLayout = () => {
-  const { user, setUser } = useAuth();
+const DashboardLayout = ({ children }) => {
+  const { user } = useAuth();
 
-  const showModal = user?.role === "viewer" && !user?.profileCompleted;
+  const shouldShowOnboarding =
+    user?.role === "viewer" && !user?.profileCompleted;
 
-  const handleComplete = () => {
-    const updatedUser = {
-      ...user,
-      profileCompleted: true,
+  // Only side-effect: lock background scroll
+  useEffect(() => {
+    if (shouldShowOnboarding) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "auto";
+    }
+
+    return () => {
+      document.body.style.overflow = "auto";
     };
-
-    setUser(updatedUser);
-    // Update localStorage as well
-    localStorage.setItem("user", JSON.stringify(updatedUser));
-  };
+  }, [shouldShowOnboarding]);
 
   return (
     <>
-      {/* Onboarding Modal */}
-      {showModal && (
-        <ViewerOnboardingModal
-          user={user}
-          onClose={() => {}}
-          onComplete={handleComplete}
-        />
-      )}
+      {shouldShowOnboarding && <ViewerOnboardingModal />}
 
-      <div className="min-h-screen flex bg-bgPrimary text-textPrimary">
-        {/* Sidebar */}
-        <aside className="hidden md:flex w-64 bg-bgSecondary border-r border-borderColorCustom">
-          <Sidebar />
-        </aside>
-
-        {/* Main */}
-        <div className="flex flex-col flex-1">
-          <header className="sticky top-0 z-40 bg-bgSecondary border-b border-borderColorCustom">
-            <Topbar />
-          </header>
-
-          <main className="flex-1 p-6 overflow-y-auto bg-bgPrimary">
-            <Outlet />
-          </main>
-        </div>
-      </div>
+      <div className="dashboard-layout">{children}</div>
     </>
   );
 };
