@@ -12,7 +12,7 @@ const adSchema = new mongoose.Schema(
       default: "draft",
     },
 
-    createBy: {
+    createdBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
     },

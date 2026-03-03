@@ -17,3 +17,27 @@ export const updateAdStatus = async (id, status) => {
   const response = await api.patch(`/api/ads/${id}/status`, { status });
   return response.data;
 };
+
+// Get Active Ads (for viewer feed)
+export const getActiveAds = async () => {
+  const response = await api.get("/api/ads/active");
+  return response.data;
+};
+
+// Get Ad By ID
+export const getAdById = async (id) => {
+  const response = await api.get(`/api/ads/${id}`);
+  return response.data;
+};
+
+// Increment Click
+export const incrementClick = async (id) => {
+  const response = await api.patch(`/api/ads/${id}/click`);
+  return response.data;
+};
+
+// Increment Impression
+export const incrementImpression = async (id) => {
+  const response = await api.patch(`/api/ads/${id}/impression`);
+  return response.data;
+};

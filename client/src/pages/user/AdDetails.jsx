@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { getAdById, incrementClick } from "../../services/viewer.service";
+import { incrementClick, getAdById } from "../../services/ad.service";
 
 const AdDetails = () => {
   const { id } = useParams();
@@ -70,12 +70,8 @@ const AdDetails = () => {
         )}
 
         {/* Title & Description */}
-        <h2 className="text-2xl font-bold text-gray-800 mb-2">
-          {ad.title}
-        </h2>
-        <p className="text-gray-600 mb-6">
-          {ad.description}
-        </p>
+        <h2 className="text-2xl font-bold text-gray-800 mb-2">{ad.title}</h2>
+        <p className="text-gray-600 mb-6">{ad.description}</p>
 
         {/* Stats */}
         <div className="flex items-center gap-6 text-gray-700 mb-6">
@@ -88,9 +84,10 @@ const AdDetails = () => {
           onClick={handleVisit}
           disabled={visiting}
           className={`w-full rounded-lg py-3 font-semibold text-white transition
-            ${visiting
-              ? "bg-gray-400 cursor-not-allowed"
-              : "bg-blue-600 hover:bg-blue-700"
+            ${
+              visiting
+                ? "bg-gray-400 cursor-not-allowed"
+                : "bg-blue-600 hover:bg-blue-700"
             }`}
         >
           {visiting ? "Redirecting..." : "Visit Website"}

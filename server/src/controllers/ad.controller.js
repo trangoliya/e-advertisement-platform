@@ -45,7 +45,7 @@ export const createAd = async (req, res, next) => {
 export const getMyAds = async (req, res, next) => {
   try {
     const ads = await Ad.find({
-      createdBy: req.user._id,
+      createdBy: req.user.id,
     });
     res.status(200).json({
       success: true,
@@ -161,7 +161,9 @@ export const updateAdStatus = async (req, res, next) => {
 
 export const getActiveAds = async (req, res, next) => {
   try {
-    const ads = await Ad.find({ status: "active" });
+    const ads = await Ad.find({ status: "active" })
+      .populate("createdBy", "name avatar") // show publisher info
+      .sort({ createdAt: -1 });
 
     res.status(200).json({
       success: true,
@@ -193,7 +195,7 @@ export const getAdById = async (req, res, next) => {
     console.log("update ad: ", ad);
 
     if (!ad) {
-      return res.status(404).js({
+      return res.status(404).json({
         success: false,
         message: "ad not found",
       });

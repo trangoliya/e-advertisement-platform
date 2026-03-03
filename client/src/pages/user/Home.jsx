@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getActiveAds } from "../../services/viewer.service";
+import { getActiveAds } from "../../services/ad.service";
 import { useNavigate } from "react-router-dom";
 import AdCard from "../../components/ads/AdCard";
 import PPAvatar from "../../assets/PP_Avatar.png";
@@ -12,7 +12,7 @@ const Home = () => {
     const fetchAds = async () => {
       try {
         const res = await getActiveAds();
-        setAds(res.data.data);
+        setAds(res.data);
       } catch (error) {
         console.error("Error fetching ads:", error);
       }

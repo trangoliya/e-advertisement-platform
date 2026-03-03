@@ -1,10 +1,12 @@
 import express from "express";
 import {
   createAd,
+  getActiveAds,
   getMyAds,
   incrementClick,
   incrementImpression,
   updateAdStatus,
+  getAdById,
 } from "../controllers/ad.controller.js";
 import authMiddleware from "../middlewares/auth.middleware.js";
 import roleMiddleware from "../middlewares/role.middleware.js";
@@ -13,29 +15,27 @@ const router = express.Router();
 
 // Post&get only when publisher login
 router.post("/", authMiddleware, roleMiddleware("publisher"), createAd);
-router.get("/my-ads", authMiddleware, roleMiddleware("publisher"), getMyAds);
 
+router.get("/my-ads", authMiddleware, roleMiddleware("publisher"), getMyAds);
 router.patch(
   "/:id/status",
   authMiddleware,
-  roleMiddleware("publisher"),
+  roleMiddleware("admin"), // better practice
   updateAdStatus,
 );
-router.patch(
-  "/:id/impression",
-  authMiddleware,
-  roleMiddleware("publisher"),
-  incrementImpression,
-);
-router.patch(
-  "/:id/click",
-  authMiddleware,
-  roleMiddleware("publisher"),
-  incrementClick,
-);
+
+// Impression & click triggered by viewers
+router.patch("/:id/impression", incrementImpression);
+router.patch("/:id/click", incrementClick);
+
+// Viewer feed
+router.get("/active", getActiveAds);
+
+// Get Ad Details
+router.get("/:id", getAdById);
 
 export default router;
-
+// check in postman
 // 1)
 // new registration [POST] - http://localhost:5000/api/auth/register
 // body -> raw -> JSON

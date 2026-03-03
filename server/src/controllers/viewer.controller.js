@@ -1,5 +1,5 @@
 import ViewerProfile from "../models/ViewerProfile.js";
-import User from "../models/User.js";
+import User from "../models/user.model.js";
 
 // Create or Update - viewer Profile
 export const createOrUpdateProfile = async (req, res) => {
