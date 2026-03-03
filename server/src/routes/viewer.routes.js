@@ -1,16 +1,28 @@
 import express from "express";
 import {
-  getActiveAds,
-  getAdById,
-  incrementClick,
-} from "../controllers/ad.controller.js";
+  createOrUpdateProfile,
+  getProfile,
+} from "../controllers/viewer.controller.js";
+
+import authMiddleware from "../middlewares/auth.middleware.js";
+import authorize from "../middlewares/role.middleware.js"; 
 
 const router = express.Router();
 
-// public router (No authentication need)
+//Create or Update Profile
+router.post(
+  "/profile",
+  authMiddleware,
+  authorize("viewer"),
+  createOrUpdateProfile
+);
 
-router.get("/ads", getActiveAds);
-router.get("/ads/:id", getAdById);
-router.patch("/ads/:id/click", incrementClick);
+// Get Profile
+router.get(
+  "/profile",
+  authMiddleware,
+  authorize("viewer"),
+  getProfile
+);
 
 export default router;

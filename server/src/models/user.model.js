@@ -20,10 +20,14 @@ const userSchema = new mongoose.Schema(
       enum: ["user", "admin", "publisher"],
       default: "user",
     },
+    profileCompleted: {
+      type: Boolean,
+      default: false,
+    },
   },
   { timestamps: true },
 );
 
 const User = mongoose.model("User", userSchema);
 
-export default User; // 👈 THIS LINE IS REQUIRED
+export default User;
