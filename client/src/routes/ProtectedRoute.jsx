@@ -1,10 +1,9 @@
 import { Navigate, Outlet } from "react-router-dom";
-import useAuth from "../hooks/useAuth";
+import { useAuth } from "../context/AuthContext";
 
 const ProtectedRoute = () => {
   const { user, loading } = useAuth();
 
-  /* Loading state */
   if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
@@ -13,12 +12,10 @@ const ProtectedRoute = () => {
     );
   }
 
-  /* Not authenticated */
   if (!user) {
     return <Navigate to="/login" replace />;
   }
 
-  /* Authenticated */
   return <Outlet />;
 };
 

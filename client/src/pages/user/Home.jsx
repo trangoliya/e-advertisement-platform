@@ -3,7 +3,6 @@ import { getActiveAds } from "../../services/ad.service";
 import { useNavigate } from "react-router-dom";
 import AdCard from "../../components/ads/AdCard";
 import PPAvatar from "../../assets/PP_Avatar.png";
-import Topbar from "../../components/layout/Topbar";
 
 const Home = () => {
   const [ads, setAds] = useState([]);
@@ -13,17 +12,17 @@ const Home = () => {
     const fetchAds = async () => {
       try {
         const res = await getActiveAds();
-        setAds(res.data);
+        setAds(res.data || []);
       } catch (error) {
         console.error("Error fetching ads:", error);
       }
     };
+
     fetchAds();
   }, []);
 
   return (
     <div className="min-h-screen bg-gray-100">
-      <Topbar />
       {/* Feed Container */}
       <div className="max-w-xl mx-auto py-8 space-y-8">
         {ads.length === 0 ? (

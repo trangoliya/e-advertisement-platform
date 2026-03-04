@@ -21,11 +21,11 @@ const ViewerOnboardingModal = () => {
   const [successMessage, setSuccessMessage] = useState("");
 
   const handleInterestChange = (interest) => {
-    if (interests.includes(interest)) {
-      setInterests(interests.filter((i) => i !== interest));
-    } else {
-      setInterests([...interests, interest]);
-    }
+    setInterests((prev) =>
+      prev.includes(interest)
+        ? prev.filter((i) => i !== interest)
+        : [...prev, interest],
+    );
   };
 
   const handleSubmit = async () => {
@@ -48,10 +48,9 @@ const ViewerOnboardingModal = () => {
         interests,
       });
 
-      if (response.data.success) {
+      if (response) {
         setSuccessMessage("Profile saved successfully!");
 
-        // Small delay so user sees success
         setTimeout(() => {
           setUser((prev) => ({
             ...prev,
@@ -67,17 +66,14 @@ const ViewerOnboardingModal = () => {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
-      <div
-        className="bg-white w-full max-w-md rounded-2xl p-6 shadow-xl"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <h2 className="text-xl font-semibold mb-4">Complete Your Profile</h2>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
+      <div className="w-full max-w-md p-6 bg-white shadow-xl rounded-2xl">
+        <h2 className="mb-4 text-xl font-semibold">Complete Your Profile</h2>
 
         <input
           type="number"
           placeholder="Age"
-          className="w-full mb-3 p-2 border rounded-lg"
+          className="w-full p-2 mb-3 border rounded-lg"
           value={age}
           onChange={(e) => setAge(e.target.value)}
           disabled={loading}
@@ -86,7 +82,7 @@ const ViewerOnboardingModal = () => {
         <input
           type="text"
           placeholder="City"
-          className="w-full mb-3 p-2 border rounded-lg"
+          className="w-full p-2 mb-3 border rounded-lg"
           value={city}
           onChange={(e) => setCity(e.target.value)}
           disabled={loading}
@@ -108,13 +104,13 @@ const ViewerOnboardingModal = () => {
         </div>
 
         {successMessage && (
-          <p className="text-green-600 text-sm mb-3">{successMessage}</p>
+          <p className="mb-3 text-sm text-green-600">{successMessage}</p>
         )}
 
         <button
           onClick={handleSubmit}
           disabled={loading}
-          className="w-full bg-black text-white py-2 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full py-2 text-white bg-black rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {loading ? "Saving..." : "Save & Continue"}
         </button>

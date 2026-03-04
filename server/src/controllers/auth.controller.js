@@ -2,12 +2,11 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import User from "../models/user.model.js";
 
-// for register function
+// REGISTER
 export const register = async (req, res, next) => {
   try {
     const { name, email, password, role } = req.body;
 
-    // check user using email
     const userExists = await User.findOne({ email });
     if (userExists) {
       return res.status(400).json({
@@ -15,25 +14,42 @@ export const register = async (req, res, next) => {
       });
     }
 
-    // password hashing
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    //
-    await User.create({
+    const user = await User.create({
       name,
       email,
       password: hashedPassword,
       role: role || "user",
+      profileCompleted: false,
     });
+
+    const token = jwt.sign(
+      {
+        id: user._id,
+        role: user.role,
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: "1d" },
+    );
+
     return res.status(201).json({
-      message: "User registered successfully",
+      token,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        profileCompleted: user.profileCompleted,
+      },
     });
   } catch (error) {
     next(error);
   }
 };
 
+// LOGIN
 export const login = async (req, res, next) => {
   try {
     const { email, password } = req.body || {};
@@ -43,32 +59,32 @@ export const login = async (req, res, next) => {
         message: "Email and password are required",
       });
     }
-    // find user in DB
+
     const user = await User.findOne({ email });
+
     if (!user) {
       return res.status(400).json({
-        message: " Invalid email or password",
+        message: "Invalid email or password",
       });
     }
 
-    //password match
     const isMatch = await bcrypt.compare(password, user.password);
+
     if (!isMatch) {
       return res.status(400).json({
-        message: " Invalid email or password",
+        message: "Invalid email or password",
       });
     }
 
-    //make token for login
     const token = jwt.sign(
       {
         id: user._id,
         role: user.role,
       },
       process.env.JWT_SECRET,
-      { expiresIn: "1d" },
+      { expiresIn: "1d" }
     );
-    console.log("Sign secret: ", process.env.JWT_SECRET);
+
     return res.status(200).json({
       token,
       user: {
@@ -76,6 +92,7 @@ export const login = async (req, res, next) => {
         name: user.name,
         email: user.email,
         role: user.role,
+        profileCompleted: user.profileCompleted,
       },
     });
   } catch (error) {

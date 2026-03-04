@@ -6,8 +6,8 @@ import api from "./api";
  */
 export const saveViewerProfile = async (data) => {
   try {
-    const response = await api.post("/viewer/profile", data);
-    return response.data;
+    const res = await api.post("/api/viewer/profile", data);
+    return res.data;
   } catch (error) {
     console.error("Error saving viewer profile:", error);
     throw error;
@@ -20,7 +20,7 @@ export const saveViewerProfile = async (data) => {
  */
 export const getViewerProfile = async () => {
   try {
-    const response = await api.get("/viewer/profile");
+    const response = await api.get("/api/viewer/profile");
     return response.data;
   } catch (error) {
     console.error("Error fetching viewer profile:", error);

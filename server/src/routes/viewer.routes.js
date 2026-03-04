@@ -13,7 +13,7 @@ const router = express.Router();
 router.post(
   "/profile",
   authMiddleware,
-  authorize("viewer"),
+  authorize("user"),
   createOrUpdateProfile
 );
 
@@ -21,7 +21,7 @@ router.post(
 router.get(
   "/profile",
   authMiddleware,
-  authorize("viewer"),
+  authorize("user"),
   getProfile
 );
 

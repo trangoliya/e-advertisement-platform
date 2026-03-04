@@ -1,32 +1,24 @@
-import { useEffect } from "react";
-import { useAuth } from "../context/AuthContext";
-import ViewerOnboardingModal from "../components/common/ViewerOnboardingModal";
+import { Outlet } from "react-router-dom";
+import Sidebar from "../components/layout/Sidebar";
+import Topbar from "../components/layout/Topbar";
 
-const DashboardLayout = ({ children }) => {
-  const { user } = useAuth();
-
-  const shouldShowOnboarding =
-    user?.role === "viewer" && !user?.profileCompleted;
-
-  // Only side-effect: lock background scroll
-  useEffect(() => {
-    if (shouldShowOnboarding) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "auto";
-    }
-
-    return () => {
-      document.body.style.overflow = "auto";
-    };
-  }, [shouldShowOnboarding]);
-
+const DashboardLayout = () => {
   return (
-    <>
-      {shouldShowOnboarding && <ViewerOnboardingModal />}
+    <div className="flex h-screen bg-gray-100">
+      {/* Sidebar */}
+      <Sidebar />
 
-      <div className="dashboard-layout">{children}</div>
-    </>
+      {/* Right Side */}
+      <div className="flex-1 flex flex-col ml-64">
+        {/* Topbar */}
+        <Topbar />
+
+        {/* Page Content */}
+        <div className="flex-1 p-6 overflow-auto">
+          <Outlet />
+        </div>
+      </div>
+    </div>
   );
 };
 

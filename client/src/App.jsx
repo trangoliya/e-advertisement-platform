@@ -1,13 +1,11 @@
-import { BrowserRouter } from "react-router-dom";
+import AuthProvider from "./context/AuthProvider.jsx";
 import AppRoutes from "./routes/AppRoutes.jsx";
 
 function App() {
   return (
-    <div>
-      {/* <h1>Welcome to the E-Advertisement Project</h1> */}
-        <AppRoutes />
-      
-    </div>
+    <AuthProvider>
+      <AppRoutes />
+    </AuthProvider>
   );
 }
 
