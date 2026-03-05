@@ -27,22 +27,16 @@ const PublisherOnboardingModal = ({ onClose }) => {
         category: category.trim(),
       });
 
-      // save new token
       localStorage.setItem("token", res.token);
-
-      // save updated user
       localStorage.setItem("user", JSON.stringify(res.user));
 
-      // update AuthContext
       setUser(res.user);
 
       onClose();
-
-      // redirect to publisher dashboard
       navigate("/publisher/dashboard");
 
     } catch (error) {
-      console.error("Publisher profile error:", error);
+      console.error(error);
 
       alert(
         error.response?.data?.message ||
@@ -56,7 +50,10 @@ const PublisherOnboardingModal = ({ onClose }) => {
   return (
     <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50">
       <div className="bg-white p-6 rounded-xl w-96 shadow-lg">
-        <h2 className="text-lg font-semibold mb-4">Become a Publisher</h2>
+
+        <h2 className="text-lg font-semibold mb-4">
+          Become a Publisher
+        </h2>
 
         <input
           type="text"
@@ -85,10 +82,11 @@ const PublisherOnboardingModal = ({ onClose }) => {
         <button
           onClick={handleSubmit}
           disabled={loading}
-          className="bg-blue-600 text-white px-4 py-2 rounded w-full disabled:opacity-60"
+          className="bg-blue-600 text-white px-4 py-2 rounded w-full"
         >
           {loading ? "Creating..." : "Create Publisher Profile"}
         </button>
+
       </div>
     </div>
   );

@@ -22,17 +22,18 @@ export const createPublisherProfile = async (req, res) => {
       category,
     });
 
+    // add publisher role
     const user = await User.findByIdAndUpdate(
       userId,
-      { role: "publisher" },
+      { $addToSet: { roles: "publisher" } },
       { new: true }
     );
 
-    //generate new token with updated role
+    // new token with updated roles
     const token = jwt.sign(
       {
         id: user._id,
-        role: user.role,
+        roles: user.roles,
       },
       process.env.JWT_SECRET,
       { expiresIn: "1d" }
@@ -41,12 +42,8 @@ export const createPublisherProfile = async (req, res) => {
     res.status(201).json({
       message: "Publisher profile created",
       token,
-      user: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-      },
+      user,
+      profile,
     });
 
   } catch (error) {
@@ -56,6 +53,7 @@ export const createPublisherProfile = async (req, res) => {
     });
   }
 };
+
 export const getPublisherProfile = async (req, res) => {
   try {
     const profile = await PublisherProfile.findOne({

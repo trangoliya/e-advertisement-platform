@@ -5,26 +5,26 @@ const authMiddleware = (req, res, next) => {
     // get authorization header
     const authHeader = req.headers.authorization;
 
-    // after authorization --> check if token exists
+    // check token exists
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
       return res.status(401).json({
-        message: "No Token Provided",
+        message: "No token provided",
       });
     }
 
-    // if token exist then extract token
+    // extract token
     const token = authHeader.split(" ")[1];
 
     // verify token
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    // attach user data to request
+    // attach user data
     req.user = {
       id: decoded.id,
-      role: decoded.role,
+      roles: decoded.roles || [],
     };
 
-    next(); //allow request (valid user-->allow)
+    next();
   } catch (error) {
     return res.status(401).json({
       message: "Invalid or expired token",
@@ -32,4 +32,4 @@ const authMiddleware = (req, res, next) => {
   }
 };
 
-export default authMiddleware;
+export default authMiddleware;  

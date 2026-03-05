@@ -2,14 +2,18 @@ import { useEffect, useState } from "react";
 import { getMyAds, updateAdStatus } from "../../services/ad.service";
 import StatusBadge from "../../components/common/StatusBadge";
 import Loader from "../../components/common/Loader";
-import { Navigate } from "react-router-dom";
-import { useLocation } from "react-router-dom";
+import Button from "../../components/common/Button";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const MyAds = () => {
   const [ads, setAds] = useState([]);
   const [loading, setLoading] = useState(true);
   const [updatingId, setUpdatingId] = useState(null);
-  
+
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const successMessage = location.state?.success;
 
   const fetchAds = async () => {
     try {
@@ -38,8 +42,7 @@ const MyAds = () => {
       setUpdatingId(null);
     }
   };
-  const location = useLocation();
-  const successMessage = location.state?.success;
+
   return (
     <div className="p-6 space-y-6 min-h-150">
       {/* Header */}
@@ -54,11 +57,13 @@ const MyAds = () => {
           <p className="text-textSecondary font-medium">
             You haven’t created any ads yet.
           </p>
+
           <p className="text-xs text-textSecondary/70">
             Start by launching your first advertisement.
           </p>
+
           <div className="pt-3">
-            <Button onClick={() => Navigate("/publisher/create-ad")}>
+            <Button onClick={() => navigate("/publisher/create-ad")}>
               Create Ad
             </Button>
           </div>
@@ -88,27 +93,22 @@ const MyAds = () => {
                              hover:bg-bgPrimary
                              transition duration-200 ease-in-out"
                 >
-                  {/* Title */}
                   <td className="px-6 py-5 font-medium text-textPrimary">
                     {ad.title}
                   </td>
 
-                  {/* Status */}
                   <td className="px-6 py-5 text-center">
                     <StatusBadge status={ad.status} />
                   </td>
 
-                  {/* Impressions */}
                   <td className="px-6 py-5 text-textSecondary text-right">
                     {ad.impressions || 0}
                   </td>
 
-                  {/* Clicks */}
                   <td className="px-6 py-5 text-textSecondary text-right">
                     {ad.clicks || 0}
                   </td>
 
-                  {/* Status Select */}
                   <td className="px-6 py-5 text-center">
                     <select
                       value={ad.status}
@@ -137,6 +137,7 @@ const MyAds = () => {
               ))}
             </tbody>
           </table>
+
           {successMessage && (
             <div className="bg-green-500/10 border border-green-500/30 text-green-400 rounded-xl p-4">
               {successMessage}
