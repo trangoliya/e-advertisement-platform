@@ -32,19 +32,20 @@ const Campaigns = () => {
     try {
       setLoading(true);
 
-      const data = await getMyCampaigns();
+      const res = await getMyCampaigns();
+      const campaignsData = res?.data || [];
 
       const campaignsWithAnalytics = await Promise.all(
-        data.map(async (campaign) => {
+        campaignsData.map(async (campaign) => {
           const analytics = await getCampaignAnalytics(campaign._id);
 
           return {
             ...campaign,
-            totalClicks: analytics.data.totalClicks || 0,
-            totalImpressions: analytics.data.totalImpressions || 0,
-            CTR: analytics.data.CTR || 0,
+            totalClicks: analytics?.data?.totalClicks || 0,
+            totalImpressions: analytics?.data?.totalImpressions || 0,
+            CTR: analytics?.data?.CTR || 0,
           };
-        }),
+        })
       );
 
       setCampaigns(campaignsWithAnalytics);
@@ -68,16 +69,24 @@ const Campaigns = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     try {
       setCreating(true);
+
       await createCampaign(formData);
 
-      setFormData({ name: "", description: "", totalBudget: "" });
+      setFormData({
+        name: "",
+        description: "",
+        totalBudget: "",
+      });
 
       await loadCampaigns();
-      document.getElementById("campaign-list")?.scrollIntoView({
-        behavior: "smooth",
-      });
+
+      document
+        .getElementById("campaign-list")
+        ?.scrollIntoView({ behavior: "smooth" });
+
       setSuccessMessage("Campaign created successfully.");
 
       setTimeout(() => {
@@ -95,11 +104,13 @@ const Campaigns = () => {
       {/* Header */}
       <div>
         <h1 className="text-3xl font-bold text-black">Campaigns</h1>
+
         {successMessage && (
           <div className="bg-green-500/10 border border-green-500/30 text-green-400 rounded-xl p-4">
             {successMessage}
           </div>
         )}
+
         <p className="text-gray-400 text-sm">
           Create and manage your advertising campaigns
         </p>
@@ -150,8 +161,13 @@ const Campaigns = () => {
       </div>
 
       {/* Campaign List */}
-      <div id="campaign-list" className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 shadow-lg min-h-75">
-        <h2 className="text-lg font-semibold text-white mb-4">My Campaigns</h2>
+      <div
+        id="campaign-list"
+        className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 shadow-lg min-h-75"
+      >
+        <h2 className="text-lg font-semibold text-white mb-4">
+          My Campaigns
+        </h2>
 
         {loading ? (
           <div className="flex justify-center py-20">
@@ -159,7 +175,9 @@ const Campaigns = () => {
           </div>
         ) : campaigns.length === 0 ? (
           <div className="py-16 text-center space-y-3">
-            <p className="text-gray-400 font-medium">No campaigns available.</p>
+            <p className="text-gray-400 font-medium">
+              No campaigns available.
+            </p>
             <p className="text-xs text-gray-500">
               Create a campaign to start running ads.
             </p>
@@ -184,10 +202,13 @@ const Campaigns = () => {
 
               <tbody>
                 {campaigns.map((campaign) => {
-                  const remaining = campaign.totalBudget - campaign.spentBudget;
+                  const spent = campaign.spentBudget || 0;
+                  const remaining = campaign.totalBudget - spent;
 
                   const percentage =
-                    (campaign.spentBudget / campaign.totalBudget) * 100;
+                    campaign.totalBudget > 0
+                      ? (spent / campaign.totalBudget) * 100
+                      : 0;
 
                   const chartData = [
                     {
@@ -211,7 +232,7 @@ const Campaigns = () => {
                       </td>
 
                       <td className="px-6 py-5 text-gray-300 text-right">
-                        ₹ {campaign.spentBudget}
+                        ₹ {spent}
                       </td>
 
                       <td className="px-6 py-5 text-gray-300 text-right">
@@ -229,8 +250,8 @@ const Campaigns = () => {
                               percentage >= 100
                                 ? "bg-red-500"
                                 : percentage >= 70
-                                  ? "bg-yellow-500"
-                                  : "bg-blue-500"
+                                ? "bg-yellow-500"
+                                : "bg-blue-500"
                             }`}
                             style={{
                               width: `${Math.min(percentage, 100)}%`,
