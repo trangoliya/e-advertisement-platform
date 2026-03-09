@@ -1,5 +1,6 @@
 import Campaign from "../models/Campaign.js";
-import Ad from "../models/Ad.js"
+import Ad from "../models/Ad.js";
+import { Parser } from "json2csv";
 
 // Create Campaign
 export const createCampaign = async (req, res) => {
@@ -77,9 +78,7 @@ export const getCampaignAnalytics = async (req, res, next) => {
 
     // Calculate CTR safely
     const CTR =
-      totalImpressions > 0
-        ? (totalClicks / totalImpressions) * 100
-        : 0;
+      totalImpressions > 0 ? (totalClicks / totalImpressions) * 100 : 0;
 
     res.status(200).json({
       success: true,
@@ -89,7 +88,60 @@ export const getCampaignAnalytics = async (req, res, next) => {
         CTR: Number(CTR.toFixed(2)),
       },
     });
+  } catch (error) {
+    next(error);
+  }
+};
 
+export const exportCampaignAnalytics = async (req, res, next) => {
+  try {
+    const campaigns = await Campaign.find({
+      createdBy: req.user.id,
+    });
+
+    if (!campaigns) {
+      return res.status(200).json({
+        success: true,
+        message: "No campaigns found",
+      });
+    }
+
+    const data = [];
+
+    for (const campaign of campaigns) {
+      const ads = await Ad.find({ campaign: campaign._id });
+
+      let totalClicks = 0;
+      let totalImpressions = 0;
+
+      ads.forEach((ad) => {
+        totalClicks += ad.clicks || 0;
+        totalImpressions += ad.impressions || 0;
+      });
+
+      const ctr =
+        totalImpressions > 0
+          ? ((totalClicks / totalImpressions) * 100).toFixed(2) + "%"
+          : "0%";
+
+      data.push({
+        CampaignName: campaign.name,
+        Impressions: totalImpressions,
+        Clicks: totalClicks,
+        CTR: ctr,
+        Budget: campaign.totalBudget,
+      });
+    }
+
+    // Convert JSON to CSV
+    const parser = new Parser();
+    const csv = parser.parse(data);
+
+    // Send CSV file
+    res.header("Content-Type", "text/csv");
+    res.attachment("campaign_analytics.csv");
+
+    res.send(csv);
   } catch (error) {
     next(error);
   }

@@ -2,7 +2,8 @@ import express from "express";
 import {
   createCampaign,
   getMyCampaigns,
-  getCampaignAnalytics
+  getCampaignAnalytics,
+  exportCampaignAnalytics
 } from "../controllers/campaign.controller.js";
 
 import authMiddleware from "../middlewares/auth.middleware.js";
@@ -32,5 +33,13 @@ router.get(
   authMiddleware, // or protect (based on what you're using)
   authorizeRoles("publisher"),
   getCampaignAnalytics
+);
+
+// GET /api/campaigns/export
+router.get(
+  "/export",
+  authMiddleware,
+  authorizeRoles("publisher"),
+  exportCampaignAnalytics
 );
 export default router;

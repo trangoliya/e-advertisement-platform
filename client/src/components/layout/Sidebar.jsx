@@ -18,15 +18,12 @@ const Sidebar = () => {
 
   return (
     <div className="fixed top-0 left-0 w-64 h-screen bg-gray-950 text-white p-6 flex flex-col border-r border-gray-800">
-      
       <h2 className="text-3xl font-bold mb-8">AdPlatform</h2>
 
       {/* USER SECTION */}
       {isUser && (
         <>
-          <p className="text-xs tracking-wider text-gray-500 mb-3">
-            USER
-          </p>
+          <p className="text-xs tracking-wider text-gray-500 mb-3">USER</p>
 
           <div className="space-y-2">
             <NavLink
@@ -47,6 +44,7 @@ const Sidebar = () => {
           <p className="text-xs tracking-wider text-gray-500 mt-8 mb-3">
             PUBLISHER
           </p>
+          
 
           <div className="space-y-2">
             <NavLink
