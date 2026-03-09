@@ -1,18 +1,13 @@
 import Ad from "../models/Ad.js";
 import mongoose from "mongoose";
 import Campaign from "../models/Campaign.js";
+import Alert from "../models/Alert.js";
 
 // use for create a Ad
 export const createAd = async (req, res, next) => {
   try {
-    const {
-      title,
-      description,
-      imageUrl,
-      targetUrl,
-      status,
-      campaignId,
-    } = req.body;
+    const { title, description, imageUrl, targetUrl, status, campaignId } =
+      req.body;
 
     if (!campaignId) {
       return res.status(400).json({
@@ -35,7 +30,6 @@ export const createAd = async (req, res, next) => {
       success: true,
       data: ad,
     });
-
   } catch (error) {
     next(error);
   }
@@ -127,6 +121,28 @@ export const incrementClick = async (req, res, next) => {
     await ad.save();
     await campaign.save();
 
+    const spentPercentage = (campaign.spentBudget / campaign.totalBudget) * 100;
+
+if (spentPercentage >= 80 && spentPercentage < 100) {
+  await Alert.create({
+    userId: campaign.createdBy, // advertiser
+    campaignId: campaign._id,
+    message: "Campaign budget reaching 80%",
+    type: "warning",
+  });
+}
+
+if (spentPercentage >= 100) {
+  campaign.status = "paused";
+  await campaign.save();
+
+  await Alert.create({
+    userId: campaign.createdBy,
+    campaignId: campaign._id,
+    message: "Campaign paused due to budget limit",
+    type: "critical",
+  });
+}
     res.status(200).json({
       success: true,
       message: "Click recorded",
@@ -134,7 +150,6 @@ export const incrementClick = async (req, res, next) => {
       spentBudget: campaign.spentBudget,
       campaignStatus: campaign.status,
     });
-
   } catch (error) {
     next(error);
   }

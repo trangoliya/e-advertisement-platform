@@ -10,11 +10,16 @@ import errorHandler from "./middlewares/error.middleware.js";
 import campaignRoutes from "./routes/campaign.routes.js";
 import publisherProfileRoutes from "./routes/publisherProfile.routes.js";
 
+import alertRoutes from "./routes/alert.routes.js";
+
 const app = express();
-app.use(cors({
-  origin: "http://localhost:5173",
-  credentials: true,
-}));
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+    credentials: true,
+  }),
+);
+
 
 app.use(express.json());
 app.use("/api/auth", authRoutes);
@@ -23,6 +28,8 @@ app.use("/api/ads", adRoutes);
 app.use("/api/viewer", viewerRoutes);
 app.use("/api/publisher", publisherProfileRoutes);
 app.use("/api/admin", adminRoutes);
+
+app.use("/api/alerts", alertRoutes);
 
 app.use("/api/campaigns", campaignRoutes);
 app.get("/test", (req, res) => {
