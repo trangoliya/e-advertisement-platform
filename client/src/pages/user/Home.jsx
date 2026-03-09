@@ -49,10 +49,8 @@ const Home = () => {
 
   return (
     <div className="min-h-screen bg-gray-100">
-
       {/* Publisher Button */}
       <div className="max-w-xl mx-auto pt-6 flex justify-end">
-
         {loadingPublisher ? null : isPublisher ? (
           <button
             onClick={() => navigate("/publisher/dashboard")}
@@ -68,7 +66,6 @@ const Home = () => {
             Switch to Publisher
           </button>
         )}
-
       </div>
 
       {/* Ads Feed */}
@@ -102,7 +99,6 @@ const Home = () => {
           onClose={() => setShowPublisherModal(false)}
         />
       )}
-
     </div>
   );
 };

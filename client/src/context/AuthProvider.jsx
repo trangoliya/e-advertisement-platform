@@ -24,7 +24,7 @@ const AuthProvider = ({ children }) => {
     localStorage.setItem("token", data.token);
     setUser(data.user);
 
-    return { success: true };
+    return { success: true, user: data.user };
   };
 
   const login = async (formData) => {
@@ -33,7 +33,7 @@ const AuthProvider = ({ children }) => {
     localStorage.setItem("token", data.token);
     setUser(data.user);
 
-    return { success: true };
+    return { success: true, user: data.user };
   };
 
   const logout = () => {

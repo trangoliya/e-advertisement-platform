@@ -10,7 +10,7 @@ api.interceptors.request.use(
 // Automatically attaches token
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
-    }
+    } 
     return config;
   },
   (error) => {

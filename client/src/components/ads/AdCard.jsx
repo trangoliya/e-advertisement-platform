@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { incrementClick } from "../../services/ad.service";
 import {
   getLikedAds,
   getSavedAds,
@@ -36,80 +37,94 @@ const AdCard = ({
     setSaved((prev) => !prev);
   };
 
+  const handleAdClick = async () => {
+    try {
+      await incrementClick(id);
+      onView();
+    } catch (error) {
+      console.error("Click tracking failed:", error);
+      onView();
+    }
+  };
+
   return (
-    <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden hover:shadow-lg transition">
-      {/* Publisher Header */}
+    <div className="bg-white rounded-2xl shadow-md border border-gray-200 overflow-hidden hover:shadow-xl transition duration-300">
+      {/* Header */}
       <div className="flex items-center justify-between px-4 py-3">
         <div className="flex items-center gap-3">
           <img
             src={publisherAvatar}
             alt={publisherName}
-            className="w-9 h-9 rounded-full object-cover"
+            className="w-10 h-10 rounded-full object-cover border"
           />
+
           <div>
             <p className="text-sm font-semibold text-gray-800">
               {publisherName}
             </p>
-            <p className="text-xs text-gray-500">Sponsored</p>
+
+            <span className="text-xs text-gray-500">Sponsored</span>
           </div>
         </div>
 
-        {/* Save */}
-        <button onClick={handleSave} className="text-xl">
+        {/* Save Button */}
+        <button
+          onClick={handleSave}
+          className="text-lg hover:scale-110 transition"
+        >
           {saved ? "🔖" : "📑"}
         </button>
       </div>
 
       {/* Media */}
-      <div onClick={onView} className="cursor-pointer">
+      <div onClick={handleAdClick} className="cursor-pointer bg-black">
         {mediaType === "video" ? (
           <video
             src={mediaUrl}
-            className="w-full max-h-125 object-cover"
+            className="w-full max-h-105 object-cover"
             muted
             loop
             playsInline
           />
         ) : (
           <img
-            src={mediaUrl || "https://picsum.photos/600/400"}
+            src={
+              mediaUrl ||
+              "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTTcT0QGetG2uzAvnYBjODTUeGzqZjpcfsUUQ&s"
+            }
             alt={title}
-            className="w-full max-h-125 object-cover"
+            className="w-full max-h-105 object-cover"
           />
         )}
       </div>
 
       {/* Content */}
       <div className="px-4 py-4">
-        <h3 className="text-base font-semibold text-gray-900 mb-1">
-          {title}
-        </h3>
+        <h3 className="text-lg font-semibold text-gray-900 mb-1">{title}</h3>
 
-        <p className="text-sm text-gray-600 line-clamp-2 mb-3">
-          {description}
-        </p>
+        <p className="text-sm text-gray-600 mb-4 line-clamp-2">{description}</p>
 
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
+        {/* Stats */}
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-4 text-gray-500 text-sm">
             <button
               onClick={handleLike}
-              className={`text-xl ${
-                liked ? "text-red-500" : "text-gray-600"
-              }`}
+              className={`text-xl ${liked ? "text-red-500" : "text-gray-500"}`}
             >
               {liked ? "❤️" : "🤍"}
             </button>
 
-            <span className="text-xl text-gray-500">
-              👁 {impressions} · 👆 {clicks}
-            </span>
+            <span>👁 {impressions}</span>
+
+            <span>👆 {clicks}</span>
           </div>
 
+          {/* CTA */}
           <button
-            onClick={onView}
-            className="text-sm font-medium text-blue-600 hover:underline"
+            onClick={handleAdClick}
+            className="bg-blue-600 text-white px-4 py-1.5 rounded-lg text-sm hover:bg-blue-700 transition"
           >
-            Learn More →
+            Learn More
           </button>
         </div>
       </div>

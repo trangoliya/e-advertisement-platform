@@ -32,8 +32,7 @@ const Campaigns = () => {
     try {
       setLoading(true);
 
-      const res = await getMyCampaigns();
-      const campaignsData = res?.data || [];
+      const campaignsData = await getMyCampaigns();
 
       const campaignsWithAnalytics = await Promise.all(
         campaignsData.map(async (campaign) => {
@@ -41,11 +40,11 @@ const Campaigns = () => {
 
           return {
             ...campaign,
-            totalClicks: analytics?.data?.totalClicks || 0,
-            totalImpressions: analytics?.data?.totalImpressions || 0,
-            CTR: analytics?.data?.CTR || 0,
+            totalClicks: analytics?.totalClicks || 0,
+            totalImpressions: analytics?.totalImpressions || 0,
+            CTR: analytics?.CTR || 0,
           };
-        })
+        }),
       );
 
       setCampaigns(campaignsWithAnalytics);
@@ -165,9 +164,7 @@ const Campaigns = () => {
         id="campaign-list"
         className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 shadow-lg min-h-75"
       >
-        <h2 className="text-lg font-semibold text-white mb-4">
-          My Campaigns
-        </h2>
+        <h2 className="text-lg font-semibold text-white mb-4">My Campaigns</h2>
 
         {loading ? (
           <div className="flex justify-center py-20">
@@ -175,9 +172,7 @@ const Campaigns = () => {
           </div>
         ) : campaigns.length === 0 ? (
           <div className="py-16 text-center space-y-3">
-            <p className="text-gray-400 font-medium">
-              No campaigns available.
-            </p>
+            <p className="text-gray-400 font-medium">No campaigns available.</p>
             <p className="text-xs text-gray-500">
               Create a campaign to start running ads.
             </p>
@@ -250,8 +245,8 @@ const Campaigns = () => {
                               percentage >= 100
                                 ? "bg-red-500"
                                 : percentage >= 70
-                                ? "bg-yellow-500"
-                                : "bg-blue-500"
+                                  ? "bg-yellow-500"
+                                  : "bg-blue-500"
                             }`}
                             style={{
                               width: `${Math.min(percentage, 100)}%`,

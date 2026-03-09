@@ -5,7 +5,7 @@ import { useAuth } from "../../context/AuthContext";
 
 const PublisherOnboardingModal = ({ onClose }) => {
   const navigate = useNavigate();
-  const { setUser } = useAuth();
+  const { user, setUser } = useAuth();
 
   const [businessName, setBusinessName] = useState("");
   const [website, setWebsite] = useState("");
@@ -27,19 +27,35 @@ const PublisherOnboardingModal = ({ onClose }) => {
         category: category.trim(),
       });
 
-      localStorage.setItem("token", res.token);
-      localStorage.setItem("user", JSON.stringify(res.user));
+      if (!res) {
+        throw new Error("Invalid server response");
+      }
 
-      setUser(res.user);
+      // Save new token
+      if (res.token) {
+        localStorage.setItem("token", res.token);
+      }
+
+      // Update user roles locally
+      const updatedUser = {
+        ...user,
+        roles: res.user?.roles || [...(user.roles || []), "publisher"],
+      };
+
+      localStorage.setItem("user", JSON.stringify(updatedUser));
+
+      setUser(updatedUser);
 
       onClose();
+
       navigate("/publisher/dashboard");
 
     } catch (error) {
-      console.error(error);
+      console.error("Publisher profile error:", error);
 
       alert(
-        error.response?.data?.message ||
+        error?.response?.data?.message ||
+        error.message ||
         "Failed to create publisher profile"
       );
     } finally {

@@ -1,9 +1,9 @@
 import { NavLink } from "react-router-dom";
-import { useAuth } from "../../context/AuthContext";
+import useAuth from "../../hooks/useAuth";
 
 const Sidebar = () => {
   const { user } = useAuth();
-  const role = user?.role;
+  const roles = user?.roles || [];
 
   const navItem =
     "flex items-center gap-3 px-4 py-2 rounded-lg transition-all duration-200 ease-in-out";
@@ -12,14 +12,39 @@ const Sidebar = () => {
   const inactiveStyle =
     "text-gray-400 hover:bg-gray-800 hover:text-white hover:scale-[1.02]";
 
+  const isPublisher = roles.includes("publisher");
+  const isAdmin = roles.includes("admin");
+  const isUser = roles.includes("user");
+
   return (
     <div className="fixed top-0 left-0 w-64 h-screen bg-gray-950 text-white p-6 flex flex-col border-r border-gray-800">
       
       <h2 className="text-3xl font-bold mb-8">AdPlatform</h2>
 
-      {role === "publisher" && (
+      {/* USER SECTION */}
+      {isUser && (
         <>
           <p className="text-xs tracking-wider text-gray-500 mb-3">
+            USER
+          </p>
+
+          <div className="space-y-2">
+            <NavLink
+              to="/home"
+              className={({ isActive }) =>
+                `${navItem} ${isActive ? activeStyle : inactiveStyle}`
+              }
+            >
+              Watch Ads
+            </NavLink>
+          </div>
+        </>
+      )}
+
+      {/* PUBLISHER SECTION */}
+      {isPublisher && (
+        <>
+          <p className="text-xs tracking-wider text-gray-500 mt-8 mb-3">
             PUBLISHER
           </p>
 
@@ -72,7 +97,8 @@ const Sidebar = () => {
         </>
       )}
 
-      {role === "admin" && (
+      {/* ADMIN SECTION */}
+      {isAdmin && (
         <>
           <p className="text-xs tracking-wider text-gray-500 mt-8 mb-3">
             ADMIN
@@ -80,7 +106,7 @@ const Sidebar = () => {
 
           <div className="space-y-2">
             <NavLink
-              to="/admin/dashboard"
+              to="/admin"
               className={({ isActive }) =>
                 `${navItem} ${isActive ? activeStyle : inactiveStyle}`
               }

@@ -1,5 +1,5 @@
 import { Navigate, Outlet } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
+import useAuth from "../hooks/useAuth";
 import { ROLES } from "../context/roles";
 
 const RoleRoute = ({ allowedRoles }) => {
@@ -17,10 +17,16 @@ const RoleRoute = ({ allowedRoles }) => {
     return <Navigate to="/login" replace />;
   }
 
-  if (!allowedRoles.includes(user.role)) {
-    if (user.role === ROLES.ADMIN) return <Navigate to="/admin" replace />;
-    if (user.role === ROLES.PUBLISHER) return <Navigate to="/publisher" replace />;
-    if (user.role === ROLES.USER) return <Navigate to="/home" replace />;
+  // role check
+  const hasAccess = allowedRoles.some((role) => user.roles?.includes(role));
+
+  if (!hasAccess) {
+    if (user.roles?.includes(ROLES.ADMIN))
+      return <Navigate to="/admin" replace />;
+    if (user.roles?.includes(ROLES.PUBLISHER))
+      return <Navigate to="/publisher" replace />;
+    if (user.roles?.includes(ROLES.USER))
+      return <Navigate to="/home" replace />;
   }
 
   return <Outlet />;

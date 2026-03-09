@@ -6,63 +6,40 @@ const Login = () => {
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  const email = e.target.email.value;
-  const password = e.target.password.value;
+    const email = e.target.email.value;
+    const password = e.target.password.value;
 
-  console.log("Submitting login:", email, password);
+    console.log("Submitting login:", email, password);
 
-  try {
-    const result = await login({ email, password });
-    console.log("Login result:", result);
+    try {
+      const result = await login({ email, password });
+      console.log("Login result:", result);
 
-    if (!result?.success) {
-      console.error("Login failed:", result?.message);
-      return;
+      if (!result?.success) {
+        console.error("Login failed:", result?.message);
+        return;
+      }
+
+      const storedUser = JSON.parse(localStorage.getItem("user"));
+
+      if (!storedUser?.roles?.length) {
+        console.error("User role missing");
+        return;
+      }
+
+      if (storedUser.roles.includes("admin")) {
+        navigate("/admin");
+      } else if (storedUser.roles.includes("publisher")) {
+        navigate("/publisher");
+      } else {
+        navigate("/home");
+      }
+    } catch (err) {
+      console.error("Login error:", err);
     }
-
-    const storedUser = JSON.parse(localStorage.getItem("user"));
-    console.log("Stored user:", storedUser);
-
-    if (!storedUser?.role) {
-      console.error("User role missing");
-      return;
-    }
-
-    if (storedUser.role === "publisher") {
-      navigate("/publisher");
-    } else if (storedUser.role === "admin") {
-      navigate("/admin");
-    } else {
-      navigate("/home");
-    }
-  } catch (err) {
-    console.error("Login error:", err);
-  }
-};  
-  // const handleSubmit = async (e) => {
-  //   e.preventDefault();
-
-  //   const email = e.target.email.value;
-  //   const password = e.target.password.value;
-
-  //   const result = await login({ email, password });
-
-  //   if (result.success) {
-  //     const storedUser = JSON.parse(localStorage.getItem("user"));
-
-  //     if (storedUser.role === "publisher") {
-  //       navigate("/publisher");
-  //     } else if (storedUser.role === "admin") {
-  //       navigate("/admin");
-  //     } else {
-  //       navigate("/home");
-  //     }
-  //   } else {
-  //     console.log(result.message);
-  //   }
-  // };
+  };
 
   return (
     <div className="min-h-screen flex bg-gray-100">
@@ -72,9 +49,7 @@ const Login = () => {
           <h2 className="text-3xl font-bold text-gray-800 mb-2">
             Welcome Back
           </h2>
-          <p className="text-gray-500 mb-6">
-            Login to your account
-          </p>
+          <p className="text-gray-500 mb-6">Login to your account</p>
 
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>

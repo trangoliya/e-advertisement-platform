@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { Outlet } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
+import useAuth from "../hooks/useAuth";
 import ViewerOnboardingModal from "../components/common/ViewerOnboardingModal";
 import { ROLES } from "../context/roles";
 import Topbar from "../components/layout/Topbar";
@@ -9,7 +9,7 @@ const MainLayout = () => {
   const { user, loading } = useAuth();
 
   const shouldShowOnboarding =
-    user?.role === ROLES.USER && user?.profileCompleted === false;
+    user?.roles?.includes(ROLES.USER) && user?.profileCompleted === false;
 
   useEffect(() => {
     if (shouldShowOnboarding) {
