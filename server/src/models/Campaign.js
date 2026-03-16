@@ -31,6 +31,12 @@ const campaignSchema = new mongoose.Schema(
       default: "active",
     },
 
+    distributionChannels: {
+      type: [String],
+      enum: ["website", "mobile", "email"],
+      default: ["website"],
+    },
+
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
@@ -39,7 +45,7 @@ const campaignSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
-  }
+  },
 );
 
 const Campaign = mongoose.model("Campaign", campaignSchema);

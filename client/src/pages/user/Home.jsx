@@ -14,6 +14,9 @@ const Home = () => {
 
   const navigate = useNavigate();
 
+  // Detect device type
+  const isMobile = window.innerWidth < 768;
+
   // Fetch ads
   useEffect(() => {
     const fetchAds = async () => {
@@ -47,6 +50,17 @@ const Home = () => {
     checkPublisher();
   }, []);
 
+  // Filter ads based on distribution channel
+  const filteredAds = ads.filter((ad) => {
+    const channels = ad.campaign?.distributionChannels || ["website"];
+
+    if (isMobile) {
+      return channels.includes("mobile");
+    }
+
+    return channels.includes("website");
+  });
+
   return (
     <div className="min-h-screen bg-gray-100">
       {/* Publisher Button */}
@@ -70,12 +84,12 @@ const Home = () => {
 
       {/* Ads Feed */}
       <div className="max-w-xl mx-auto py-8 space-y-8">
-        {ads.length === 0 ? (
+        {filteredAds.length === 0 ? (
           <div className="text-center text-gray-500 py-20">
             No ads available
           </div>
         ) : (
-          ads.map((ad) => (
+          filteredAds.map((ad) => (
             <AdCard
               key={ad._id}
               id={ad._id}

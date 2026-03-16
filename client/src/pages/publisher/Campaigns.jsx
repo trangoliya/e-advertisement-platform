@@ -26,6 +26,7 @@ const Campaigns = () => {
     name: "",
     description: "",
     totalBudget: "",
+    distributionChannels: [],
   });
 
   const loadCampaigns = async () => {
@@ -44,7 +45,7 @@ const Campaigns = () => {
             totalImpressions: analytics?.totalImpressions || 0,
             CTR: analytics?.CTR || 0,
           };
-        }),
+        })
       );
 
       setCampaigns(campaignsWithAnalytics);
@@ -66,6 +67,19 @@ const Campaigns = () => {
     });
   };
 
+  const handleChannelChange = (channel) => {
+    setFormData((prev) => {
+      const exists = prev.distributionChannels.includes(channel);
+
+      return {
+        ...prev,
+        distributionChannels: exists
+          ? prev.distributionChannels.filter((c) => c !== channel)
+          : [...prev.distributionChannels, channel],
+      };
+    });
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -78,6 +92,7 @@ const Campaigns = () => {
         name: "",
         description: "",
         totalBudget: "",
+        distributionChannels: [],
       });
 
       await loadCampaigns();
@@ -100,12 +115,11 @@ const Campaigns = () => {
 
   return (
     <div className="p-6 space-y-8 min-h-150">
-      {/* Header */}
       <div>
         <h1 className="text-3xl font-bold text-black">Campaigns</h1>
 
         {successMessage && (
-          <div className="bg-green-500/10 border border-green-500/30 text-green-400 rounded-xl p-4">
+          <div className="bg-green-500/10 border border-green-500/30 text-green-400 rounded-xl p-4 mt-3">
             {successMessage}
           </div>
         )}
@@ -151,6 +165,47 @@ const Campaigns = () => {
             className="bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-2 text-white focus:ring-2 focus:ring-blue-500"
           />
 
+          {/* Distribution Channels */}
+          <div className="md:col-span-3">
+            <label className="block text-sm text-gray-300 mb-3">
+              Distribution Channels
+            </label>
+
+            <div className="flex gap-6">
+
+              <label className="flex items-center gap-2 cursor-pointer text-gray-300">
+                <input
+                  type="checkbox"
+                  className="w-4 h-4 accent-blue-500"
+                  checked={formData.distributionChannels.includes("website")}
+                  onChange={() => handleChannelChange("website")}
+                />
+                Website Ads
+              </label>
+
+              <label className="flex items-center gap-2 cursor-pointer text-gray-300">
+                <input
+                  type="checkbox"
+                  className="w-4 h-4 accent-blue-500"
+                  checked={formData.distributionChannels.includes("mobile")}
+                  onChange={() => handleChannelChange("mobile")}
+                />
+                Mobile Ads
+              </label>
+
+              <label className="flex items-center gap-2 cursor-pointer text-gray-300">
+                <input
+                  type="checkbox"
+                  className="w-4 h-4 accent-blue-500"
+                  checked={formData.distributionChannels.includes("email")}
+                  onChange={() => handleChannelChange("email")}
+                />
+                Email Ads
+              </label>
+
+            </div>
+          </div>
+
           <div className="md:col-span-3 flex justify-end">
             <Button type="submit" disabled={creating}>
               {creating ? "Creating..." : "Create Campaign"}
@@ -187,6 +242,7 @@ const Campaigns = () => {
                   <th className="px-6 py-4 text-center">Spent</th>
                   <th className="px-6 py-4 text-center">Remaining</th>
                   <th className="px-6 py-4 text-center">Status</th>
+                  <th className="px-6 py-4 text-center">Channels</th>
                   <th className="px-6 py-4 text-center">Progress</th>
                   <th className="px-6 py-4 text-center">Impressions</th>
                   <th className="px-6 py-4 text-center">Clicks</th>
@@ -216,7 +272,7 @@ const Campaigns = () => {
                   return (
                     <tr
                       key={campaign._id}
-                      className="border-b border-zinc-800 hover:bg-zinc-800/50 transition duration-200"
+                      className="border-b border-zinc-800 hover:bg-zinc-800/50 transition"
                     >
                       <td className="px-6 py-6 text-white font-semibold">
                         {campaign.name}
@@ -238,6 +294,10 @@ const Campaigns = () => {
                         <StatusBadge status={campaign.status} />
                       </td>
 
+                      <td className="px-6 py-5 text-center text-gray-300">
+                        {campaign.distributionChannels?.join(", ") || "website"}
+                      </td>
+
                       <td className="px-6 py-5 text-center w-40">
                         <div className="w-full bg-zinc-800 rounded-full h-2.5">
                           <div
@@ -245,12 +305,10 @@ const Campaigns = () => {
                               percentage >= 100
                                 ? "bg-red-500"
                                 : percentage >= 70
-                                  ? "bg-yellow-500"
-                                  : "bg-blue-500"
+                                ? "bg-yellow-500"
+                                : "bg-blue-500"
                             }`}
-                            style={{
-                              width: `${Math.min(percentage, 100)}%`,
-                            }}
+                            style={{ width: `${Math.min(percentage, 100)}%` }}
                           />
                         </div>
                       </td>

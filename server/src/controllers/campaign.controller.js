@@ -5,7 +5,7 @@ import { Parser } from "json2csv";
 // Create Campaign
 export const createCampaign = async (req, res) => {
   try {
-    const { name, description, totalBudget } = req.body;
+    const { name, description, totalBudget, distributionChannels } = req.body;
 
     if (!name || !totalBudget) {
       return res.status(400).json({
@@ -13,11 +13,18 @@ export const createCampaign = async (req, res) => {
       });
     }
 
+    // if no channel selected → default website
+    const channels =
+      distributionChannels && distributionChannels.length > 0
+        ? distributionChannels
+        : ["website"];
+
     const campaign = await Campaign.create({
       name,
       description,
       totalBudget,
-      createdBy: req.user.id, // comes from auth middleware
+      distributionChannels: channels,
+      createdBy: req.user.id,
     });
 
     res.status(201).json({
@@ -31,7 +38,6 @@ export const createCampaign = async (req, res) => {
     });
   }
 };
-
 // Get My Campaigns (Publisher only)
 export const getMyCampaigns = async (req, res) => {
   try {
