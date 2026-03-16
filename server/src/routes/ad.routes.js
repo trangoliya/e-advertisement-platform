@@ -7,6 +7,8 @@ import {
   incrementImpression,
   updateAdStatus,
   getAdById,
+  trackAdView,
+  trackAdClick,
 } from "../controllers/ad.controller.js";
 import authMiddleware from "../middlewares/auth.middleware.js";
 import roleMiddleware from "../middlewares/role.middleware.js";
@@ -33,6 +35,9 @@ router.get("/active", getActiveAds);
 
 // Get Ad Details
 router.get("/:id", getAdById);
+
+router.post("/track-view", authMiddleware, trackAdView);
+router.post("/track-click", authMiddleware, trackAdClick);
 
 export default router;
 // check in postman

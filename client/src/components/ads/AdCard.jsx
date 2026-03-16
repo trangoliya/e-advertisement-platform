@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import axios from "axios";
 import { incrementClick } from "../../services/ad.service";
 import {
   getLikedAds,
@@ -22,9 +23,23 @@ const AdCard = ({
   const [liked, setLiked] = useState(false);
   const [saved, setSaved] = useState(false);
 
+  // Load liked & saved state
   useEffect(() => {
     setLiked(getLikedAds().includes(id));
     setSaved(getSavedAds().includes(id));
+  }, [id]);
+
+  // Track ad view
+  useEffect(() => {
+    const trackView = async () => {
+      try {
+        await axios.post("/api/ads/track-view", { adId: id });
+      } catch (error) {
+        console.error("View tracking failed:", error);
+      }
+    };
+
+    trackView();
   }, [id]);
 
   const handleLike = () => {
@@ -37,13 +52,15 @@ const AdCard = ({
     setSaved((prev) => !prev);
   };
 
+  // Track ad click
   const handleAdClick = async () => {
     try {
+      await axios.post("/api/ads/track-click", { adId: id });
       await incrementClick(id);
-      onView();
+
+      if (onView) onView();
     } catch (error) {
       console.error("Click tracking failed:", error);
-      onView();
     }
   };
 
@@ -62,12 +79,10 @@ const AdCard = ({
             <p className="text-sm font-semibold text-gray-800">
               {publisherName}
             </p>
-
             <span className="text-xs text-gray-500">Sponsored</span>
           </div>
         </div>
 
-        {/* Save Button */}
         <button
           onClick={handleSave}
           className="text-lg hover:scale-110 transition"
@@ -104,7 +119,6 @@ const AdCard = ({
 
         <p className="text-sm text-gray-600 mb-4 line-clamp-2">{description}</p>
 
-        {/* Stats */}
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-4 text-gray-500 text-sm">
             <button
@@ -115,11 +129,9 @@ const AdCard = ({
             </button>
 
             <span>👁 {impressions}</span>
-
             <span>👆 {clicks}</span>
           </div>
 
-          {/* CTA */}
           <button
             onClick={handleAdClick}
             className="bg-blue-600 text-white px-4 py-1.5 rounded-lg text-sm hover:bg-blue-700 transition"

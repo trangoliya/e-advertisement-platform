@@ -2,6 +2,7 @@ import Ad from "../models/Ad.js";
 import mongoose from "mongoose";
 import Campaign from "../models/Campaign.js";
 import Alert from "../models/Alert.js";
+import UserAdInteraction from "../models/UserAdInteraction.js";
 
 // use for create a Ad
 export const createAd = async (req, res, next) => {
@@ -123,26 +124,26 @@ export const incrementClick = async (req, res, next) => {
 
     const spentPercentage = (campaign.spentBudget / campaign.totalBudget) * 100;
 
-if (spentPercentage >= 80 && spentPercentage < 100) {
-  await Alert.create({
-    userId: campaign.createdBy, // advertiser
-    campaignId: campaign._id,
-    message: "Campaign budget reaching 80%",
-    type: "warning",
-  });
-}
+    if (spentPercentage >= 80 && spentPercentage < 100) {
+      await Alert.create({
+        userId: campaign.createdBy, // advertiser
+        campaignId: campaign._id,
+        message: "Campaign budget reaching 80%",
+        type: "warning",
+      });
+    }
 
-if (spentPercentage >= 100) {
-  campaign.status = "paused";
-  await campaign.save();
+    if (spentPercentage >= 100) {
+      campaign.status = "paused";
+      await campaign.save();
 
-  await Alert.create({
-    userId: campaign.createdBy,
-    campaignId: campaign._id,
-    message: "Campaign paused due to budget limit",
-    type: "critical",
-  });
-}
+      await Alert.create({
+        userId: campaign.createdBy,
+        campaignId: campaign._id,
+        message: "Campaign paused due to budget limit",
+        type: "critical",
+      });
+    }
     res.status(200).json({
       success: true,
       message: "Click recorded",
@@ -176,9 +177,43 @@ export const updateAdStatus = async (req, res, next) => {
 
 export const getActiveAds = async (req, res, next) => {
   try {
+    const userId = req.user.id;
+
+    // Get user interactions
+    const interactions = await UserAdInteraction.find({ userId })
+      .populate({
+        path: "adId",
+        populate: { path: "campaign" },
+      })
+      .limit(50);
+
+    // Calculate interest categories
+    const interestMap = {}; 
+
+    interactions.forEach((item) => {
+      const category = item.adId?.campaign?.category;
+      if (!category) return;
+
+      interestMap[category] = (interestMap[category] || 0) + 1;
+    });
+
+    const userInterests = Object.keys(interestMap).sort(
+      (a, b) => interestMap[b] - interestMap[a],
+    );
+
+    // Get active ads
     const ads = await Ad.find({ status: "active" })
-      .populate("createdBy", "name avatar") // show publisher info
-      .sort({ createdAt: -1 });
+      .populate("createdBy", "name avatar")
+      .populate("campaign")
+      .lean();
+
+    // Prioritize ads based on interests
+    ads.sort((a, b) => {
+      const aScore = userInterests.includes(a.campaign?.category) ? 1 : 0;
+      const bScore = userInterests.includes(b.campaign?.category) ? 1 : 0;
+
+      return bScore - aScore;
+    });
 
     res.status(200).json({
       success: true,
@@ -221,5 +256,49 @@ export const getAdById = async (req, res, next) => {
     });
   } catch (error) {
     next(error);
+  }
+};
+
+export const trackAdView = async (req, res) => {
+  try {
+    const { adId } = req.body;
+
+    await UserAdInteraction.create({
+      userId: req.user.id,
+      adId,
+      action: "view",
+    });
+
+    res.status(200).json({
+      success: true,
+      message: "Ad view tracked",
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+export const trackAdClick = async (req, res) => {
+  try {
+    const { adId } = req.body;
+
+    await UserAdInteraction.create({
+      userId: req.user.id,
+      adId,
+      action: "click",
+    });
+
+    res.status(200).json({
+      success: true,
+      message: "Ad click tracked",
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
   }
 };
