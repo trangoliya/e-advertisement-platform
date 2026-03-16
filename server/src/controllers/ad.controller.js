@@ -177,37 +177,37 @@ export const updateAdStatus = async (req, res, next) => {
 
 export const getActiveAds = async (req, res, next) => {
   try {
-    const userId = req.user.id;
+    const userId = req.user?.id;
 
-    // Get user interactions
-    const interactions = await UserAdInteraction.find({ userId })
-      .populate({
-        path: "adId",
-        populate: { path: "campaign" },
-      })
-      .limit(50);
+    let userInterests = [];
 
-    // Calculate interest categories
-    const interestMap = {}; 
+    if (userId) {
+      const interactions = await UserAdInteraction.find({ userId })
+        .populate({
+          path: "adId",
+          populate: { path: "campaign" },
+        })
+        .limit(50);
 
-    interactions.forEach((item) => {
-      const category = item.adId?.campaign?.category;
-      if (!category) return;
+      const interestMap = {};
 
-      interestMap[category] = (interestMap[category] || 0) + 1;
-    });
+      interactions.forEach((item) => {
+        const category = item.adId?.campaign?.category;
+        if (!category) return;
 
-    const userInterests = Object.keys(interestMap).sort(
-      (a, b) => interestMap[b] - interestMap[a],
-    );
+        interestMap[category] = (interestMap[category] || 0) + 1;
+      });
 
-    // Get active ads
+      userInterests = Object.keys(interestMap).sort(
+        (a, b) => interestMap[b] - interestMap[a],
+      );
+    }
+
     const ads = await Ad.find({ status: "active" })
       .populate("createdBy", "name avatar")
       .populate("campaign")
       .lean();
 
-    // Prioritize ads based on interests
     ads.sort((a, b) => {
       const aScore = userInterests.includes(a.campaign?.category) ? 1 : 0;
       const bScore = userInterests.includes(b.campaign?.category) ? 1 : 0;
