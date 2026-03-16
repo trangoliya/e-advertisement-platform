@@ -3,9 +3,18 @@ import mongoose from "mongoose";
 const adSchema = new mongoose.Schema(
   {
     title: String,
+
     description: String,
-    imageUrl: String,
+
+    mediaUrl: String,
+
+    mediaType: {
+      type: String,
+      enum: ["image", "video"],
+    },
+
     targetUrl: String,
+
     status: {
       type: String,
       enum: ["draft", "active", "paused"],

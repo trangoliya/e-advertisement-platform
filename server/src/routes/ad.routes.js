@@ -12,11 +12,12 @@ import {
 } from "../controllers/ad.controller.js";
 import authMiddleware from "../middlewares/auth.middleware.js";
 import roleMiddleware from "../middlewares/role.middleware.js";
+import upload from "../middleware/uploadMiddleware.js";
 
 const router = express.Router();
 
 // Post&get only when publisher login
-router.post("/", authMiddleware, roleMiddleware("publisher"), createAd);
+router.post("/", authMiddleware, roleMiddleware("publisher"), upload.single("image"), createAd);
 
 router.get("/my-ads", authMiddleware, roleMiddleware("publisher"), getMyAds);
 router.patch(

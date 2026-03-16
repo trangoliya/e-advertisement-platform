@@ -7,8 +7,7 @@ import UserAdInteraction from "../models/UserAdInteraction.js";
 // use for create a Ad
 export const createAd = async (req, res, next) => {
   try {
-    const { title, description, imageUrl, targetUrl, status, campaignId } =
-      req.body;
+    const { title, description, targetUrl, status, campaignId } = req.body;
 
     if (!campaignId) {
       return res.status(400).json({
@@ -17,14 +16,29 @@ export const createAd = async (req, res, next) => {
       });
     }
 
+    let mediaUrl = null;
+    let mediaType = null;
+
+    // If file uploaded
+    if (req.file) {
+      mediaUrl = `/uploads/${req.file.filename}`;
+
+      if (req.file.mimetype.startsWith("image")) {
+        mediaType = "image";
+      } else if (req.file.mimetype.startsWith("video")) {
+        mediaType = "video";
+      }
+    }
+
     const ad = await Ad.create({
       title,
       description,
-      imageUrl,
       targetUrl,
       status,
-      campaign: campaignId, // LINK TO CAMPAIGN
-      createdBy: req.user.id, // use id (based on your auth middleware)
+      campaign: campaignId,
+      createdBy: req.user.id,
+      mediaUrl,
+      mediaType,
     });
 
     res.status(201).json({
@@ -35,7 +49,6 @@ export const createAd = async (req, res, next) => {
     next(error);
   }
 };
-
 // For get Ad
 export const getMyAds = async (req, res, next) => {
   try {

@@ -20,13 +20,13 @@ app.use(
   }),
 );
 
-
 app.use(express.json());
 app.use("/api/auth", authRoutes);
 app.use("/api/test", testRoutes);
 app.use("/api/ads", adRoutes);
 app.use("/api/viewer", viewerRoutes);
 app.use("/api/publisher", publisherProfileRoutes);
+app.use("/uploads", express.static("uploads"));
 app.use("/api/admin", adminRoutes);
 
 app.use("/api/alerts", alertRoutes);
