@@ -17,7 +17,7 @@ const Sidebar = () => {
   const isUser = roles.includes("user");
 
   return (
-    <div className="fixed top-0 left-0 w-64 h-screen bg-gray-950 text-white p-6 flex flex-col border-r border-gray-800">
+    <div className="fixed top-0 left-0 w-64 h-screen bg-gray-950 text-white p-6 flex flex-col border-r border-gray-800 overflow-y-auto">
       <h2 className="text-3xl font-bold mb-8">AdPlatform</h2>
 
       {/* USER SECTION */}

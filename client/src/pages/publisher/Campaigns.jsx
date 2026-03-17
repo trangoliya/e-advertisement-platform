@@ -27,7 +27,19 @@ const Campaigns = () => {
     description: "",
     totalBudget: "",
     distributionChannels: [],
+    ageMin: "",
+    ageMax: "",
+    locations: "",
+    interests: [],
   });
+
+  const interestOptions = [
+    "Technology",
+    "Gaming",
+    "Finance",
+    "Travel",
+    "Sports",
+  ];
 
   const loadCampaigns = async () => {
     try {
@@ -45,7 +57,7 @@ const Campaigns = () => {
             totalImpressions: analytics?.totalImpressions || 0,
             CTR: analytics?.CTR || 0,
           };
-        })
+        }),
       );
 
       setCampaigns(campaignsWithAnalytics);
@@ -80,19 +92,51 @@ const Campaigns = () => {
     });
   };
 
+  const handleInterestChange = (interest) => {
+    setFormData((prev) => {
+      const exists = prev.interests.includes(interest);
+
+      return {
+        ...prev,
+        interests: exists
+          ? prev.interests.filter((i) => i !== interest)
+          : [...prev.interests, interest],
+      };
+    });
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
       setCreating(true);
 
-      await createCampaign(formData);
+      const targeting = {
+        ageMin: Number(formData.ageMin),
+        ageMax: Number(formData.ageMax),
+        locations: formData.locations
+          ? formData.locations.split(",").map((l) => l.trim())
+          : [],
+        interests: formData.interests,
+      };
+
+      await createCampaign({
+        name: formData.name,
+        description: formData.description,
+        totalBudget: formData.totalBudget,
+        distributionChannels: formData.distributionChannels,
+        targeting,
+      });
 
       setFormData({
         name: "",
         description: "",
         totalBudget: "",
         distributionChannels: [],
+        ageMin: "",
+        ageMax: "",
+        locations: "",
+        interests: [],
       });
 
       await loadCampaigns();
@@ -143,7 +187,7 @@ const Campaigns = () => {
             value={formData.name}
             onChange={handleChange}
             required
-            className="bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-2 text-white focus:ring-2 focus:ring-blue-500"
+            className="bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-2 text-white"
           />
 
           <input
@@ -152,7 +196,7 @@ const Campaigns = () => {
             placeholder="Description"
             value={formData.description}
             onChange={handleChange}
-            className="bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-2 text-white focus:ring-2 focus:ring-blue-500"
+            className="bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-2 text-white"
           />
 
           <input
@@ -162,7 +206,7 @@ const Campaigns = () => {
             value={formData.totalBudget}
             onChange={handleChange}
             required
-            className="bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-2 text-white focus:ring-2 focus:ring-blue-500"
+            className="bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-2 text-white"
           />
 
           {/* Distribution Channels */}
@@ -172,37 +216,73 @@ const Campaigns = () => {
             </label>
 
             <div className="flex gap-6">
+              {["website", "mobile", "email"].map((channel) => (
+                <label
+                  key={channel}
+                  className="flex items-center gap-2 cursor-pointer text-gray-300"
+                >
+                  <input
+                    type="checkbox"
+                    className="accent-blue-500"
+                    checked={formData.distributionChannels.includes(channel)}
+                    onChange={() => handleChannelChange(channel)}
+                  />
+                  {channel}
+                </label>
+              ))}
+            </div>
+          </div>
 
-              <label className="flex items-center gap-2 cursor-pointer text-gray-300">
-                <input
-                  type="checkbox"
-                  className="w-4 h-4 accent-blue-500"
-                  checked={formData.distributionChannels.includes("website")}
-                  onChange={() => handleChannelChange("website")}
-                />
-                Website Ads
-              </label>
+          {/* TARGET AUDIENCE */}
+          <div className="md:col-span-3 border-t border-zinc-800 pt-6 mt-2">
+            <h3 className="text-white font-semibold mb-4">
+             Target Audience
+            </h3>
 
-              <label className="flex items-center gap-2 cursor-pointer text-gray-300">
-                <input
-                  type="checkbox"
-                  className="w-4 h-4 accent-blue-500"
-                  checked={formData.distributionChannels.includes("mobile")}
-                  onChange={() => handleChannelChange("mobile")}
-                />
-                Mobile Ads
-              </label>
+            <div className="grid md:grid-cols-2 gap-4 mb-4">
+              <input
+                type="number"
+                name="ageMin"
+                placeholder="Minimum Age"
+                value={formData.ageMin}
+                onChange={handleChange}
+                className="bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-2 text-white"
+              />
 
-              <label className="flex items-center gap-2 cursor-pointer text-gray-300">
-                <input
-                  type="checkbox"
-                  className="w-4 h-4 accent-blue-500"
-                  checked={formData.distributionChannels.includes("email")}
-                  onChange={() => handleChannelChange("email")}
-                />
-                Email Ads
-              </label>
+              <input
+                type="number"
+                name="ageMax"
+                placeholder="Maximum Age"
+                value={formData.ageMax}
+                onChange={handleChange}
+                className="bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-2 text-white"
+              />
+            </div>
 
+            <input
+              type="text"
+              name="locations"
+              placeholder="Target Locations (Surat, Ahmedabad, Mumbai)"
+              value={formData.locations}
+              onChange={handleChange}
+              className="w-full bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-2 text-white mb-4"
+            />
+
+            <div className="flex flex-wrap gap-6">
+              {interestOptions.map((interest) => (
+                <label
+                  key={interest}
+                  className="flex items-center gap-2 text-gray-300 cursor-pointer"
+                >
+                  <input
+                    type="checkbox"
+                    className="accent-blue-500"
+                    checked={formData.interests.includes(interest)}
+                    onChange={() => handleInterestChange(interest)}
+                  />
+                  {interest}
+                </label>
+              ))}
             </div>
           </div>
 
@@ -216,134 +296,134 @@ const Campaigns = () => {
 
       {/* Campaign List */}
       <div
-        id="campaign-list"
-        className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 shadow-lg min-h-75"
-      >
-        <h2 className="text-lg font-semibold text-white mb-4">My Campaigns</h2>
+  id="campaign-list"
+  className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 shadow-lg min-h-75 overflow-hidden"
+>
+  <h2 className="text-lg font-semibold text-white mb-4">My Campaigns</h2>
 
-        {loading ? (
-          <div className="flex justify-center py-20">
-            <Loader />
-          </div>
-        ) : campaigns.length === 0 ? (
-          <div className="py-16 text-center space-y-3">
-            <p className="text-gray-400 font-medium">No campaigns available.</p>
-            <p className="text-xs text-gray-500">
-              Create a campaign to start running ads.
-            </p>
-          </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead className="text-gray-400 border-b border-zinc-800 uppercase tracking-wider text-xs">
-                <tr>
-                  <th className="px-6 py-4 text-left">Name</th>
-                  <th className="px-6 py-4 text-center">Total</th>
-                  <th className="px-6 py-4 text-center">Spent</th>
-                  <th className="px-6 py-4 text-center">Remaining</th>
-                  <th className="px-6 py-4 text-center">Status</th>
-                  <th className="px-6 py-4 text-center">Channels</th>
-                  <th className="px-6 py-4 text-center">Progress</th>
-                  <th className="px-6 py-4 text-center">Impressions</th>
-                  <th className="px-6 py-4 text-center">Clicks</th>
-                  <th className="px-6 py-4 text-center">CTR %</th>
-                  <th className="px-6 py-4 text-center">Performance</th>
-                </tr>
-              </thead>
+  {loading ? (
+    <div className="flex justify-center py-20">
+      <Loader />
+    </div>
+  ) : campaigns.length === 0 ? (
+    <div className="py-16 text-center space-y-3">
+      <p className="text-gray-400 font-medium">No campaigns available.</p>
+      <p className="text-xs text-gray-500">
+        Create a campaign to start running ads.
+      </p>
+    </div>
+  ) : (
+    <div className="w-full overflow-x-auto">
+      <table className="min-w-300 w-full text-sm">
+        <thead className="text-gray-400 border-b border-zinc-800 uppercase tracking-wider text-xs">
+          <tr>
+            <th className="px-6 py-4 text-left">Name</th>
+            <th className="px-6 py-4 text-center">Total</th>
+            <th className="px-6 py-4 text-center">Spent</th>
+            <th className="px-6 py-4 text-center">Remaining</th>
+            <th className="px-6 py-4 text-center">Status</th>
+            <th className="px-6 py-4 text-center">Channels</th>
+            <th className="px-6 py-4 text-center">Progress</th>
+            <th className="px-6 py-4 text-center">Impressions</th>
+            <th className="px-6 py-4 text-center">Clicks</th>
+            <th className="px-6 py-4 text-center">CTR %</th>
+            <th className="px-6 py-4 text-center">Performance</th>
+          </tr>
+        </thead>
 
-              <tbody>
-                {campaigns.map((campaign) => {
-                  const spent = campaign.spentBudget || 0;
-                  const remaining = campaign.totalBudget - spent;
+        <tbody>
+          {campaigns.map((campaign) => {
+            const spent = campaign.spentBudget || 0;
+            const remaining = campaign.totalBudget - spent;
 
-                  const percentage =
-                    campaign.totalBudget > 0
-                      ? (spent / campaign.totalBudget) * 100
-                      : 0;
+            const percentage =
+              campaign.totalBudget > 0
+                ? (spent / campaign.totalBudget) * 100
+                : 0;
 
-                  const chartData = [
-                    {
-                      name: "Performance",
-                      impressions: campaign.totalImpressions,
-                      clicks: campaign.totalClicks,
-                    },
-                  ];
+            const chartData = [
+              {
+                name: "Performance",
+                impressions: campaign.totalImpressions,
+                clicks: campaign.totalClicks,
+              },
+            ];
 
-                  return (
-                    <tr
-                      key={campaign._id}
-                      className="border-b border-zinc-800 hover:bg-zinc-800/50 transition"
-                    >
-                      <td className="px-6 py-6 text-white font-semibold">
-                        {campaign.name}
-                      </td>
+            return (
+              <tr
+                key={campaign._id}
+                className="border-b border-zinc-800 hover:bg-zinc-800/50 transition"
+              >
+                <td className="px-6 py-6 text-white font-semibold">
+                  {campaign.name}
+                </td>
 
-                      <td className="px-6 py-5 text-gray-300 text-right">
-                        ₹ {campaign.totalBudget}
-                      </td>
+                <td className="px-6 py-5 text-gray-300 text-right">
+                  ₹ {campaign.totalBudget}
+                </td>
 
-                      <td className="px-6 py-5 text-gray-300 text-right">
-                        ₹ {spent}
-                      </td>
+                <td className="px-6 py-5 text-gray-300 text-right">
+                  ₹ {spent}
+                </td>
 
-                      <td className="px-6 py-5 text-gray-300 text-right">
-                        ₹ {remaining}
-                      </td>
+                <td className="px-6 py-5 text-gray-300 text-right">
+                  ₹ {remaining}
+                </td>
 
-                      <td className="px-6 py-5 text-center">
-                        <StatusBadge status={campaign.status} />
-                      </td>
+                <td className="px-6 py-5 text-center">
+                  <StatusBadge status={campaign.status} />
+                </td>
 
-                      <td className="px-6 py-5 text-center text-gray-300">
-                        {campaign.distributionChannels?.join(", ") || "website"}
-                      </td>
+                <td className="px-6 py-5 text-center text-gray-300">
+                  {campaign.distributionChannels?.join(", ") || "website"}
+                </td>
 
-                      <td className="px-6 py-5 text-center w-40">
-                        <div className="w-full bg-zinc-800 rounded-full h-2.5">
-                          <div
-                            className={`h-2.5 rounded-full ${
-                              percentage >= 100
-                                ? "bg-red-500"
-                                : percentage >= 70
-                                ? "bg-yellow-500"
-                                : "bg-blue-500"
-                            }`}
-                            style={{ width: `${Math.min(percentage, 100)}%` }}
-                          />
-                        </div>
-                      </td>
+                <td className="px-6 py-5 text-center w-40">
+                  <div className="w-full bg-zinc-800 rounded-full h-2.5">
+                    <div
+                      className={`h-2.5 rounded-full ${
+                        percentage >= 100
+                          ? "bg-red-500"
+                          : percentage >= 70
+                          ? "bg-yellow-500"
+                          : "bg-blue-500"
+                      }`}
+                      style={{ width: `${Math.min(percentage, 100)}%` }}
+                    />
+                  </div>
+                </td>
 
-                      <td className="px-6 py-5 text-gray-300 text-right">
-                        {campaign.totalImpressions}
-                      </td>
+                <td className="px-6 py-5 text-gray-300 text-right">
+                  {campaign.totalImpressions}
+                </td>
 
-                      <td className="px-6 py-5 text-gray-300 text-right">
-                        {campaign.totalClicks}
-                      </td>
+                <td className="px-6 py-5 text-gray-300 text-right">
+                  {campaign.totalClicks}
+                </td>
 
-                      <td className="px-6 py-5 text-gray-300 text-right">
-                        {campaign.CTR}%
-                      </td>
+                <td className="px-6 py-5 text-gray-300 text-right">
+                  {campaign.CTR}%
+                </td>
 
-                      <td className="px-6 py-5 text-center w-64">
-                        <ResponsiveContainer width="100%" height={100}>
-                          <BarChart data={chartData}>
-                            <XAxis dataKey="name" hide />
-                            <YAxis hide />
-                            <Tooltip />
-                            <Bar dataKey="impressions" fill="#3b82f6" />
-                            <Bar dataKey="clicks" fill="#22c55e" />
-                          </BarChart>
-                        </ResponsiveContainer>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </div>
+                <td className="px-6 py-5 text-center w-64">
+                  <ResponsiveContainer width="100%" height={100}>
+                    <BarChart data={chartData}>
+                      <XAxis dataKey="name" hide />
+                      <YAxis hide />
+                      <Tooltip />
+                      <Bar dataKey="impressions" fill="#3b82f6" />
+                      <Bar dataKey="clicks" fill="#22c55e" />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
+  )}
+</div>
     </div>
   );
 };

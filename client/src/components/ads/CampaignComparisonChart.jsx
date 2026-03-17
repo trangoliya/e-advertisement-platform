@@ -27,7 +27,7 @@ const CampaignComparisonChart = ({ campaigns = [] }) => {
     <div className="bg-white shadow-lg rounded-xl p-5 w-full">
       <h2 className="text-lg font-semibold mb-4">Campaign Comparison</h2>
 
-      <div className="w-full min-h-[320px]">
+      <div className="w-full min-h-80">
   <ResponsiveContainer width="100%" height={320}>
     <BarChart data={data}>
       <CartesianGrid strokeDasharray="3 3" />

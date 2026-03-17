@@ -12,7 +12,7 @@ const AnalyticsChart = ({ data = [] }) => {
   if (!data.length) return null;
 
   return (
-    <div className="w-full min-h-[320px]">
+    <div className="w-full min-h-80">
       <ResponsiveContainer width="100%" height={320}>
         <LineChart data={data}>
           <CartesianGrid strokeDasharray="3 3" />
