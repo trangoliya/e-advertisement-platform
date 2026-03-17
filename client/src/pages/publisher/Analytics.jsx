@@ -48,6 +48,11 @@ const Analytics = () => {
   };
   const totalClicks = ads.reduce((sum, ad) => sum + (ad.clicks || 0), 0);
 
+  const totalConversions = ads.reduce(
+    (sum, ad) => sum + (ad.conversions || 0),
+    0,
+  );
+
   const totalImpressions = ads.reduce(
     (sum, ad) => sum + (ad.impressions || 0),
     0,
@@ -115,9 +120,10 @@ const Analytics = () => {
       ) : (
         <>
           {/* Stat Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <StatCard title="Total Impressions" value={totalImpressions} />
             <StatCard title="Total Clicks" value={totalClicks} />
+            <StatCard title="Total Conversions" value={totalConversions} />
             <StatCard title="CTR (%)" value={`${ctr}%`} />
           </div>
 

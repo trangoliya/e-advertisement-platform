@@ -123,6 +123,9 @@ export const incrementClick = async (req, res, next) => {
     // Increment ad clicks
     ad.clicks += 1;
 
+    // Increment ad conversions
+    ad.conversions += 1;
+    
     // Increase campaign spent budget
     campaign.spentBudget += CPC;
 

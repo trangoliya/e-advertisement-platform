@@ -9,7 +9,7 @@ import errorHandler from "./middlewares/error.middleware.js";
 
 import campaignRoutes from "./routes/campaign.routes.js";
 import publisherProfileRoutes from "./routes/publisherProfile.routes.js";
-
+import feedbackRoutes from "./routes/feedback.routes.js";
 import alertRoutes from "./routes/alert.routes.js";
 
 const app = express();
@@ -30,7 +30,7 @@ app.use("/uploads", express.static("uploads"));
 app.use("/api/admin", adminRoutes);
 
 app.use("/api/alerts", alertRoutes);
-
+app.use("/api", feedbackRoutes);
 app.use("/api/campaigns", campaignRoutes);
 app.get("/test", (req, res) => {
   res.send("Server working");

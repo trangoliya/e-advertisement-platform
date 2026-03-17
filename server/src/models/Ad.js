@@ -36,13 +36,18 @@ const adSchema = new mongoose.Schema(
       default: 0,
     },
 
+    conversions: {
+      type: Number,
+      default: 0,
+    },
+
     campaign: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Campaign",
       required: true,
     },
   },
-  { timestamps: true },
+  { timestamps: true }
 );
 
 const Ad = mongoose.model("Ad", adSchema);

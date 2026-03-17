@@ -76,10 +76,12 @@ export const getCampaignAnalytics = async (req, res, next) => {
     // Calculate totals
     let totalClicks = 0;
     let totalImpressions = 0;
+    let totalConversions = 0;
 
     ads.forEach((ad) => {
       totalClicks += ad.clicks || 0;
       totalImpressions += ad.impressions || 0;
+      totalConversions += ad.conversions || 0;
     });
 
     // Calculate CTR safely
@@ -91,6 +93,7 @@ export const getCampaignAnalytics = async (req, res, next) => {
       data: {
         totalClicks,
         totalImpressions,
+        totalConversions,
         CTR: Number(CTR.toFixed(2)),
       },
     });
@@ -119,10 +122,12 @@ export const exportCampaignAnalytics = async (req, res, next) => {
 
       let totalClicks = 0;
       let totalImpressions = 0;
+      let totalConversions = 0;
 
       ads.forEach((ad) => {
         totalClicks += ad.clicks || 0;
         totalImpressions += ad.impressions || 0;
+        totalConversions += ad.conversions || 0;
       });
 
       const ctr =
@@ -134,6 +139,7 @@ export const exportCampaignAnalytics = async (req, res, next) => {
         CampaignName: campaign.name,
         Impressions: totalImpressions,
         Clicks: totalClicks,
+        Conversions: totalConversions,
         CTR: ctr,
         Budget: campaign.totalBudget,
       });

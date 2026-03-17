@@ -1,12 +1,15 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { incrementClick, getAdById } from "../../services/ad.service";
+import axios from "axios";
 
 const AdDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+
   const [ad, setAd] = useState(null);
   const [visiting, setVisiting] = useState(false);
+  const [feedbackSubmitted, setFeedbackSubmitted] = useState(false);
 
   useEffect(() => {
     const fetchAd = async () => {
@@ -37,6 +40,18 @@ const AdDetails = () => {
       console.error("Error increment click:", error);
     } finally {
       setVisiting(false);
+    }
+  };
+
+  const sendFeedback = async (response) => {
+    try {
+      await axios.post(`/api/ads/${ad._id}/feedback`, {
+        response,
+      });
+
+      setFeedbackSubmitted(true);
+    } catch (error) {
+      console.error("Error submitting feedback:", error);
     }
   };
 
@@ -92,6 +107,37 @@ const AdDetails = () => {
         >
           {visiting ? "Redirecting..." : "Visit Website"}
         </button>
+
+        {/* Feedback Section */}
+        <div className="mt-6 border-t pt-4">
+          <p className="font-semibold mb-3 text-gray-800">
+            Was this ad helpful?
+          </p>
+
+          <div className="flex gap-4">
+            <button
+              disabled={feedbackSubmitted}
+              onClick={() => sendFeedback("yes")}
+              className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 disabled:opacity-50"
+            >
+              👍 Yes
+            </button>
+
+            <button
+              disabled={feedbackSubmitted}
+              onClick={() => sendFeedback("no")}
+              className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 disabled:opacity-50"
+            >
+              👎 No
+            </button>
+          </div>
+
+          {feedbackSubmitted && (
+            <p className="text-sm text-gray-500 mt-2">
+              Thank you for your feedback!
+            </p>
+          )}
+        </div>
       </div>
     </div>
   );
