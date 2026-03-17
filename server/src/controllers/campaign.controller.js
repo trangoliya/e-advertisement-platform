@@ -1,5 +1,6 @@
 import Campaign from "../models/Campaign.js";
 import Ad from "../models/Ad.js";
+import Alert from "../models/Alert.js";
 import { Parser } from "json2csv";
 
 // Create Campaign
@@ -87,7 +88,25 @@ export const getCampaignAnalytics = async (req, res, next) => {
     // Calculate CTR safely
     const CTR =
       totalImpressions > 0 ? (totalClicks / totalImpressions) * 100 : 0;
+    // Optimization alert if CTR too low
+    if (CTR < 1 && totalImpressions > 50) {
+      const existingAlert = await Alert.findOne({
+        campaignId: id,
+        type: "optimization",
+      });
 
+      if (!existingAlert) {
+        const campaign = await Campaign.findById(id);
+
+        await Alert.create({
+          userId: campaign.createdBy,
+          campaignId: id,
+          message:
+            "Campaign performance is low. Consider adjusting targeting or ad design.",
+          type: "optimization",
+        });
+      }
+    }
     res.status(200).json({
       success: true,
       data: {

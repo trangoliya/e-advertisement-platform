@@ -7,6 +7,7 @@ import TopAds from "../../components/ads/TopAds.jsx";
 import CTRTrendChart from "../../components/ads/CTRTrendChart.jsx";
 import StatusBadge from "../../components/common/StatusBadge";
 import { getMyAds } from "../../services/ad.service";
+import { getAlerts } from "../../services/alert.service";
 import Button from "../../components/common/Button.jsx";
 import Loader from "../../components/common/Loader.jsx";
 
@@ -14,15 +15,14 @@ const PublisherPage = () => {
   const navigate = useNavigate();
 
   const [ads, setAds] = useState([]);
+  const [alerts, setAlerts] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchAds = async () => {
       try {
         setLoading(true);
-
         const res = await getMyAds();
-
         setAds(res?.data || []);
       } catch (err) {
         console.error("Error fetching ads", err);
@@ -31,7 +31,17 @@ const PublisherPage = () => {
       }
     };
 
+    const fetchAlerts = async () => {
+      try {
+        const res = await getAlerts();
+        setAlerts(res?.data?.data || []);
+      } catch (error) {
+        console.error("Error fetching alerts", error);
+      }
+    };
+
     fetchAds();
+    fetchAlerts();
   }, []);
 
   const totalAds = ads.length;
@@ -42,7 +52,7 @@ const PublisherPage = () => {
 
   const totalImpressions = ads.reduce(
     (sum, ad) => sum + (ad.impressions || 0),
-    0,
+    0
   );
 
   const avgCTR =
@@ -51,41 +61,13 @@ const PublisherPage = () => {
       : 0;
 
   const chartData = [
-    {
-      name: "Mon",
-      clicks: Math.round(totalClicks * 0.12),
-      impressions: Math.round(totalImpressions * 0.15),
-    },
-    {
-      name: "Tue",
-      clicks: Math.round(totalClicks * 0.18),
-      impressions: Math.round(totalImpressions * 0.2),
-    },
-    {
-      name: "Wed",
-      clicks: Math.round(totalClicks * 0.14),
-      impressions: Math.round(totalImpressions * 0.17),
-    },
-    {
-      name: "Thu",
-      clicks: Math.round(totalClicks * 0.16),
-      impressions: Math.round(totalImpressions * 0.18),
-    },
-    {
-      name: "Fri",
-      clicks: Math.round(totalClicks * 0.2),
-      impressions: Math.round(totalImpressions * 0.22),
-    },
-    {
-      name: "Sat",
-      clicks: Math.round(totalClicks * 0.1),
-      impressions: Math.round(totalImpressions * 0.08),
-    },
-    {
-      name: "Sun",
-      clicks: Math.round(totalClicks * 0.1),
-      impressions: Math.round(totalImpressions * 0.1),
-    },
+    { name: "Mon", clicks: Math.round(totalClicks * 0.12), impressions: Math.round(totalImpressions * 0.15) },
+    { name: "Tue", clicks: Math.round(totalClicks * 0.18), impressions: Math.round(totalImpressions * 0.2) },
+    { name: "Wed", clicks: Math.round(totalClicks * 0.14), impressions: Math.round(totalImpressions * 0.17) },
+    { name: "Thu", clicks: Math.round(totalClicks * 0.16), impressions: Math.round(totalImpressions * 0.18) },
+    { name: "Fri", clicks: Math.round(totalClicks * 0.2), impressions: Math.round(totalImpressions * 0.22) },
+    { name: "Sat", clicks: Math.round(totalClicks * 0.1), impressions: Math.round(totalImpressions * 0.08) },
+    { name: "Sun", clicks: Math.round(totalClicks * 0.1), impressions: Math.round(totalImpressions * 0.1) },
   ];
 
   return (
@@ -100,6 +82,20 @@ const PublisherPage = () => {
           + Add New Ad
         </Button>
       </div>
+
+      {/* Alerts */}
+      {alerts.length > 0 && (
+        <div className="space-y-2">
+          {alerts.map((alert) => (
+            <div
+              key={alert._id}
+              className="flex items-center gap-2 bg-yellow-100 border-l-4 border-yellow-500 p-3 rounded-md text-sm"
+            >
+              ⚠ {alert.message}
+            </div>
+          ))}
+        </div>
+      )}
 
       {loading ? (
         <div className="flex justify-center py-20">
@@ -124,22 +120,14 @@ const PublisherPage = () => {
           {/* Stats Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
             <StatCard title="Total Ads" value={totalAds} />
-
             <StatCard title="Active Ads" value={activeAds} />
-
             <StatCard title="Total Clicks" value={totalClicks} />
-
             <StatCard title="Impressions" value={totalImpressions} />
-
             <StatCard title="Average CTR" value={`${avgCTR}%`} />
           </div>
 
           {/* Performance Chart */}
-          <div
-            className="bg-bgSecondary border border-borderColorCustom
-  rounded-2xl p-6 transition-all duration-200
-  hover:shadow-md hover:-translate-y-0.5"
-          >
+          <div className="bg-bgSecondary border border-borderColorCustom rounded-2xl p-6 transition-all duration-200 hover:shadow-md hover:-translate-y-0.5">
             <h3 className="text-lg font-semibold text-textPrimary mb-4">
               Performance Overview
             </h3>
@@ -154,18 +142,14 @@ const PublisherPage = () => {
             <CTRTrendChart data={chartData} />
           </div>
 
-          {/* Campaign Comparison Chart */}
+          {/* Campaign Comparison */}
           <CampaignComparisonChart campaigns={ads.slice(0, 5)} />
 
-          {/* Top Performing Ads */}
+          {/* Top Ads */}
           <TopAds ads={ads} />
 
           {/* Ads Table */}
-          <div
-            className="bg-bgSecondary border border-borderColorCustom
-            rounded-2xl overflow-hidden
-            transition duration-200 hover:shadow-sm"
-          >
+          <div className="bg-bgSecondary border border-borderColorCustom rounded-2xl overflow-hidden transition duration-200 hover:shadow-sm">
             <table className="w-full text-sm">
               <thead className="bg-bgPrimary border-b border-borderColorCustom">
                 <tr className="text-xs uppercase tracking-wider text-textSecondary">
@@ -179,8 +163,7 @@ const PublisherPage = () => {
                 {ads.slice(0, 5).map((ad) => (
                   <tr
                     key={ad._id}
-                    className="border-t border-borderColorCustom
-                    hover:bg-bgPrimary transition duration-200"
+                    className="border-t border-borderColorCustom hover:bg-bgPrimary transition duration-200"
                   >
                     <td className="px-6 py-5 text-textPrimary">{ad.title}</td>
 
