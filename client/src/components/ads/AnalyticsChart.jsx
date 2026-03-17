@@ -8,12 +8,12 @@ import {
   CartesianGrid,
 } from "recharts";
 
-const AnalyticsChart = ({ data }) => {
-  if (!data || data.length === 0) return null;
+const AnalyticsChart = ({ data = [] }) => {
+  if (!data.length) return null;
 
   return (
-    <div className="w-full">
-      <ResponsiveContainer width="100%" aspect={3}>
+    <div className="w-full min-h-[320px]">
+      <ResponsiveContainer width="100%" height={320}>
         <LineChart data={data}>
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="name" />
@@ -26,4 +26,5 @@ const AnalyticsChart = ({ data }) => {
     </div>
   );
 };
+
 export default AnalyticsChart;

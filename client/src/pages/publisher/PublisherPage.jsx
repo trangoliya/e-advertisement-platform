@@ -2,6 +2,9 @@ import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import StatCard from "../../components/common/StatCard.jsx";
 import AnalyticsChart from "../../components/ads/AnalyticsChart.jsx";
+import CampaignComparisonChart from "../../components/ads/CampaignComparisonChart.jsx";
+import TopAds from "../../components/ads/TopAds.jsx";
+import CTRTrendChart from "../../components/ads/CTRTrendChart.jsx";
 import StatusBadge from "../../components/common/StatusBadge";
 import { getMyAds } from "../../services/ad.service";
 import Button from "../../components/common/Button.jsx";
@@ -41,6 +44,11 @@ const PublisherPage = () => {
     (sum, ad) => sum + (ad.impressions || 0),
     0,
   );
+
+  const avgCTR =
+    totalImpressions > 0
+      ? ((totalClicks / totalImpressions) * 100).toFixed(2)
+      : 0;
 
   const chartData = [
     {
@@ -114,7 +122,7 @@ const PublisherPage = () => {
       ) : (
         <>
           {/* Stats Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
             <StatCard title="Total Ads" value={totalAds} />
 
             <StatCard title="Active Ads" value={activeAds} />
@@ -122,27 +130,41 @@ const PublisherPage = () => {
             <StatCard title="Total Clicks" value={totalClicks} />
 
             <StatCard title="Impressions" value={totalImpressions} />
+
+            <StatCard title="Average CTR" value={`${avgCTR}%`} />
           </div>
 
-          {/* Chart */}
+          {/* Performance Chart */}
           <div
             className="bg-bgSecondary border border-borderColorCustom
-                       rounded-2xl p-6
-                       transition-all duration-200
-                       hover:shadow-md hover:-translate-y-0.5"
+  rounded-2xl p-6 transition-all duration-200
+  hover:shadow-md hover:-translate-y-0.5"
           >
             <h3 className="text-lg font-semibold text-textPrimary mb-4">
               Performance Overview
             </h3>
 
-            <AnalyticsChart data={chartData} />
+            <div className="w-full h-80">
+              <AnalyticsChart data={chartData} />
+            </div>
           </div>
+
+          {/* CTR Trend */}
+          <div className="w-full h-80">
+            <CTRTrendChart data={chartData} />
+          </div>
+
+          {/* Campaign Comparison Chart */}
+          <CampaignComparisonChart campaigns={ads.slice(0, 5)} />
+
+          {/* Top Performing Ads */}
+          <TopAds ads={ads} />
 
           {/* Ads Table */}
           <div
             className="bg-bgSecondary border border-borderColorCustom
-                       rounded-2xl overflow-hidden
-                       transition duration-200 hover:shadow-sm"
+            rounded-2xl overflow-hidden
+            transition duration-200 hover:shadow-sm"
           >
             <table className="w-full text-sm">
               <thead className="bg-bgPrimary border-b border-borderColorCustom">
@@ -158,8 +180,7 @@ const PublisherPage = () => {
                   <tr
                     key={ad._id}
                     className="border-t border-borderColorCustom
-                               hover:bg-bgPrimary
-                               transition duration-200 ease-in-out"
+                    hover:bg-bgPrimary transition duration-200"
                   >
                     <td className="px-6 py-5 text-textPrimary">{ad.title}</td>
 
