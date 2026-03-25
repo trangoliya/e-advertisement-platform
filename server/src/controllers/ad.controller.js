@@ -117,19 +117,38 @@ export const incrementClick = async (req, res, next) => {
       });
     }
 
+    const today = new Date().toDateString();
+    const lastReset = campaign.lastResetDate
+      ? new Date(campaign.lastResetDate).toDateString()
+      : null;
+
+    if (lastReset !== today) {
+      campaign.dailySpent = 0;
+      campaign.lastResetDate = new Date();
+    }
+
     // Define CPC
     const CPC = 2;
-
+    if (
+      campaign.dailyBudget > 0 &&
+      campaign.dailySpent + 2 > campaign.dailyBudget
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: "Daily budget limit reached",
+      });
+    }
     // Increment ad clicks
     ad.clicks += 1;
 
     // Increment ad conversions
     ad.conversions += 1;
-    
+
     // Increase campaign spent budget
+    campaign.dailySpent += CPC;
     campaign.spentBudget += CPC;
 
-    // Auto pause if budget exceeded
+    // Auto pause if total budget exceeded
     if (campaign.spentBudget >= campaign.totalBudget) {
       campaign.status = "paused";
     }
@@ -142,7 +161,7 @@ export const incrementClick = async (req, res, next) => {
 
     if (spentPercentage >= 80 && spentPercentage < 100) {
       await Alert.create({
-        userId: campaign.createdBy, // advertiser
+        userId: campaign.createdBy,
         campaignId: campaign._id,
         message: "Campaign budget reaching 80%",
         type: "warning",
@@ -160,6 +179,7 @@ export const incrementClick = async (req, res, next) => {
         type: "critical",
       });
     }
+
     res.status(200).json({
       success: true,
       message: "Click recorded",

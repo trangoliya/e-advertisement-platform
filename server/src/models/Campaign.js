@@ -25,6 +25,23 @@ const campaignSchema = new mongoose.Schema(
       min: 0,
     },
 
+    dailyBudget: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
+
+    dailySpent: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
+
+    lastResetDate: {
+      type: Date,
+      default: Date.now,
+    },
+
     status: {
       type: String,
       enum: ["active", "paused", "completed"],
