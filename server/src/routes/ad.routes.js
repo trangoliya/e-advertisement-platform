@@ -17,7 +17,7 @@ import upload from "../middlewares/uploadMiddleware.js";
 const router = express.Router();
 
 // Post&get only when publisher login
-router.post("/", authMiddleware, roleMiddleware("publisher"), upload.single("image"), createAd);
+router.post("/", authMiddleware, roleMiddleware("publisher"), upload.single("media"), createAd);
 
 router.get("/my-ads", authMiddleware, roleMiddleware("publisher"), getMyAds);
 router.patch(
