@@ -18,7 +18,7 @@ const adSchema = new mongoose.Schema(
     status: {
       type: String,
       enum: ["draft", "active", "paused"],
-      default: "draft",
+      default: "active",
     },
 
     createdBy: {
