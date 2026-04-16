@@ -7,6 +7,7 @@ import {
   toggleLikeAd,
   toggleSaveAd,
 } from "../../utils/adEngagement";
+import { useNavigate } from "react-router-dom";
 
 const AdCard = ({
   id,
@@ -14,7 +15,6 @@ const AdCard = ({
   description,
   impressions,
   clicks,
-  onView,
   mediaUrl,
   mediaType = "image",
   publisherName = "Sponsored",
@@ -53,15 +53,17 @@ const AdCard = ({
   };
 
   // Track ad click
+  const navigate = useNavigate();
   const handleAdClick = async () => {
     try {
       await api.post("/api/ads/track-click", { adId: id });
       await incrementClick(id);
 
-      if (onView) onView();
+      navigate(`/ads/${id}`);
     } catch (error) {
       console.error("Click tracking failed:", error);
     }
+    
   };
 
   return (

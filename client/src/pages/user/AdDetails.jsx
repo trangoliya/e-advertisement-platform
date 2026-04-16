@@ -15,7 +15,9 @@ const AdDetails = () => {
     const fetchAd = async () => {
       try {
         const res = await getAdById(id);
-        setAd(res.data.data);
+        console.log(res.data);
+
+        setAd(res.data.ad || res.data.data || res.data);
       } catch (error) {
         console.error("Error fetching ad:", error);
       }
