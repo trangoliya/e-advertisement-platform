@@ -45,7 +45,7 @@ const AdDetails = () => {
 
   const sendFeedback = async (response) => {
     try {
-      await axios.post(`/api/ads/${ad._id}/feedback`, {
+      await api.post(`/api/ads/${ad._id}/feedback`, {
         response,
       });
 

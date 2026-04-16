@@ -33,7 +33,7 @@ const AdCard = ({
   useEffect(() => {
     const trackView = async () => {
       try {
-        await axios.post("/api/ads/track-view", { adId: id });
+        await api.post("/api/ads/track-view", { adId: id });
       } catch (error) {
         console.error("View tracking failed:", error);
       }
@@ -55,7 +55,7 @@ const AdCard = ({
   // Track ad click
   const handleAdClick = async () => {
     try {
-      await axios.post("/api/ads/track-click", { adId: id });
+      await api.post("/api/ads/track-click", { adId: id });
       await incrementClick(id);
 
       if (onView) onView();
