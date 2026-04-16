@@ -94,10 +94,10 @@ export const getViewerAds = async (req, res) => {
         message: "Viewer profile not found",
       });
     }
-console.log("Profile:", profile);
+    console.log("Profile:", profile);
     // Fetch active campaigns
     const campaigns = await Campaign.find({ status: "active" });
-console.log("Campaigns:", campaigns.length);
+    console.log("Campaigns:", campaigns.length);
     // Targeting matching
     const matchedCampaigns = campaigns.filter((campaign) => {
       const targeting = campaign.targeting || {};
@@ -109,18 +109,22 @@ console.log("Campaigns:", campaigns.length);
       const cityMatch =
         !targeting.locations ||
         targeting.locations.length === 0 ||
-        targeting.locations.includes(profile.city);
+        targeting.locations.some(
+          (loc) => loc.toLowerCase() === profile.city.toLowerCase(),
+        );
 
       const interestMatch =
         !targeting.interests ||
         targeting.interests.length === 0 ||
         profile.interests.some((interest) =>
-          targeting.interests.includes(interest),
+          targeting.interests.some(
+            (target) => target.toLowerCase() === interest.toLowerCase(),
+          ),
         );
 
       return ageMatch && cityMatch && interestMatch;
     });
-console.log("Matched Campaigns:", matchedCampaigns.length);
+    console.log("Matched Campaigns:", matchedCampaigns.length);
     // Extract campaign IDs
     const campaignIds = matchedCampaigns.map((c) => c._id);
 
