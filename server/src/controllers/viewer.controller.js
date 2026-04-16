@@ -94,10 +94,9 @@ export const getViewerAds = async (req, res) => {
         message: "Viewer profile not found",
       });
     }
-    console.log("Profile:", profile);
     // Fetch active campaigns
     const campaigns = await Campaign.find({ status: "active" });
-    console.log("Campaigns:", campaigns.length);
+
     // Targeting matching
     const matchedCampaigns = campaigns.filter((campaign) => {
       const targeting = campaign.targeting || {};
@@ -124,7 +123,6 @@ export const getViewerAds = async (req, res) => {
 
       return ageMatch && cityMatch && interestMatch;
     });
-    console.log("Matched Campaigns:", matchedCampaigns.length);
     // Extract campaign IDs
     const campaignIds = matchedCampaigns.map((c) => c._id);
 
