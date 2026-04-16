@@ -11,11 +11,12 @@ import campaignRoutes from "./routes/campaign.routes.js";
 import publisherProfileRoutes from "./routes/publisherProfile.routes.js";
 import feedbackRoutes from "./routes/feedback.routes.js";
 import alertRoutes from "./routes/alert.routes.js";
-
+import cors from "cors";
 const app = express();
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: "https://e-advertisement-platform.vercel.app/",
+    methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
   }),
 );
