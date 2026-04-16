@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { incrementClick, getAdById } from "../../services/ad.service";
-import axios from "axios";
+import api from "../../services/api";
 
 const AdDetails = () => {
   const { id } = useParams();

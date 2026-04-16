@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
+import api from "../../services/api";
 import { incrementClick } from "../../services/ad.service";
 import {
   getLikedAds,
