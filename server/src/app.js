@@ -11,6 +11,8 @@ import campaignRoutes from "./routes/campaign.routes.js";
 import publisherProfileRoutes from "./routes/publisherProfile.routes.js";
 import feedbackRoutes from "./routes/feedback.routes.js";
 import alertRoutes from "./routes/alert.routes.js";
+import fs from "fs";
+
 const app = express();
 app.use(
   cors({
@@ -19,7 +21,9 @@ app.use(
     credentials: true,
   }),
 );
-
+if (!fs.existsSync("uploads")) {
+  fs.mkdirSync("uploads");
+}
 app.use(express.json());
 app.use("/api/auth", authRoutes);
 app.use("/api/test", testRoutes);
