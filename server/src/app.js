@@ -15,7 +15,7 @@ import cors from "cors";
 const app = express();
 app.use(
   cors({
-    origin: "https://e-advertisement-platform.vercel.app/",
+    origin: "https://e-advertisement-platform.vercel.app",
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
   }),
