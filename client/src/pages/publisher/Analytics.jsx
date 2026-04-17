@@ -4,7 +4,7 @@ import StatCard from "../../components/common/StatCard";
 import AnalyticsChart from "../../components/ads/AnalyticsChart";
 import Loader from "../../components/common/Loader";
 import Button from "../../components/common/Button";
-import axios from "axios";
+import api from "../../services/api";
 
 const Analytics = () => {
   const [ads, setAds] = useState([]);
@@ -25,18 +25,11 @@ const Analytics = () => {
     fetchAds();
   }, []);
 
-  const exportCSV = async () => {
-    const token = localStorage.getItem("token");
-
-    const response = await axios.get(
-      "http://localhost:5000/api/campaigns/export",
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        responseType: "blob",
-      },
-    );
+ const exportCSV = async () => {
+  try {
+    const response = await api.get("/api/campaigns/export", {
+      responseType: "blob",
+    });
 
     const url = window.URL.createObjectURL(new Blob([response.data]));
     const link = document.createElement("a");
@@ -45,7 +38,10 @@ const Analytics = () => {
     link.setAttribute("download", "campaign_analytics.csv");
     document.body.appendChild(link);
     link.click();
-  };
+  } catch (error) {
+    console.error("Export failed:", error);
+  }
+};
   const totalClicks = ads.reduce((sum, ad) => sum + (ad.clicks || 0), 0);
 
   const totalConversions = ads.reduce(
