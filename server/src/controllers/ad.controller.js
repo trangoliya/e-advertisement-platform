@@ -16,6 +16,12 @@ export const createAd = async (req, res, next) => {
       });
     }
 
+    if (!targetUrl || !targetUrl.startsWith("http")) {
+      return res.status(400).json({
+        success: false,
+        message: "Valid target URL is required (https://...)",
+      });
+    }
     let mediaUrl = null;
     let mediaType = null;
 
@@ -29,7 +35,6 @@ export const createAd = async (req, res, next) => {
         mediaType = "video";
       }
     }
-
     const ad = await Ad.create({
       title,
       description,
@@ -43,7 +48,7 @@ export const createAd = async (req, res, next) => {
 
     res.status(201).json({
       success: true,
-      data: ad,
+      ad,
     });
   } catch (error) {
     next(error);
@@ -288,7 +293,7 @@ export const getAdById = async (req, res, next) => {
     }
     res.status(200).json({
       success: true,
-      data: ad,
+      ad,
     });
   } catch (error) {
     next(error);

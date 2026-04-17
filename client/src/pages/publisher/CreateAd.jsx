@@ -13,6 +13,7 @@ const CreateAd = () => {
     title: "",
     description: "",
     campaignId: "",
+    targetUrl: "",
   });
 
   const [media, setMedia] = useState(null);
@@ -59,6 +60,7 @@ const CreateAd = () => {
       data.append("title", formData.title);
       data.append("description", formData.description);
       data.append("campaignId", formData.campaignId);
+      data.append("targetUrl", formData.targetUrl);
 
       if (media) {
         data.append("media", media);
@@ -145,6 +147,26 @@ const CreateAd = () => {
                          px-4 py-2.5 text-textPrimary
                          outline-none transition-all duration-200
                          focus:border-accent focus:ring-2 focus:ring-accent/30"
+            />
+          </div>
+
+            {/* Target URL */}
+          <div>
+            <label className="block text-sm font-medium text-textSecondary mb-1">
+              Advertisement URL
+            </label>
+
+            <input
+              type="url"
+              name="targetUrl"
+              value={formData.targetUrl}
+              onChange={handleChange}
+              required
+              placeholder="https://example.com"
+              className="w-full rounded-xl bg-bgPrimary border border-borderColorCustom
+               px-4 py-2.5 text-textPrimary
+               outline-none transition duration-200
+               focus:border-accent focus:ring-2 focus:ring-accent/30"
             />
           </div>
 

@@ -13,7 +13,11 @@ const adSchema = new mongoose.Schema(
       enum: ["image", "video"],
     },
 
-    targetUrl: String,
+    targetUrl: {
+      type: String,
+      required: true,
+      trim: true,
+    },
 
     status: {
       type: String,
@@ -47,7 +51,7 @@ const adSchema = new mongoose.Schema(
       required: true,
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 const Ad = mongoose.model("Ad", adSchema);
