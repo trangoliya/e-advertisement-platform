@@ -7,7 +7,7 @@ import UserAdInteraction from "../models/UserAdInteraction.js";
 // use for create a Ad
 export const createAd = async (req, res, next) => {
   try {
-    const { title, description, targetUrl, status, campaignId } = req.body;
+    const { title, description, targetUrl, status, campaignId, template  } = req.body;
 
     if (!campaignId) {
       return res.status(400).json({
@@ -44,6 +44,7 @@ export const createAd = async (req, res, next) => {
       createdBy: req.user.id,
       mediaUrl,
       mediaType,
+      template,
     });
 
     res.status(201).json({

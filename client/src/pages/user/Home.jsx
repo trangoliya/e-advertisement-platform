@@ -99,6 +99,7 @@ const Home = () => {
               clicks={ad.clicks}
               mediaUrl={ad.mediaUrl}
               mediaType={ad.mediaType}
+              template={ad.template}
               publisherName={ad.publisher?.name || "Publisher"}
               publisherAvatar={ad.publisher?.avatar || PPAvatar}
               onView={() => navigate(`/ads/${ad._id}`)}

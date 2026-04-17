@@ -61,6 +61,7 @@ const CreateAd = () => {
       data.append("description", formData.description);
       data.append("campaignId", formData.campaignId);
       data.append("targetUrl", formData.targetUrl);
+      data.append("template", template); 
 
       if (media) {
         data.append("media", media);

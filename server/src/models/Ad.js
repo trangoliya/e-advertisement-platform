@@ -18,7 +18,12 @@ const adSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
-
+    
+    template: {
+      type: String,
+      enum: ["standard", "banner", "compact"],
+      default: "standard",
+    },
     status: {
       type: String,
       enum: ["draft", "active", "paused"],

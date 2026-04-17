@@ -19,9 +19,12 @@ const AdCard = ({
   mediaType = "image",
   publisherName = "Sponsored",
   publisherAvatar,
+  template = "standard",
 }) => {
   const [liked, setLiked] = useState(false);
   const [saved, setSaved] = useState(false);
+
+  const navigate = useNavigate();
 
   // Load liked & saved state
   useEffect(() => {
@@ -31,15 +34,9 @@ const AdCard = ({
 
   // Track ad view
   useEffect(() => {
-    const trackView = async () => {
-      try {
-        await api.post("/api/ads/track-view", { adId: id });
-      } catch (error) {
-        console.error("View tracking failed:", error);
-      }
-    };
-
-    trackView();
+    api
+      .post("/api/ads/track-view", { adId: id })
+      .catch((error) => console.error("View tracking failed:", error));
   }, [id]);
 
   const handleLike = () => {
@@ -52,22 +49,24 @@ const AdCard = ({
     setSaved((prev) => !prev);
   };
 
-  // Track ad click
-  const navigate = useNavigate();
-  const handleAdClick = async () => {
-    try {
-      await api.post("/api/ads/track-click", { adId: id });
-      await incrementClick(id);
+  // Click + Navigation (optimized)
+  const handleAdClick = () => {
+    navigate(`/ads/${id}`);
 
-      navigate(`/ads/${id}`);
-    } catch (error) {
-      console.error("Click tracking failed:", error);
-    }
-    
+    api
+      .post("/api/ads/track-click", { adId: id })
+      .catch((err) => console.error("Track click error", err));
+
+    incrementClick(id).catch((err) =>
+      console.error("Increment error", err)
+    );
   };
+
+  const baseUrl = "https://e-advertisement-platform.onrender.com";
 
   return (
     <div className="bg-white rounded-2xl shadow-md border border-gray-200 overflow-hidden hover:shadow-xl transition duration-300">
+
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3">
         <div className="flex items-center gap-3">
@@ -85,47 +84,92 @@ const AdCard = ({
           </div>
         </div>
 
-        <button
-          onClick={handleSave}
-          className="text-lg hover:scale-110 transition"
-        >
+        <button onClick={handleSave} className="text-lg">
           {saved ? "🔖" : "📑"}
         </button>
       </div>
 
-      {/* Media */}
-      <div onClick={handleAdClick} className="cursor-pointer bg-black">
-        {mediaType === "video" ? (
-          <video
-            src={mediaUrl}
-            className="w-full max-h-105 object-cover"
-            muted
-            loop
-            playsInline
-          />
-        ) : (
-          <img
-            src={
-              mediaUrl ||
-              "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTTcT0QGetG2uzAvnYBjODTUeGzqZjpcfsUUQ&s"
-            }
-            alt={title}
-            className="w-full max-h-105 object-cover"
-          />
-        )}
-      </div>
+      {/* TEMPLATE UI */}
 
-      {/* Content */}
-      <div className="px-4 py-4">
-        <h3 className="text-lg font-semibold text-gray-900 mb-1">{title}</h3>
+      {/* STANDARD */}
+      {template === "standard" && (
+        <>
+          <div className="bg-black">
+            {mediaType === "video" ? (
+              <video
+                src={`${baseUrl}${mediaUrl}`}
+                className="w-full max-h-105 object-cover"
+                muted
+                autoPlay
+                loop
+                playsInline
+                controls
+              />
+            ) : (
+              mediaUrl && (
+                <img
+                  src={`${baseUrl}${mediaUrl}`}
+                  alt={title}
+                  className="w-full max-h-105 object-cover"
+                />
+              )
+            )}
+          </div>
 
-        <p className="text-sm text-gray-600 mb-4 line-clamp-2">{description}</p>
+          <div className="px-4 py-4">
+            <h3 className="text-lg font-semibold text-gray-900">
+              {title}
+            </h3>
+            <p className="text-sm text-gray-600 mt-1">
+              {description}
+            </p>
+          </div>
+        </>
+      )}
 
-        <div className="flex items-center justify-between mb-3">
+      {/* BANNER */}
+      {template === "banner" && (
+        <div className="flex items-center gap-4 px-4 py-4">
+          {mediaUrl && (
+            <img
+              src={`${baseUrl}${mediaUrl}`}
+              className="w-32 h-20 object-cover rounded-lg"
+            />
+          )}
+
+          <div>
+            <h3 className="font-semibold text-gray-900">
+              {title}
+            </h3>
+            <p className="text-sm text-gray-600">
+              {description}
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* COMPACT */}
+      {template === "compact" && (
+        <div className="px-4 py-3">
+          {mediaUrl && (
+            <img
+              src={`${baseUrl}${mediaUrl}`}
+              className="rounded-lg mb-2 w-full h-32 object-cover"
+            />
+          )}
+          <h3 className="text-sm font-semibold text-gray-900">
+            {title}
+          </h3>
+        </div>
+      )}
+
+      {/* Footer */}
+      <div className="px-4 pb-4">
+        <div className="flex items-center justify-between">
           <div className="flex items-center gap-4 text-gray-500 text-sm">
             <button
               onClick={handleLike}
-              className={`text-xl ${liked ? "text-red-500" : "text-gray-500"}`}
+              className={liked ? "text-red-500" : ""}
             >
               {liked ? "❤️" : "🤍"}
             </button>
@@ -136,7 +180,7 @@ const AdCard = ({
 
           <button
             onClick={handleAdClick}
-            className="bg-blue-600 text-white px-4 py-1.5 rounded-lg text-sm hover:bg-blue-700 transition"
+            className="bg-blue-600 text-white px-4 py-1.5 rounded-lg text-sm hover:bg-blue-700"
           >
             Learn More
           </button>
