@@ -15,7 +15,20 @@ import upload from "../middlewares/uploadMiddleware.js";
 const router = express.Router();
 
 // Post&get only when publisher login
-router.post("/", authMiddleware, roleMiddleware("publisher"), upload.single("media"), createAd);
+router.post(
+  "/",
+  authMiddleware,
+  roleMiddleware("publisher"),
+  upload.single("media"),
+  (err, req, res, next) => {
+    if (err) {
+      console.error("UPLOAD ERROR:", err);
+      return res.status(500).json({ message: err.message });
+    }
+    next();
+  },
+  createAd,
+);
 
 router.get("/my-ads", authMiddleware, roleMiddleware("publisher"), getMyAds);
 router.patch(
@@ -24,8 +37,6 @@ router.patch(
   roleMiddleware("admin"), // better practice
   updateAdStatus,
 );
-
-
 
 // Viewer feed
 router.get("/active", getActiveAds);
