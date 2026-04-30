@@ -23,12 +23,13 @@ export const createAd = async (req, res, next) => {
         message: "Valid target URL is required (https://...)",
       });
     }
+
     let mediaUrl = null;
     let mediaType = null;
 
-    // If file uploaded
+  
     if (req.file) {
-      mediaUrl = req.file.path;
+      mediaUrl = req.file.path; 
 
       if (req.file.mimetype.startsWith("image")) {
         mediaType = "image";
@@ -36,6 +37,7 @@ export const createAd = async (req, res, next) => {
         mediaType = "video";
       }
     }
+
     const ad = await Ad.create({
       title,
       description,
@@ -54,6 +56,7 @@ export const createAd = async (req, res, next) => {
       ad,
     });
   } catch (error) {
+    console.error("CREATE AD ERROR:", error); 
     next(error);
   }
 };
