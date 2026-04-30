@@ -59,45 +59,55 @@ export const getCampaignAnalytics = async (req, res, next) => {
   try {
     const { id } = req.params;
 
-    // Get all ads under this campaign
+    // Validate campaign
+    const campaign = await Campaign.findById(id);
+    if (!campaign) {
+      return res.status(404).json({
+        success: false,
+        message: "Campaign not found",
+      });
+    }
+
+    // Get ads
     const ads = await Ad.find({ campaign: id });
 
-    // If no ads found
-    if (!ads || ads.length === 0) {
+    // No ads case
+    if (!ads.length) {
       return res.status(200).json({
         success: true,
         data: {
           totalClicks: 0,
           totalImpressions: 0,
+          totalConversions: 0,
           CTR: 0,
         },
       });
     }
 
-    // Calculate totals
-    let totalClicks = 0;
-    let totalImpressions = 0;
-    let totalConversions = 0;
+    // Use reduce (clean)
+    const totals = ads.reduce(
+      (acc, ad) => {
+        acc.totalClicks += ad.clicks || 0;
+        acc.totalImpressions += ad.impressions || 0;
+        acc.totalConversions += ad.conversions || 0;
+        return acc;
+      },
+      { totalClicks: 0, totalImpressions: 0, totalConversions: 0 }
+    );
 
-    ads.forEach((ad) => {
-      totalClicks += ad.clicks || 0;
-      totalImpressions += ad.impressions || 0;
-      totalConversions += ad.conversions || 0;
-    });
-
-    // Calculate CTR safely
     const CTR =
-      totalImpressions > 0 ? (totalClicks / totalImpressions) * 100 : 0;
-    // Optimization alert if CTR too low
-    if (CTR < 1 && totalImpressions > 50) {
+      totals.totalImpressions > 0
+        ? (totals.totalClicks / totals.totalImpressions) * 100
+        : 0;
+
+    // Optimization alert (safe)
+    if (CTR < 1 && totals.totalImpressions > 50) {
       const existingAlert = await Alert.findOne({
         campaignId: id,
         type: "optimization",
       });
 
       if (!existingAlert) {
-        const campaign = await Campaign.findById(id);
-
         await Alert.create({
           userId: campaign.createdBy,
           campaignId: id,
@@ -107,12 +117,11 @@ export const getCampaignAnalytics = async (req, res, next) => {
         });
       }
     }
-    res.status(200).json({
+
+    return res.status(200).json({
       success: true,
       data: {
-        totalClicks,
-        totalImpressions,
-        totalConversions,
+        ...totals,
         CTR: Number(CTR.toFixed(2)),
       },
     });

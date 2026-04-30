@@ -39,6 +39,7 @@ export const createAd = async (req, res, next) => {
     const ad = await Ad.create({
       title,
       description,
+      publisher: req.user.id,
       targetUrl,
       status,
       campaign: campaignId,
@@ -61,7 +62,7 @@ export const getMyAds = async (req, res, next) => {
   try {
     const ads = await Ad.find({
       createdBy: req.user.id,
-    });
+    }).populate("createdBy", "name avatar");
     res.status(200).json({
       success: true,
       count: ads.length,

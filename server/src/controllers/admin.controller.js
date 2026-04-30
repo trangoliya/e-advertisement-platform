@@ -11,14 +11,15 @@ export const getAllUsers = async (req, res, next) => {
       data: users,
     });
   } catch (error) {
-        next(error);
-
+    next(error);
   }
 };
 
 export const getAllAds = async (req, res, next) => {
   try {
-    const ads = await Ad.find().populate("createBy", "name email role").sort({ createdAt: -1 });
+    const ads = await Ad.find()
+      .populate("createdBy", "name email avatar roles")
+      .sort({ createdAt: -1 });
 
     res.status(200).json({
       success: true,
@@ -26,8 +27,7 @@ export const getAllAds = async (req, res, next) => {
       data: ads,
     });
   } catch (error) {
-        next(error);
-
+    next(error);
   }
 };
 
@@ -60,7 +60,6 @@ export const updateAdStatusByAdmin = async (req, res, next) => {
       data: ad,
     });
   } catch (error) {
-        next(error);
-
+    next(error);
   }
 };
