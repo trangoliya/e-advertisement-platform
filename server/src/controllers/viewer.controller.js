@@ -128,8 +128,10 @@ export const getViewerAds = async (req, res) => {
 
     // Fetch ads from matched campaigns
     const ads = await Ad.find({
-      campaignId: { $in: campaignIds },
-    });
+      campaign: { $in: campaignIds },
+      status: "active",
+    }).populate({ path: "campaign", match: { status: "active" } });
+    const filteredAds = ads.filter((ad) => ad.campaign !== null);
 
     // Return ads
     res.status(200).json({
