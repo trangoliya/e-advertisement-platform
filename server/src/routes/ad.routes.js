@@ -3,8 +3,6 @@ import {
   createAd,
   getActiveAds,
   getMyAds,
-  incrementClick,
-  incrementImpression,
   updateAdStatus,
   getAdById,
   trackAdView,
