@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import api from "../../services/api";
-import { incrementClick } from "../../services/ad.service";
 import {
   getLikedAds,
   getSavedAds,
@@ -15,7 +14,7 @@ const AdCard = ({
   description,
   impressions,
   clicks,
-  mediaUrl,
+  mediaUrl, 
   mediaType = "image",
   publisherName = "Sponsored",
   publisherAvatar,
@@ -55,17 +54,13 @@ useEffect(() => {
   };
 
   // Click + Navigation (optimized)
-  const handleAdClick = () => {
-    navigate(`/ads/${id}`);
+const handleAdClick = () => {
+  navigate(`/ads/${id}`);
 
-    api
-      .post("/api/ads/track-click", { adId: id })
-      .catch((err) => console.error("Track click error", err));
-
-    incrementClick(id).catch((err) =>
-      console.error("Increment error", err)
-    );
-  };
+  api
+    .post("/api/ads/track-click", { adId: id })
+    .catch((err) => console.error("Track click error", err));
+};
 
   const baseUrl = "https://e-advertisement-platform.onrender.com";
 
