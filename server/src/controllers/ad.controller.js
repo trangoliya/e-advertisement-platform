@@ -7,6 +7,8 @@ import UserAdInteraction from "../models/UserAdInteraction.js";
 // use for create a Ad
 export const createAd = async (req, res, next) => {
   try {
+    console.log("BODY:", req.body);
+    console.log("FILE:", req.file);
     const { title, description, targetUrl, status, campaignId, template } =
       req.body;
 
