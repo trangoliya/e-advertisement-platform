@@ -28,28 +28,15 @@ const AdCard = ({
   const [saved, setSaved] = useState(false);
 
   const navigate = useNavigate();
-  const baseUrl = "https://e-advertisement-platform.onrender.com";
-  // FIXED MEDIA URL FUNCTION
-const getMediaUrl = (url) => {
-  console.log("ORIGINAL mediaUrl:", url); 
 
-  if (!url) return "";
+  const BASE_URL = "https://e-advertisement-platform.onrender.com";
 
-  if (url.startsWith("http")) {
-    console.log("FINAL URL:", url);
-    return url;
-  }
-
-  if (!url.startsWith("/")) {
-    const finalUrl = `${baseUrl}/${url}`;
-    console.log("FINAL URL:", finalUrl); 
-    return finalUrl;
-  }
-
-  const finalUrl = `${baseUrl}${url}`;
-  console.log("FINAL URL:", finalUrl); 
-  return finalUrl;
-};
+  // ✅ SAFE MEDIA URL (NO CRASH VERSION)
+  const finalMediaUrl = mediaUrl
+    ? mediaUrl.startsWith("http")
+      ? mediaUrl
+      : `${BASE_URL}${mediaUrl}`
+    : "";
 
   useEffect(() => {
     setLiked(getLikedAds().includes(id));
@@ -84,6 +71,7 @@ const getMediaUrl = (url) => {
 
   return (
     <div className="bg-white rounded-2xl shadow border overflow-hidden hover:shadow-xl transition">
+
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3">
         <div className="flex items-center gap-3">
@@ -106,7 +94,7 @@ const getMediaUrl = (url) => {
           <div onClick={handleAdClick} className="cursor-pointer">
             {mediaType === "video" ? (
               <video
-                src={getMediaUrl(mediaUrl)}
+                src={finalMediaUrl}
                 className="w-full h-60 object-cover"
                 autoPlay
                 muted
@@ -114,7 +102,7 @@ const getMediaUrl = (url) => {
               />
             ) : (
               <img
-                src={getMediaUrl(mediaUrl)}
+                src={finalMediaUrl}
                 className="w-full h-60 object-cover"
                 alt={title}
               />
@@ -139,7 +127,7 @@ const getMediaUrl = (url) => {
       {template === "banner" && (
         <div className="flex gap-3 p-4">
           <img
-            src={getMediaUrl(mediaUrl)}
+            src={finalMediaUrl}
             className="w-28 h-20 object-cover rounded"
             alt={title}
           />
