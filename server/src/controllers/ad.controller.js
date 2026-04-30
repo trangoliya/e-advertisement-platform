@@ -222,6 +222,8 @@ export const trackAdView = async (req, res) => {
 
 export const trackAdClick = async (req, res) => {
   try {
+    console.log("BODY:", req.body);
+
     const { adId } = req.body;
 
     if (!adId) {
@@ -234,11 +236,11 @@ export const trackAdClick = async (req, res) => {
       return res.status(404).json({ message: "Ad not found" });
     }
 
-    const campaign = ad.campaign;
-
-    if (!campaign) {
+    if (!ad.campaign) {
       return res.status(400).json({ message: "Campaign missing" });
     }
+
+    const campaign = ad.campaign;
 
     if (campaign.status !== "active") {
       return res.status(400).json({ message: "Campaign paused" });
@@ -250,7 +252,9 @@ export const trackAdClick = async (req, res) => {
       campaign.dailyBudget > 0 &&
       campaign.dailySpent + CPC > campaign.dailyBudget
     ) {
-      return res.status(400).json({ message: "Daily budget exceeded" });
+      return res.status(400).json({
+        message: "Daily budget exceeded",
+      });
     }
 
     // update
@@ -261,7 +265,7 @@ export const trackAdClick = async (req, res) => {
     await ad.save();
     await campaign.save();
 
-    // optional user tracking (safe)
+    // SAFE user tracking
     try {
       if (req.user) {
         await UserAdInteraction.create({
@@ -271,7 +275,7 @@ export const trackAdClick = async (req, res) => {
         });
       }
     } catch (err) {
-      console.warn("User interaction save failed");
+      console.warn("User interaction failed (ignored)");
     }
 
     return res.status(200).json({
@@ -283,7 +287,7 @@ export const trackAdClick = async (req, res) => {
     console.error("🔥 TRACK CLICK ERROR:", error);
     return res.status(500).json({
       success: false,
-      message: "Internal server error",
+      message: error.message,
     });
   }
 };
