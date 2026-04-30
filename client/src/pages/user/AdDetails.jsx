@@ -11,14 +11,11 @@ const AdDetails = () => {
   const [visiting, setVisiting] = useState(false);
   const [feedbackSubmitted, setFeedbackSubmitted] = useState(false);
 
-  const baseUrl = "https://e-advertisement-platform.onrender.com";
-
   // Fetch Ad
   useEffect(() => {
     const fetchAd = async () => {
       try {
         const res = await getAdById(id);
-        console.log("API Response:", res.data);
 
         if (res.data && res.data.ad) {
           setAd(res.data.ad);
@@ -38,22 +35,21 @@ const AdDetails = () => {
   const handleVisit = async () => {
     if (!ad || visiting) return;
 
-   try {
-  setVisiting(true);
+    try {
+      setVisiting(true);
 
-  await api.post("/api/ads/track-click", { adId: ad._id });
+      await api.post("/api/ads/track-click", { adId: ad._id });
 
-  setAd((prev) => ({
-    ...prev,
-    clicks: prev.clicks + 1,
-  }));
+      setAd((prev) => ({
+        ...prev,
+        clicks: prev.clicks + 1,
+      }));
 
-  if (ad.targetUrl) {
-    window.open(ad.targetUrl, "_blank");
-  } else {
-    alert("No target URL found");
-  }
-
+      if (ad.targetUrl) {
+        window.open(ad.targetUrl, "_blank");
+      } else {
+        alert("No target URL found");
+      }
     } catch (error) {
       console.error("Error increment click:", error);
     } finally {
@@ -71,7 +67,7 @@ const AdDetails = () => {
     }
   };
 
-  // Loading Spinner
+  // Loading
   if (!ad) {
     return (
       <div className="flex min-h-screen items-center justify-center">
@@ -80,7 +76,7 @@ const AdDetails = () => {
     );
   }
 
-  // Error State
+  // Error
   if (ad === "error") {
     return (
       <p className="text-center mt-10 text-red-500">
@@ -101,13 +97,23 @@ const AdDetails = () => {
           ← Back
         </button>
 
-        {/* Media */}
+        {/* ✅ MEDIA (IMAGE + VIDEO BOTH SUPPORT) */}
         {ad?.mediaUrl && (
-          <img
-            src={`${baseUrl}${ad.mediaUrl}`}
-            alt={ad.title}
-            className="w-full max-h-125 object-cover rounded-xl mb-6"
-          />
+          ad.mediaType === "video" ? (
+            <video
+              src={ad.mediaUrl}
+              className="w-full max-h-125 object-cover rounded-xl mb-6"
+              controls
+              autoPlay
+              muted
+            />
+          ) : (
+            <img
+              src={ad.mediaUrl}
+              alt={ad.title}
+              className="w-full max-h-125 object-cover rounded-xl mb-6"
+            />
+          )
         )}
 
         {/* Title */}
@@ -170,6 +176,7 @@ const AdDetails = () => {
             </p>
           )}
         </div>
+
       </div>
     </div>
   );

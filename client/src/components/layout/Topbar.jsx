@@ -12,18 +12,7 @@ const Topbar = () => {
   const [alerts, setAlerts] = useState([]);
   const [open, setOpen] = useState(false);
 
-  const baseUrl = "https://e-advertisement-platform.onrender.com";
-
   // Load alerts
-  const loadAlerts = async () => {
-    try {
-      const res = await getAlerts();
-      setAlerts(res.data);
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -34,10 +23,9 @@ const Topbar = () => {
       }
     };
 
-    fetchData(); // ✅ safe
+    fetchData();
 
     const interval = setInterval(fetchData, 30000);
-
     return () => clearInterval(interval);
   }, []);
 
@@ -45,7 +33,8 @@ const Topbar = () => {
 
   const handleRead = async (id) => {
     await markAlertRead(id);
-    loadAlerts();
+    const res = await getAlerts();
+    setAlerts(res.data);
   };
 
   const handleLogout = () => {
@@ -53,18 +42,19 @@ const Topbar = () => {
     navigate("/login");
   };
 
-  // ✅ Avatar fallback
-  const avatarUrl = user?.avatar
-    ? `${baseUrl}${user.avatar}`
-    : `https://ui-avatars.com/api/?name=${user?.name || "User"}`;
+  // ✅ FINAL AVATAR LOGIC (Cloudinary ready)
+  const avatarUrl =
+    user?.avatar || `https://ui-avatars.com/api/?name=${user?.name || "User"}`;
 
   return (
     <div className="h-15 bg-white border-b border-gray-200 flex items-center justify-between px-6">
+      
       {/* Brand */}
       <h3 className="text-lg font-semibold">AdPlatform</h3>
 
       {/* Right */}
       <div className="flex items-center gap-5 relative">
+
         {/* 🔔 Notification */}
         <div className="relative">
           <button
@@ -82,6 +72,7 @@ const Topbar = () => {
 
           {open && (
             <div className="absolute right-0 mt-3 w-72 bg-white border border-gray-200 rounded-lg shadow-lg p-3 z-20">
+              
               {alerts.length === 0 && (
                 <p className="text-sm text-gray-500">No alerts</p>
               )}
@@ -109,7 +100,7 @@ const Topbar = () => {
           <p className="text-xs text-gray-500">{user?.email}</p>
         </div>
 
-        {/* ✅ Avatar clickable */}
+        {/* ✅ Avatar */}
         <img
           src={avatarUrl}
           alt="avatar"
@@ -124,6 +115,7 @@ const Topbar = () => {
         >
           Logout
         </button>
+
       </div>
     </div>
   );
