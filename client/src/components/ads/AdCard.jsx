@@ -8,7 +8,7 @@ import {
   toggleSaveAd,
 } from "../../utils/adEngagement";
 import { useNavigate } from "react-router-dom";
-
+import { useRef } from "react";
 const AdCard = ({
   id,
   title,
@@ -21,6 +21,7 @@ const AdCard = ({
   publisherAvatar,
   template = "standard",
 }) => {
+  const hasTracked = useRef(false);
   const [liked, setLiked] = useState(false);
   const [saved, setSaved] = useState(false);
 
@@ -33,11 +34,15 @@ const AdCard = ({
   }, [id]);
 
   // Track ad view
-  useEffect(() => {
-    api
-      .post("/api/ads/track-view", { adId: id })
-      .catch((error) => console.error("View tracking failed:", error));
-  }, [id]);
+useEffect(() => {
+  if (hasTracked.current) return;
+
+  hasTracked.current = true;
+
+  api
+    .post("/api/ads/track-view", { adId: id })
+    .catch((error) => console.error("View tracking failed:", error));
+}, [id]);
 
   const handleLike = () => {
     toggleLikeAd(id);
