@@ -29,8 +29,9 @@ const AdCard = ({
 
   const navigate = useNavigate();
   const baseUrl = "https://e-advertisement-platform.onrender.com";
-
-  // ✅ FIXED MEDIA URL FUNCTION
+  console.log("MEDIA URL:", mediaUrl);
+  console.log("FINAL URL:", getMediaUrl(mediaUrl));
+  // FIXED MEDIA URL FUNCTION
   const getMediaUrl = (url) => {
     if (!url) return "";
 
@@ -76,7 +77,6 @@ const AdCard = ({
 
   return (
     <div className="bg-white rounded-2xl shadow border overflow-hidden hover:shadow-xl transition">
-
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3">
         <div className="flex items-center gap-3">
