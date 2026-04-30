@@ -224,6 +224,10 @@ export const trackAdClick = async (req, res) => {
   try {
     const { adId } = req.body;
 
+    if (!adId) {
+      return res.status(400).json({ message: "Ad ID required" });
+    }
+
     const ad = await Ad.findById(adId).populate("campaign");
 
     if (!ad) {
@@ -232,55 +236,54 @@ export const trackAdClick = async (req, res) => {
 
     const campaign = ad.campaign;
 
-    if (!campaign || campaign.status !== "active") {
-      return res.status(400).json({
-        message: "Campaign not active",
-      });
+    if (!campaign) {
+      return res.status(400).json({ message: "Campaign missing" });
+    }
+
+    if (campaign.status !== "active") {
+      return res.status(400).json({ message: "Campaign paused" });
     }
 
     const CPC = 2;
 
-    // Budget check
     if (
       campaign.dailyBudget > 0 &&
       campaign.dailySpent + CPC > campaign.dailyBudget
     ) {
-      return res.status(400).json({
-        message: "Daily budget limit reached",
-      });
+      return res.status(400).json({ message: "Daily budget exceeded" });
     }
 
-    // Update values
+    // update
     ad.clicks += 1;
-    ad.conversions += 1;
-
     campaign.dailySpent += CPC;
     campaign.spentBudget += CPC;
-
-    if (campaign.spentBudget >= campaign.totalBudget) {
-      campaign.status = "paused";
-    }
 
     await ad.save();
     await campaign.save();
 
-    // Track user interaction
-    await UserAdInteraction.create({
-      userId: req.user.id,
-      adId,
-      action: "click",
-    });
+    // optional user tracking (safe)
+    try {
+      if (req.user) {
+        await UserAdInteraction.create({
+          userId: req.user.id,
+          adId,
+          action: "click",
+        });
+      }
+    } catch (err) {
+      console.warn("User interaction save failed");
+    }
 
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
-      message: "Click tracked successfully",
       clicks: ad.clicks,
     });
 
   } catch (error) {
-    res.status(500).json({
+    console.error("🔥 TRACK CLICK ERROR:", error);
+    return res.status(500).json({
       success: false,
-      message: error.message,
+      message: "Internal server error",
     });
   }
 };
