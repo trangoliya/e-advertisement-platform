@@ -7,7 +7,8 @@ import UserAdInteraction from "../models/UserAdInteraction.js";
 // use for create a Ad
 export const createAd = async (req, res, next) => {
   try {
-    const { title, description, targetUrl, status, campaignId, template  } = req.body;
+    const { title, description, targetUrl, status, campaignId, template } =
+      req.body;
 
     if (!campaignId) {
       return res.status(400).json({
@@ -202,11 +203,11 @@ export const trackAdView = async (req, res) => {
       $inc: { impressions: 1 },
     });
 
-    await UserAdInteraction.create({
-      userId: req.user.id,
-      adId,
-      action: "view",
-    });
+    // await UserAdInteraction.create({
+    //   userId: req.user.id,
+    //   adId,
+    //   action: "view",
+    // });
 
     res.status(200).json({
       success: true,
@@ -223,7 +224,9 @@ export const trackAdView = async (req, res) => {
 export const trackAdClick = async (req, res) => {
   try {
     console.log("BODY:", req.body);
-
+    console.log("BODY:", req.body);
+    console.log("AD:", ad);
+    console.log("CAMPAIGN:", campaign);
     const { adId } = req.body;
 
     if (!adId) {
@@ -268,11 +271,11 @@ export const trackAdClick = async (req, res) => {
     // SAFE user tracking
     try {
       if (req.user) {
-        await UserAdInteraction.create({
-          userId: req.user.id,
-          adId,
-          action: "click",
-        });
+        // await UserAdInteraction.create({
+        //   userId: req.user.id,
+        //   adId,
+        //   action: "click",
+        // });
       }
     } catch (err) {
       console.warn("User interaction failed (ignored)");
@@ -282,7 +285,6 @@ export const trackAdClick = async (req, res) => {
       success: true,
       clicks: ad.clicks,
     });
-
   } catch (error) {
     console.error("🔥 TRACK CLICK ERROR:", error);
     return res.status(500).json({
