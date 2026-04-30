@@ -1,5 +1,5 @@
 import dotenv from "dotenv";
-dotenv.config(); // MUST be first line
+dotenv.config({ path: "./server/.env" }); // MUST be first line
 
 console.log("PORT: ", process.env.PORT);
 console.log("JWT_SECRET: ", process.env.JWT_SECRET);
