@@ -3,6 +3,8 @@ import { useAuth } from "../../context/AuthContext";
 import { useEffect, useState } from "react";
 import { getAlerts, markAlertRead } from "../../services/alert.service";
 
+import { FiBell } from "react-icons/fi";
+
 const Topbar = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
@@ -10,17 +12,9 @@ const Topbar = () => {
   const [alerts, setAlerts] = useState([]);
   const [open, setOpen] = useState(false);
 
-  const fetchAlerts = async () => {
-    try {
-      const res = await getAlerts();
-      setAlerts(res.data);
-    } catch (err) {
-      console.error(err);
-    }
-  };
+  const baseUrl = "https://e-advertisement-platform.onrender.com";
 
-  useEffect(() => {
-
+  // Load alerts
   const loadAlerts = async () => {
     try {
       const res = await getAlerts();
@@ -30,21 +24,28 @@ const Topbar = () => {
     }
   };
 
-  // first load
-  loadAlerts();
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await getAlerts();
+        setAlerts(res.data);
+      } catch (err) {
+        console.error(err);
+      }
+    };
 
-  // auto refresh every 30 seconds
-  const interval = setInterval(loadAlerts, 30000);
+    fetchData(); // ✅ safe
 
-  return () => clearInterval(interval);
+    const interval = setInterval(fetchData, 30000);
 
-}, []);
+    return () => clearInterval(interval);
+  }, []);
 
-  const unreadCount = alerts.filter(a => !a.isRead).length;
+  const unreadCount = alerts.filter((a) => !a.isRead).length;
 
   const handleRead = async (id) => {
     await markAlertRead(id);
-    fetchAlerts();
+    loadAlerts();
   };
 
   const handleLogout = () => {
@@ -52,22 +53,25 @@ const Topbar = () => {
     navigate("/login");
   };
 
+  // ✅ Avatar fallback
+  const avatarUrl = user?.avatar
+    ? `${baseUrl}${user.avatar}`
+    : `https://ui-avatars.com/api/?name=${user?.name || "User"}`;
+
   return (
     <div className="h-15 bg-white border-b border-gray-200 flex items-center justify-between px-6">
-
       {/* Brand */}
       <h3 className="text-lg font-semibold">AdPlatform</h3>
 
-      {/* Right Side */}
+      {/* Right */}
       <div className="flex items-center gap-5 relative">
-
         {/* 🔔 Notification */}
         <div className="relative">
           <button
             onClick={() => setOpen(!open)}
             className="text-xl hover:text-gray-700"
           >
-            🔔
+            <FiBell />
           </button>
 
           {unreadCount > 0 && (
@@ -76,17 +80,13 @@ const Topbar = () => {
             </span>
           )}
 
-          {/* Dropdown */}
           {open && (
             <div className="absolute right-0 mt-3 w-72 bg-white border border-gray-200 rounded-lg shadow-lg p-3 z-20">
-
               {alerts.length === 0 && (
-                <p className="text-sm text-gray-500">
-                  No alerts
-                </p>
+                <p className="text-sm text-gray-500">No alerts</p>
               )}
 
-              {alerts.map(alert => (
+              {alerts.map((alert) => (
                 <div
                   key={alert._id}
                   onClick={() => handleRead(alert._id)}
@@ -99,7 +99,6 @@ const Topbar = () => {
                   {alert.message}
                 </div>
               ))}
-
             </div>
           )}
         </div>
@@ -110,8 +109,13 @@ const Topbar = () => {
           <p className="text-xs text-gray-500">{user?.email}</p>
         </div>
 
-        {/* Avatar */}
-        <div className="w-9 h-9 rounded-full bg-slate-800"></div>
+        {/* ✅ Avatar clickable */}
+        <img
+          src={avatarUrl}
+          alt="avatar"
+          className="w-9 h-9 rounded-full object-cover cursor-pointer"
+          onClick={() => navigate("/profile")}
+        />
 
         {/* Logout */}
         <button
@@ -120,7 +124,6 @@ const Topbar = () => {
         >
           Logout
         </button>
-
       </div>
     </div>
   );
