@@ -305,6 +305,10 @@ export const trackAdView = async (req, res) => {
   try {
     const { adId } = req.body;
 
+    await Ad.findByIdAndUpdate(adId, {
+      $inc: { impressions: 1 },
+    });
+
     await UserAdInteraction.create({
       userId: req.user.id,
       adId,
@@ -327,6 +331,47 @@ export const trackAdClick = async (req, res) => {
   try {
     const { adId } = req.body;
 
+    const ad = await Ad.findById(adId).populate("campaign");
+
+    if (!ad) {
+      return res.status(404).json({ message: "Ad not found" });
+    }
+
+    const campaign = ad.campaign;
+
+    if (!campaign || campaign.status !== "active") {
+      return res.status(400).json({
+        message: "Campaign not active",
+      });
+    }
+
+    const CPC = 2;
+
+    // Budget check
+    if (
+      campaign.dailyBudget > 0 &&
+      campaign.dailySpent + CPC > campaign.dailyBudget
+    ) {
+      return res.status(400).json({
+        message: "Daily budget limit reached",
+      });
+    }
+
+    // Update values
+    ad.clicks += 1;
+    ad.conversions += 1;
+
+    campaign.dailySpent += CPC;
+    campaign.spentBudget += CPC;
+
+    if (campaign.spentBudget >= campaign.totalBudget) {
+      campaign.status = "paused";
+    }
+
+    await ad.save();
+    await campaign.save();
+
+    // Track user interaction
     await UserAdInteraction.create({
       userId: req.user.id,
       adId,
@@ -335,8 +380,10 @@ export const trackAdClick = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: "Ad click tracked",
+      message: "Click tracked successfully",
+      clicks: ad.clicks,
     });
+
   } catch (error) {
     res.status(500).json({
       success: false,

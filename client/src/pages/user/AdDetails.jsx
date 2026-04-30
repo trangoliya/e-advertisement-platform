@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { incrementClick, getAdById } from "../../services/ad.service";
+import { getAdById } from "../../services/ad.service";
 import api from "../../services/api";
 
 const AdDetails = () => {
@@ -38,21 +38,21 @@ const AdDetails = () => {
   const handleVisit = async () => {
     if (!ad || visiting) return;
 
-    try {
-      setVisiting(true);
+   try {
+  setVisiting(true);
 
-      await incrementClick(ad._id);
+  await api.post("/api/ads/track-click", { adId: ad._id });
 
-      setAd((prev) => ({
-        ...prev,
-        clicks: prev.clicks + 1,
-      }));
+  setAd((prev) => ({
+    ...prev,
+    clicks: prev.clicks + 1,
+  }));
 
-      if (ad.targetUrl) {
-        window.open(ad.targetUrl, "_blank");
-      } else {
-        alert("No target URL found");
-      }
+  if (ad.targetUrl) {
+    window.open(ad.targetUrl, "_blank");
+  } else {
+    alert("No target URL found");
+  }
 
     } catch (error) {
       console.error("Error increment click:", error);

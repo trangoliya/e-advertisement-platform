@@ -27,9 +27,7 @@ router.patch(
   updateAdStatus,
 );
 
-// Impression & click triggered by viewers
-router.patch("/:id/impression", incrementImpression);
-router.patch("/:id/click", incrementClick);
+
 
 // Viewer feed
 router.get("/active", getActiveAds);
