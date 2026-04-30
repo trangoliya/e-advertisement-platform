@@ -1,9 +1,14 @@
 import { useNavigate, Link } from "react-router-dom";
 import useAuth from "../../hooks/useAuth";
+import { useState } from "react";
+import { FiEye, FiEyeOff } from "react-icons/fi";
 
 const Register = () => {
   const { register } = useAuth();
   const navigate = useNavigate();
+
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -51,9 +56,7 @@ const Register = () => {
           <h2 className="text-3xl font-bold text-gray-800 mb-2">
             Create Account
           </h2>
-          <p className="text-gray-500 mb-6">
-            Join us and start your journey
-          </p>
+          <p className="text-gray-500 mb-6">Join us and start your journey</p>
 
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
@@ -68,7 +71,7 @@ const Register = () => {
                 id="name"
                 name="name"
                 required
-                placeholder="Tusharth Rangoliya"
+                placeholder="Your Full Name"
                 className="w-full rounded-lg border border-gray-300 px-4 py-2.5
                            focus:border-blue-500 focus:ring-2 focus:ring-blue-500/30
                            outline-none transition"
@@ -101,18 +104,30 @@ const Register = () => {
               >
                 Password
               </label>
-              <input
-                type="password"
-                id="password"
-                name="password"
-                required
-                placeholder="••••••••"
-                className="w-full rounded-lg border border-gray-300 px-4 py-2.5
-                           focus:border-blue-500 focus:ring-2 focus:ring-blue-500/30
-                           outline-none transition"
-              />
+
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  id="password"
+                  name="password"
+                  required
+                  placeholder="••••••••"
+                  className="w-full rounded-lg border border-gray-300 px-4 py-2.5 pr-10
+                       focus:border-blue-500 focus:ring-2 focus:ring-blue-500/30
+                       outline-none transition"
+                />
+
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-black"
+                >
+                  {showPassword ? <FiEyeOff /> : <FiEye />}
+                </button>
+              </div>
             </div>
 
+            {/* Confirm Password */}
             <div>
               <label
                 htmlFor="confirm"
@@ -120,16 +135,27 @@ const Register = () => {
               >
                 Confirm Password
               </label>
-              <input
-                type="password"
-                id="confirm"
-                name="confirm"
-                required
-                placeholder="••••••••"
-                className="w-full rounded-lg border border-gray-300 px-4 py-2.5
-                           focus:border-blue-500 focus:ring-2 focus:ring-blue-500/30
-                           outline-none transition"
-              />
+
+              <div className="relative">
+                <input
+                  type={showConfirm ? "text" : "password"}
+                  id="confirm"
+                  name="confirm"
+                  required
+                  placeholder="••••••••"
+                  className="w-full rounded-lg border border-gray-300 px-4 py-2.5 pr-10
+                       focus:border-blue-500 focus:ring-2 focus:ring-blue-500/30
+                       outline-none transition"
+                />
+
+                <button
+                  type="button"
+                  onClick={() => setShowConfirm(!showConfirm)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-black"
+                >
+                  {showConfirm ? <FiEyeOff /> : <FiEye />}
+                </button>
+              </div>
             </div>
 
             <button
