@@ -1,6 +1,9 @@
 import dotenv from "dotenv";
-dotenv.config({ path: "./server/.env" }); // MUST be first line
+import path from "path";
 
+dotenv.config({
+  path: path.resolve(process.cwd(), "server/.env"),
+});
 console.log("PORT: ", process.env.PORT);
 console.log("JWT_SECRET: ", process.env.JWT_SECRET);
 console.log("CLOUD:", process.env.CLOUDINARY_CLOUD_NAME);
