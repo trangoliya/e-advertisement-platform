@@ -28,7 +28,7 @@ export const createAd = async (req, res, next) => {
 
     // If file uploaded
     if (req.file) {
-      mediaUrl = `/uploads/${req.file.filename}`;
+      mediaUrl: req.file.path;
 
       if (req.file.mimetype.startsWith("image")) {
         mediaType = "image";
