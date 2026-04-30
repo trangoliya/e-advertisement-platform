@@ -94,7 +94,7 @@ const AdCard = ({
           <div onClick={handleAdClick} className="cursor-pointer">
             {mediaType === "video" ? (
               <video
-                src={finalMediaUrl}
+                src={encodeURI(finalMediaUrl)}
                 className="w-full h-60 object-cover"
                 autoPlay
                 muted
@@ -102,7 +102,7 @@ const AdCard = ({
               />
             ) : (
               <img
-                src={finalMediaUrl}
+                src={encodeURI(finalMediaUrl)}
                 className="w-full h-60 object-cover"
                 alt={title}
               />
@@ -127,7 +127,7 @@ const AdCard = ({
       {template === "banner" && (
         <div className="flex gap-3 p-4">
           <img
-            src={finalMediaUrl}
+            src={encodeURI(finalMediaUrl)}
             className="w-28 h-20 object-cover rounded"
             alt={title}
           />
