@@ -21,7 +21,7 @@ const AdCard = ({
   mediaType = "image",
   publisherName = "Sponsored",
   publisherAvatar,
-  template = "standard", // ✅ now used
+  template = "standard",
 }) => {
   const hasTracked = useRef(false);
   const [liked, setLiked] = useState(false);
@@ -29,6 +29,19 @@ const AdCard = ({
 
   const navigate = useNavigate();
   const baseUrl = "https://e-advertisement-platform.onrender.com";
+
+  // ✅ FIXED MEDIA URL FUNCTION
+  const getMediaUrl = (url) => {
+    if (!url) return "";
+
+    if (url.startsWith("http")) return url;
+
+    if (!url.startsWith("/")) {
+      return `${baseUrl}/${url}`;
+    }
+
+    return `${baseUrl}${url}`;
+  };
 
   useEffect(() => {
     setLiked(getLikedAds().includes(id));
@@ -80,15 +93,13 @@ const AdCard = ({
         </button>
       </div>
 
-      {/* TEMPLATE BASED UI */}
-
       {/* STANDARD */}
       {template === "standard" && (
         <>
-          <div onClick={handleAdClick}>
+          <div onClick={handleAdClick} className="cursor-pointer">
             {mediaType === "video" ? (
               <video
-                src={`${baseUrl}${mediaUrl}`}
+                src={getMediaUrl(mediaUrl)}
                 className="w-full h-60 object-cover"
                 autoPlay
                 muted
@@ -96,8 +107,9 @@ const AdCard = ({
               />
             ) : (
               <img
-                src={`${baseUrl}${mediaUrl}`}
+                src={getMediaUrl(mediaUrl)}
                 className="w-full h-60 object-cover"
+                alt={title}
               />
             )}
           </div>
@@ -120,8 +132,9 @@ const AdCard = ({
       {template === "banner" && (
         <div className="flex gap-3 p-4">
           <img
-            src={`${baseUrl}${mediaUrl}`}
+            src={getMediaUrl(mediaUrl)}
             className="w-28 h-20 object-cover rounded"
+            alt={title}
           />
           <div>
             <h3 className="font-semibold">{title}</h3>
