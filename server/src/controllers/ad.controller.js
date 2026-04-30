@@ -199,24 +199,39 @@ export const trackAdView = async (req, res) => {
   try {
     const { adId } = req.body;
 
+    if (!adId) {
+      return res.status(400).json({
+        success: false,
+        message: "Ad ID required",
+      });
+    }
+
     await Ad.findByIdAndUpdate(adId, {
       $inc: { impressions: 1 },
     });
 
-    // await UserAdInteraction.create({
-    //   userId: req.user.id,
-    //   adId,
-    //   action: "view",
-    // });
+    if (req.user?.id) {
+      try {
+        await UserAdInteraction.create({
+          userId: req.user.id,
+          adId,
+          action: "view",
+        });
+      } catch (err) {
+        console.warn("View tracking skipped");
+      }
+    }
 
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
-      message: "Ad view tracked",
+      message: "View tracked",
     });
   } catch (error) {
-    res.status(500).json({
+    console.error("🔥 TRACK VIEW ERROR:", error);
+
+    return res.status(500).json({
       success: false,
-      message: error.message,
+      message: "Internal server error",
     });
   }
 };
@@ -224,72 +239,94 @@ export const trackAdView = async (req, res) => {
 export const trackAdClick = async (req, res) => {
   try {
     console.log("BODY:", req.body);
-    console.log("BODY:", req.body);
-    console.log("AD:", ad);
-    console.log("CAMPAIGN:", campaign);
+
     const { adId } = req.body;
 
+    //validate input
     if (!adId) {
-      return res.status(400).json({ message: "Ad ID required" });
+      return res.status(400).json({
+        success: false,
+        message: "Ad ID required",
+      });
     }
 
+    // find ad + campaign
     const ad = await Ad.findById(adId).populate("campaign");
 
     if (!ad) {
-      return res.status(404).json({ message: "Ad not found" });
+      return res.status(404).json({
+        success: false,
+        message: "Ad not found",
+      });
     }
 
     if (!ad.campaign) {
-      return res.status(400).json({ message: "Campaign missing" });
+      return res.status(400).json({
+        success: false,
+        message: "Campaign missing",
+      });
     }
 
     const campaign = ad.campaign;
 
+    // campaign must be active
     if (campaign.status !== "active") {
-      return res.status(400).json({ message: "Campaign paused" });
+      return res.status(400).json({
+        success: false,
+        message: "Campaign paused",
+      });
     }
 
     const CPC = 2;
 
+    // budget check
     if (
       campaign.dailyBudget > 0 &&
       campaign.dailySpent + CPC > campaign.dailyBudget
     ) {
       return res.status(400).json({
+        success: false,
         message: "Daily budget exceeded",
       });
     }
 
-    // update
+    // update values
     ad.clicks += 1;
     campaign.dailySpent += CPC;
     campaign.spentBudget += CPC;
 
+    // auto pause
+    if (campaign.spentBudget >= campaign.totalBudget) {
+      campaign.status = "paused";
+    }
+
     await ad.save();
     await campaign.save();
 
-    // SAFE user tracking
-    try {
-      if (req.user) {
-        // await UserAdInteraction.create({
-        //   userId: req.user.id,
-        //   adId,
-        //   action: "click",
-        // });
+    // SAFE tracking (no crash)
+    if (req.user?.id) {
+      try {
+        await UserAdInteraction.create({
+          userId: req.user.id,
+          adId,
+          action: "click",
+        });
+      } catch (err) {
+        console.warn("User tracking skipped");
       }
-    } catch (err) {
-      console.warn("User interaction failed (ignored)");
     }
 
     return res.status(200).json({
       success: true,
+      message: "Click tracked successfully",
       clicks: ad.clicks,
     });
   } catch (error) {
-    console.error("🔥 TRACK CLICK ERROR:", error);
+    console.error(" TRACK CLICK ERROR:", error);
+
     return res.status(500).json({
       success: false,
-      message: error.message,
+      message: "Internal server error",
     });
   }
 };
