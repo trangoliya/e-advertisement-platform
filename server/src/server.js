@@ -3,6 +3,8 @@ dotenv.config(); // MUST be first line
 
 console.log("PORT: ", process.env.PORT);
 console.log("JWT_SECRET: ", process.env.JWT_SECRET);
+console.log("CLOUD:", process.env.CLOUDINARY_CLOUD_NAME);
+console.log("API KEY:", process.env.CLOUDINARY_API_KEY);
 import app from "./app.js";
 import connectDB from "./config/db.js";
 
