@@ -29,20 +29,27 @@ const AdCard = ({
 
   const navigate = useNavigate();
   const baseUrl = "https://e-advertisement-platform.onrender.com";
-  console.log("MEDIA URL:", mediaUrl);
-  console.log("FINAL URL:", getMediaUrl(mediaUrl));
   // FIXED MEDIA URL FUNCTION
-  const getMediaUrl = (url) => {
-    if (!url) return "";
+const getMediaUrl = (url) => {
+  console.log("ORIGINAL mediaUrl:", url); 
 
-    if (url.startsWith("http")) return url;
+  if (!url) return "";
 
-    if (!url.startsWith("/")) {
-      return `${baseUrl}/${url}`;
-    }
+  if (url.startsWith("http")) {
+    console.log("FINAL URL:", url);
+    return url;
+  }
 
-    return `${baseUrl}${url}`;
-  };
+  if (!url.startsWith("/")) {
+    const finalUrl = `${baseUrl}/${url}`;
+    console.log("FINAL URL:", finalUrl); 
+    return finalUrl;
+  }
+
+  const finalUrl = `${baseUrl}${url}`;
+  console.log("FINAL URL:", finalUrl); 
+  return finalUrl;
+};
 
   useEffect(() => {
     setLiked(getLikedAds().includes(id));
