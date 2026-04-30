@@ -22,7 +22,8 @@ export const updateProfile = async (req, res) => {
 
     // update avatar (if file uploaded)
     if (req.file) {
-      user.avatar = `/uploads/${req.file.filename}`;
+      user.avatar = req.file.path;
+      console.log("FILE:", req.file);
     }
 
     await user.save();
