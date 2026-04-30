@@ -2,7 +2,7 @@ import dotenv from "dotenv";
 import path from "path";
 
 dotenv.config({
-  path: path.resolve(process.cwd(), "server/.env"),
+  path: path.resolve(process.cwd(), ".env"),
 });
 console.log("PORT: ", process.env.PORT);
 console.log("JWT_SECRET: ", process.env.JWT_SECRET);
