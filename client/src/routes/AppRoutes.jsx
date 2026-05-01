@@ -6,7 +6,7 @@ import AuthLayout from "../layouts/AuthLayout.jsx";
 import Login from "../pages/auth/Login.jsx";
 import Register from "../pages/auth/Register.jsx";
 
-// User (Common + User)
+// User
 import MainLayout from "../layouts/MainLayout.jsx";
 import Home from "../pages/user/Home.jsx";
 import AdDetails from "../pages/user/AdDetails.jsx";
@@ -37,7 +37,7 @@ const router = createBrowserRouter([
     element: <PublicPage />,
   },
 
-  // Auth Routes
+  // Auth
   {
     element: <AuthLayout />,
     children: [
@@ -46,35 +46,23 @@ const router = createBrowserRouter([
     ],
   },
 
-  // Protected Routes
+  // Protected
   {
     element: <ProtectedRoute />,
     children: [
 
-      // COMMON ROUTES (ALL LOGGED-IN USERS)
+      // MAIN LAYOUT (COMMON + USER)
       {
         element: <MainLayout />,
         children: [
-          { path: "/profile", element: <Profile /> },
+          { path: "home", element: <Home /> },
+          { path: "ads/:id", element: <AdDetails /> },
+          { path: "publisher/:id", element: <PublisherProfile /> },
+          { path: "profile", element: <Profile /> }, 
         ],
       },
 
-      // USER ROUTES
-      {
-        element: <RoleRoute allowedRoles={[ROLES.USER]} />,
-        children: [
-          {
-            element: <MainLayout />,
-            children: [
-              { path: "/home", element: <Home /> },
-              { path: "/ads/:id", element: <AdDetails /> },
-              { path: "/publisher/:id", element: <PublisherProfile /> },
-            ],
-          },
-        ],
-      },
-
-      // ADMIN ROUTES
+      // ADMIN
       {
         element: <RoleRoute allowedRoles={[ROLES.ADMIN]} />,
         children: [
@@ -89,7 +77,7 @@ const router = createBrowserRouter([
         ],
       },
 
-      // PUBLISHER ROUTES
+      // PUBLISHER
       {
         element: <RoleRoute allowedRoles={[ROLES.PUBLISHER]} />,
         children: [
