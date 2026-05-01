@@ -6,7 +6,7 @@ import adRoutes from "./routes/ad.routes.js";
 import viewerRoutes from "./routes/viewer.routes.js";
 import adminRoutes from "./routes/admin.routes.js";
 import errorHandler from "./middlewares/error.middleware.js";
-
+import userRoutes from "./routes/user.routes.js";
 import campaignRoutes from "./routes/campaign.routes.js";
 import publisherProfileRoutes from "./routes/publisherProfile.routes.js";
 import feedbackRoutes from "./routes/feedback.routes.js";
@@ -32,7 +32,7 @@ app.use("/api/viewer", viewerRoutes);
 app.use("/api/publisher", publisherProfileRoutes);
 app.use("/uploads", express.static("uploads"));
 app.use("/api/admin", adminRoutes);
-
+app.use("/api/users", userRoutes);
 app.use("/api/alerts", alertRoutes);
 app.use("/api", feedbackRoutes);
 app.use("/api/campaigns", campaignRoutes);
