@@ -1,5 +1,5 @@
 import User from "../models/user.model.js";
-import Ad from "../models/ad.model.js";
+import Ad from "../models/Ad.js";
 
 // Get Logged-in User Profile
 export const getProfile = async (req, res) => {
