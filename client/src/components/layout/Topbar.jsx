@@ -30,7 +30,7 @@ const Topbar = () => {
     return () => clearInterval(interval);
   }, []);
 
-  // Close dropdown on outside click
+  // Close dropdown
   useEffect(() => {
     const handleClickOutside = () => {
       setOpen(false);
@@ -54,12 +54,13 @@ const Topbar = () => {
     navigate("/login");
   };
 
+  // ✅ CLEAN AVATAR (NO HACK)
   const avatarUrl =
     user?.avatar || `https://ui-avatars.com/api/?name=${user?.name || "User"}`;
 
   return (
     <div className="h-15 bg-white border-b border-gray-200 flex items-center justify-between px-6">
-      
+
       {/* Brand */}
       <h3 className="text-lg font-semibold">AdPlatform</h3>
 
@@ -110,17 +111,17 @@ const Topbar = () => {
         </div>
 
         {/* User Info */}
-        <div className="text-right">
+        <div className="text-right hidden sm:block">
           <p className="text-sm font-medium">{user?.name}</p>
           <p className="text-xs text-gray-500">{user?.email}</p>
         </div>
 
-        {/* Avatar Dropdown */}
+        {/* Avatar */}
         <div className="relative">
           <img
             src={avatarUrl}
             alt="avatar"
-            className="w-9 h-9 rounded-full object-cover cursor-pointer border"
+            className="w-9 h-9 rounded-full object-cover cursor-pointer border hover:scale-105 transition"
             onClick={(e) => {
               e.stopPropagation();
               setProfileOpen(!profileOpen);
@@ -129,7 +130,7 @@ const Topbar = () => {
           />
 
           {profileOpen && (
-            <div className="absolute right-0 mt-3 w-40 bg-white border border-gray-200 rounded-lg shadow-lg z-20">
+            <div className="absolute right-0 mt-3 w-40 bg-white border border-gray-200 rounded-lg shadow-lg z-20 overflow-hidden">
 
               <button
                 onClick={() => {
