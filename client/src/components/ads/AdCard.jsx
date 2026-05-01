@@ -21,6 +21,7 @@ const AdCard = ({
   mediaType = "image",
   publisherName = "Sponsored",
   publisherAvatar,
+  publisherId, 
   template = "standard",
 }) => {
   const hasTracked = useRef(false);
@@ -29,14 +30,7 @@ const AdCard = ({
 
   const navigate = useNavigate();
 
-  const BASE_URL = "https://e-advertisement-platform.onrender.com";
-
-  // ✅ SAFE MEDIA URL (NO CRASH VERSION)
-  const finalMediaUrl = mediaUrl
-    ? mediaUrl.startsWith("http")
-      ? mediaUrl
-      : `${BASE_URL}${mediaUrl}`
-    : "";
+  const finalMediaUrl = mediaUrl || "";
 
   useEffect(() => {
     setLiked(getLikedAds().includes(id));
@@ -50,12 +44,14 @@ const AdCard = ({
     api.post("/api/ads/track-view", { adId: id }).catch(() => {});
   }, [id]);
 
-  const handleLike = () => {
+  const handleLike = (e) => {
+    e.stopPropagation();
     toggleLikeAd(id);
     setLiked((prev) => !prev);
   };
 
-  const handleSave = () => {
+  const handleSave = (e) => {
+    e.stopPropagation();
     toggleSaveAd(id);
     setSaved((prev) => !prev);
   };
@@ -65,16 +61,30 @@ const AdCard = ({
     api.post("/api/ads/track-click", { adId: id }).catch(() => {});
   };
 
-  const avatarUrl = publisherAvatar
-    ? publisherAvatar
-    : `https://ui-avatars.com/api/?name=${publisherName}`;
+  // publisher click
+  const handlePublisherClick = (e) => {
+    e.stopPropagation();
+    if (publisherId) {
+      navigate(`/publisher/${publisherId}`);
+    }
+  };
+
+  const avatarUrl =
+    publisherAvatar || `https://ui-avatars.com/api/?name=${publisherName}`;
 
   return (
-    <div className="bg-white rounded-2xl shadow border overflow-hidden hover:shadow-xl transition">
-
+    <div
+      className="bg-white rounded-2xl shadow border overflow-hidden hover:shadow-xl transition cursor-pointer"
+      onClick={handleAdClick}
+    >
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3">
-        <div className="flex items-center gap-3">
+        
+        {/* CLICKABLE PUBLISHER */}
+        <div
+          className="flex items-center gap-3 cursor-pointer hover:opacity-80"
+          onClick={handlePublisherClick}
+        >
           <img
             src={avatarUrl}
             alt={publisherName}
@@ -91,27 +101,27 @@ const AdCard = ({
       {/* STANDARD */}
       {template === "standard" && (
         <>
-          <div onClick={handleAdClick} className="cursor-pointer">
-            {mediaType === "video" ? (
-              <video
-                src={encodeURI(finalMediaUrl)}
-                className="w-full h-60 object-cover"
-                autoPlay
-                muted
-                loop
-              />
-            ) : (
-              <img
-                src={encodeURI(finalMediaUrl)}
-                className="w-full h-60 object-cover"
-                alt={title}
-              />
-            )}
-          </div>
+          {mediaType === "video" ? (
+            <video
+              src={finalMediaUrl}
+              className="w-full h-60 object-cover"
+              autoPlay
+              muted
+              loop
+            />
+          ) : (
+            <img
+              src={finalMediaUrl}
+              className="w-full h-60 object-cover"
+              alt={title}
+            />
+          )}
 
           <div className="p-4">
-            <h3 className="font-semibold">{title}</h3>
-            <p className="text-sm text-gray-600">{description}</p>
+            <h3 className="font-semibold text-lg">{title}</h3>
+            <p className="text-sm text-gray-600 line-clamp-2">
+              {description}
+            </p>
           </div>
         </>
       )}
@@ -127,7 +137,7 @@ const AdCard = ({
       {template === "banner" && (
         <div className="flex gap-3 p-4">
           <img
-            src={encodeURI(finalMediaUrl)}
+            src={finalMediaUrl}
             className="w-28 h-20 object-cover rounded"
             alt={title}
           />
@@ -139,10 +149,14 @@ const AdCard = ({
       )}
 
       {/* Footer */}
-      <div className="flex justify-between px-4 pb-4">
-        <div className="flex gap-3 text-sm text-gray-500">
+      <div className="flex justify-between items-center px-4 pb-4">
+        <div className="flex gap-4 text-sm text-gray-500 items-center">
           <button onClick={handleLike}>
-            {liked ? <FaHeart className="text-red-500" /> : <FiHeart />}
+            {liked ? (
+              <FaHeart className="text-red-500" />
+            ) : (
+              <FiHeart />
+            )}
           </button>
 
           <span className="flex items-center gap-1">
@@ -155,8 +169,11 @@ const AdCard = ({
         </div>
 
         <button
-          onClick={handleAdClick}
-          className="bg-blue-600 text-white px-3 py-1 rounded"
+          onClick={(e) => {
+            e.stopPropagation();
+            handleAdClick();
+          }}
+          className="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700"
         >
           Learn More
         </button>

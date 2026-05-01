@@ -3,7 +3,7 @@ import { useAuth } from "../../context/AuthContext";
 import { useEffect, useState } from "react";
 import { getAlerts, markAlertRead } from "../../services/alert.service";
 
-import { FiBell } from "react-icons/fi";
+import { FiBell, FiUser, FiLogOut } from "react-icons/fi";
 
 const Topbar = () => {
   const { user, logout } = useAuth();
@@ -11,6 +11,7 @@ const Topbar = () => {
 
   const [alerts, setAlerts] = useState([]);
   const [open, setOpen] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
 
   // Load alerts
   useEffect(() => {
@@ -24,9 +25,20 @@ const Topbar = () => {
     };
 
     fetchData();
-
     const interval = setInterval(fetchData, 30000);
+
     return () => clearInterval(interval);
+  }, []);
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    const handleClickOutside = () => {
+      setOpen(false);
+      setProfileOpen(false);
+    };
+
+    window.addEventListener("click", handleClickOutside);
+    return () => window.removeEventListener("click", handleClickOutside);
   }, []);
 
   const unreadCount = alerts.filter((a) => !a.isRead).length;
@@ -42,7 +54,6 @@ const Topbar = () => {
     navigate("/login");
   };
 
-  // ✅ FINAL AVATAR LOGIC (Cloudinary ready)
   const avatarUrl =
     user?.avatar || `https://ui-avatars.com/api/?name=${user?.name || "User"}`;
 
@@ -55,10 +66,14 @@ const Topbar = () => {
       {/* Right */}
       <div className="flex items-center gap-5 relative">
 
-        {/* 🔔 Notification */}
+        {/* Notification */}
         <div className="relative">
           <button
-            onClick={() => setOpen(!open)}
+            onClick={(e) => {
+              e.stopPropagation();
+              setOpen(!open);
+              setProfileOpen(false);
+            }}
             className="text-xl hover:text-gray-700"
           >
             <FiBell />
@@ -100,21 +115,42 @@ const Topbar = () => {
           <p className="text-xs text-gray-500">{user?.email}</p>
         </div>
 
-        {/* ✅ Avatar */}
-        <img
-          src={avatarUrl}
-          alt="avatar"
-          className="w-9 h-9 rounded-full object-cover cursor-pointer"
-          onClick={() => navigate("/profile")}
-        />
+        {/* Avatar Dropdown */}
+        <div className="relative">
+          <img
+            src={avatarUrl}
+            alt="avatar"
+            className="w-9 h-9 rounded-full object-cover cursor-pointer border"
+            onClick={(e) => {
+              e.stopPropagation();
+              setProfileOpen(!profileOpen);
+              setOpen(false);
+            }}
+          />
 
-        {/* Logout */}
-        <button
-          onClick={handleLogout}
-          className="px-3 py-1 text-sm bg-red-500 text-white rounded-md hover:bg-red-600 transition"
-        >
-          Logout
-        </button>
+          {profileOpen && (
+            <div className="absolute right-0 mt-3 w-40 bg-white border border-gray-200 rounded-lg shadow-lg z-20">
+
+              <button
+                onClick={() => {
+                  navigate("/profile");
+                  setProfileOpen(false);
+                }}
+                className="flex items-center gap-2 w-full px-4 py-2 text-sm hover:bg-gray-100"
+              >
+                <FiUser /> Profile
+              </button>
+
+              <button
+                onClick={handleLogout}
+                className="flex items-center gap-2 w-full px-4 py-2 text-sm text-red-500 hover:bg-red-50"
+              >
+                <FiLogOut /> Logout
+              </button>
+
+            </div>
+          )}
+        </div>
 
       </div>
     </div>

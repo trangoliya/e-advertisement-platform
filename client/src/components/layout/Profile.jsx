@@ -57,7 +57,7 @@ const Profile = () => {
 
   if (!user) return <p className="text-center mt-10">Loading...</p>;
 
-  // ✅ Cloudinary direct URL
+  // Cloudinary direct URL
   const avatarUrl =
     preview || user.avatar || `https://ui-avatars.com/api/?name=${user.name}`;
 

@@ -10,7 +10,7 @@ import Home from "../pages/user/Home.jsx";
 import AdDetails from "../pages/user/AdDetails.jsx";
 
 import DashboardLayout from "../layouts/DashboardLayout.jsx";
-
+import PublisherProfile from "../pages/publisher/PublisherProfile.jsx";
 import Admin from "../pages/admin/AdminPage.jsx";
 import AllUserList from "../pages/admin/AllUserList.jsx";
 import AdminAds from "../pages/admin/AdminAds.jsx";
@@ -48,6 +48,7 @@ const router = createBrowserRouter([
             children: [
               { path: "/home", element: <Home /> },
               { path: "/ads/:id", element: <AdDetails /> },
+              { path: "/publisher/:id", element: <PublisherProfile /> },
             ],
           },
         ],
