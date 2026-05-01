@@ -11,7 +11,7 @@ export const getProfile = async (req, res) => {
   });
 };
 
-// Update Profile (name + avatar + company + bio)
+// Update Profile (extended fields + avatar)
 export const updateProfile = async (req, res) => {
   try {
     const user = await User.findById(req.user.id);
@@ -20,14 +20,19 @@ export const updateProfile = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    // Existing logic
+    // BASIC FIELD
     user.name = req.body.name || user.name;
 
-    // Publisher fields
+    // NEW PROFILE FIELDS
+    user.age = req.body.age ? Number(req.body.age) : user.age;
+    user.city = req.body.city || user.city;
+    user.interests = req.body.interests || user.interests;
+
+    // PUBLISHER FIELDS
     user.companyName = req.body.companyName || user.companyName;
     user.bio = req.body.bio || user.bio;
 
-    // Avatar upload
+    // AVATAR (Cloudinary)
     if (req.file) {
       user.avatar = req.file.path;
       console.log("FILE:", req.file);
@@ -48,7 +53,7 @@ export const updateProfile = async (req, res) => {
 export const getPublisherProfile = async (req, res) => {
   try {
     const user = await User.findById(req.params.id).select(
-      "name email avatar companyName bio"
+      "name email avatar companyName bio city interests"
     );
 
     if (!user) {

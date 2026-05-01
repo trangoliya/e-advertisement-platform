@@ -3,7 +3,12 @@ import { useParams, useNavigate } from "react-router-dom";
 import api from "../../services/api";
 import AdCard from "../../components/ads/AdCard";
 
-import { FiArrowLeft, FiBriefcase } from "react-icons/fi";
+import {
+  FiArrowLeft,
+  FiBriefcase,
+  FiMapPin,
+  FiTag,
+} from "react-icons/fi";
 
 const PublisherProfile = () => {
   const { id } = useParams();
@@ -50,39 +55,55 @@ const PublisherProfile = () => {
         </button>
 
         {/* PROFILE CARD */}
-        <div className="bg-white rounded-2xl shadow p-6 mb-6 flex items-center gap-5">
+        <div className="bg-white rounded-2xl shadow p-6 mb-6 flex flex-col md:flex-row items-center gap-6">
+
           <img
             src={avatarUrl}
             alt={user.name}
-            className="w-20 h-20 rounded-full object-cover border"
+            className="w-24 h-24 rounded-full object-cover border"
           />
 
-          <div>
-            <h2 className="text-xl font-bold">{user.name}</h2>
+          <div className="text-center md:text-left">
+            <h2 className="text-2xl font-bold">{user.name}</h2>
 
             {user.companyName && (
-              <p className="flex items-center gap-2 text-gray-600 text-sm">
+              <p className="flex items-center justify-center md:justify-start gap-2 text-gray-600 text-sm mt-1">
                 <FiBriefcase /> {user.companyName}
               </p>
             )}
 
+            {user.city && (
+              <p className="flex items-center justify-center md:justify-start gap-2 text-gray-500 text-sm mt-1">
+                <FiMapPin /> {user.city}
+              </p>
+            )}
+
+            {user.interests && (
+              <p className="flex items-center justify-center md:justify-start gap-2 text-gray-500 text-sm mt-1">
+                <FiTag /> {user.interests}
+              </p>
+            )}
+
             {user.bio && (
-              <p className="text-gray-500 text-sm mt-1">
+              <p className="text-gray-600 text-sm mt-3 max-w-md">
                 {user.bio}
               </p>
             )}
           </div>
         </div>
 
-        {/* ADS */}
+        {/* ADS HEADER */}
         <div className="mb-3 flex justify-between items-center">
           <h3 className="text-lg font-semibold">
             Active Ads ({ads.length})
           </h3>
         </div>
 
+        {/* NO ADS */}
         {ads.length === 0 ? (
-          <p className="text-gray-500">No active ads</p>
+          <div className="bg-white p-6 rounded-xl shadow text-center text-gray-500">
+            No active ads
+          </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             {ads.map((ad) => (
