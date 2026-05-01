@@ -24,7 +24,7 @@ const ViewerOnboardingModal = () => {
     setInterests((prev) =>
       prev.includes(interest)
         ? prev.filter((i) => i !== interest)
-        : [...prev, interest],
+        : [...prev, interest]
     );
   };
 
@@ -48,18 +48,18 @@ const ViewerOnboardingModal = () => {
         interests,
       });
 
-      if (response) {
+      // FULL USER UPDATE
+      if (response?.data?.data) {
         setSuccessMessage("Profile saved successfully!");
 
         setTimeout(() => {
-          setUser((prev) => ({
-            ...prev,
-            profileCompleted: true,
-          }));
+          setUser(response.data.data); 
         }, 800);
       }
+
     } catch (error) {
       console.error("Profile save error:", error);
+      alert("Something went wrong");
     } finally {
       setLoading(false);
     }
@@ -68,8 +68,12 @@ const ViewerOnboardingModal = () => {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
       <div className="w-full max-w-md p-6 bg-white shadow-xl rounded-2xl">
-        <h2 className="mb-4 text-xl font-semibold">Complete Your Profile</h2>
 
+        <h2 className="mb-4 text-xl font-semibold">
+          Complete Your Profile
+        </h2>
+
+        {/* Age */}
         <input
           type="number"
           placeholder="Age"
@@ -79,6 +83,7 @@ const ViewerOnboardingModal = () => {
           disabled={loading}
         />
 
+        {/* City */}
         <input
           type="text"
           placeholder="City"
@@ -88,10 +93,12 @@ const ViewerOnboardingModal = () => {
           disabled={loading}
         />
 
+        {/* Interests */}
         <div className="mb-4">
           <p className="mb-2 font-medium">Interests</p>
+
           {interestsList.map((interest) => (
-            <label key={interest} className="block mb-1">
+            <label key={interest} className="block mb-1 cursor-pointer">
               <input
                 type="checkbox"
                 checked={interests.includes(interest)}
@@ -103,17 +110,22 @@ const ViewerOnboardingModal = () => {
           ))}
         </div>
 
+        {/* Success */}
         {successMessage && (
-          <p className="mb-3 text-sm text-green-600">{successMessage}</p>
+          <p className="mb-3 text-sm text-green-600">
+            {successMessage}
+          </p>
         )}
 
+        {/* Button */}
         <button
           onClick={handleSubmit}
           disabled={loading}
-          className="w-full py-2 text-white bg-black rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full py-2 text-white bg-black rounded-lg hover:bg-gray-800 disabled:opacity-50"
         >
           {loading ? "Saving..." : "Save & Continue"}
         </button>
+
       </div>
     </div>
   );
