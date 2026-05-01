@@ -20,7 +20,7 @@ import MyAds from "../pages/publisher/MyAds.jsx";
 import CreateAd from "../pages/publisher/CreateAd.jsx";
 import Analytics from "../pages/publisher/Analytics.jsx";
 import Campaigns from "../pages/publisher/Campaigns.jsx";
-import Profile from "../pages/Profile.jsx";
+import Profile from "../components/layout/Profile.jsx";
 import ProtectedRoute from "./ProtectedRoute.jsx";
 import RoleRoute from "./RoleRoute.jsx";
 import { ROLES } from "../context/roles.js";
