@@ -13,24 +13,23 @@ const Topbar = () => {
   const [open, setOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
 
-  // Load alerts
   useEffect(() => {
     const fetchData = async () => {
       try {
         const res = await getAlerts();
         setAlerts(res.data);
       } catch (err) {
-        console.error(err);
+        console.error("Alert fetch failed:", err);
       }
     };
 
     fetchData();
+
     const interval = setInterval(fetchData, 30000);
 
     return () => clearInterval(interval);
   }, []);
 
-  // Close dropdown
   useEffect(() => {
     const handleClickOutside = () => {
       setOpen(false);
@@ -38,15 +37,23 @@ const Topbar = () => {
     };
 
     window.addEventListener("click", handleClickOutside);
-    return () => window.removeEventListener("click", handleClickOutside);
+
+    return () => {
+      window.removeEventListener("click", handleClickOutside);
+    };
   }, []);
 
   const unreadCount = alerts.filter((a) => !a.isRead).length;
 
   const handleRead = async (id) => {
-    await markAlertRead(id);
-    const res = await getAlerts();
-    setAlerts(res.data);
+    try {
+      await markAlertRead(id);
+
+      const res = await getAlerts();
+      setAlerts(res.data);
+    } catch (err) {
+      console.error("Failed to mark alert as read:", err);
+    }
   };
 
   const handleLogout = () => {
@@ -54,20 +61,20 @@ const Topbar = () => {
     navigate("/login");
   };
 
-  // ✅ CLEAN AVATAR (NO HACK)
   const avatarUrl =
     user?.avatar || `https://ui-avatars.com/api/?name=${user?.name || "User"}`;
 
   return (
-    <div className="h-15 bg-white border-b border-gray-200 flex items-center justify-between px-6">
-
+    <div className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-6 shadow-sm">
       {/* Brand */}
-      <h3 className="text-lg font-semibold">AdPlatform</h3>
+      <div>
+        <h3 className="text-lg font-bold text-gray-900">AdPlatform</h3>
+        <p className="text-xs text-gray-500">Digital Advertising System</p>
+      </div>
 
-      {/* Right */}
+      {/* Right Side */}
       <div className="flex items-center gap-5 relative">
-
-        {/* Notification */}
+        {/* Notifications */}
         <div className="relative">
           <button
             onClick={(e) => {
@@ -75,20 +82,21 @@ const Topbar = () => {
               setOpen(!open);
               setProfileOpen(false);
             }}
-            className="text-xl hover:text-gray-700"
+            className="text-xl text-gray-700 hover:text-indigo-600 transition"
           >
             <FiBell />
           </button>
 
           {unreadCount > 0 && (
-            <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs px-2 py-0.5 rounded-full">
+            <span className="absolute -top-2 -right-2 min-w-4.5 h-4.5 flex items-center justify-center bg-red-500 text-white text-[10px] font-semibold rounded-full">
               {unreadCount}
             </span>
           )}
 
           {open && (
-            <div className="absolute right-0 mt-3 w-72 bg-white border border-gray-200 rounded-lg shadow-lg p-3 z-20">
-              
+            <div className="absolute right-0 mt-3 w-72 bg-white border border-gray-200 rounded-xl shadow-xl p-3 z-50">
+              <h4 className="font-semibold text-sm mb-3">Notifications</h4>
+
               {alerts.length === 0 && (
                 <p className="text-sm text-gray-500">No alerts</p>
               )}
@@ -97,7 +105,7 @@ const Topbar = () => {
                 <div
                   key={alert._id}
                   onClick={() => handleRead(alert._id)}
-                  className={`p-2 mb-2 rounded-md text-sm cursor-pointer transition ${
+                  className={`p-3 mb-2 rounded-lg text-sm cursor-pointer transition ${
                     alert.isRead
                       ? "bg-gray-100"
                       : "bg-yellow-100 hover:bg-yellow-200"
@@ -112,7 +120,8 @@ const Topbar = () => {
 
         {/* User Info */}
         <div className="text-right hidden sm:block">
-          <p className="text-sm font-medium">{user?.name}</p>
+          <p className="text-sm font-semibold text-gray-800">{user?.name}</p>
+
           <p className="text-xs text-gray-500">{user?.email}</p>
         </div>
 
@@ -121,7 +130,7 @@ const Topbar = () => {
           <img
             src={avatarUrl}
             alt="avatar"
-            className="w-9 h-9 rounded-full object-cover cursor-pointer border hover:scale-105 transition"
+            className="w-10 h-10 rounded-full object-cover cursor-pointer border-2 border-gray-200 hover:border-indigo-500 hover:scale-105 transition"
             onClick={(e) => {
               e.stopPropagation();
               setProfileOpen(!profileOpen);
@@ -130,29 +139,28 @@ const Topbar = () => {
           />
 
           {profileOpen && (
-            <div className="absolute right-0 mt-3 w-40 bg-white border border-gray-200 rounded-lg shadow-lg z-20 overflow-hidden">
-
+            <div className="absolute right-0 mt-3 w-48 bg-white border border-gray-200 rounded-xl shadow-xl z-50 overflow-hidden">
               <button
                 onClick={() => {
                   navigate("/profile");
                   setProfileOpen(false);
                 }}
-                className="flex items-center gap-2 w-full px-4 py-2 text-sm hover:bg-gray-100"
+                className="flex items-center gap-2 w-full px-4 py-3 text-sm hover:bg-gray-100 transition"
               >
-                <FiUser /> Profile
+                <FiUser />
+                Profile
               </button>
 
               <button
                 onClick={handleLogout}
-                className="flex items-center gap-2 w-full px-4 py-2 text-sm text-red-500 hover:bg-red-50"
+                className="flex items-center gap-2 w-full px-4 py-3 text-sm text-red-500 hover:bg-red-50 transition"
               >
-                <FiLogOut /> Logout
+                <FiLogOut />
+                Logout
               </button>
-
             </div>
           )}
         </div>
-
       </div>
     </div>
   );

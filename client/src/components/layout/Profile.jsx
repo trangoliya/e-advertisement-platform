@@ -14,7 +14,7 @@ const Profile = () => {
   const [avatar, setAvatar] = useState(null);
   const [preview, setPreview] = useState(null);
 
-  // 🔥 LOAD PROFILE (AUTO-FILL)
+  //  LOAD PROFILE (AUTO-FILL)
   useEffect(() => {
     const loadProfile = async () => {
       try {
@@ -23,7 +23,7 @@ const Profile = () => {
 
         setUser(data);
 
-        // ✅ AUTO-FILL (IMPORTANT)
+        // AUTO-FILL (IMPORTANT)
         setName(data.name || "");
         setAge(data.age || "");
         setCity(data.city || "");
@@ -66,7 +66,7 @@ const Profile = () => {
 
       const res = await api.put("/api/users/profile", formData);
 
-      // 🔥 IMPORTANT → UPDATE UI
+    
       setUser(res.data.data);
 
       alert("Profile updated!");
