@@ -36,8 +36,8 @@ const AdminAds = () => {
 
     try {
       setUpdatingId(ad._id);
-      await updateAdStatus(ad._id, nextStatus); // 🔑 API call
-      await fetchAds(); // 🔄 refresh list
+      await updateAdStatus(ad._id, nextStatus); // api call to update status
+      await fetchAds(); // refresh list
     } catch (error) {
       console.error("Error updating ad status:", error);
     } finally {
@@ -55,86 +55,127 @@ const AdminAds = () => {
   }
 
   return (
-    <div className="p-6 space-y-6">
-      <h1 className="text-3xl font-bold text-gray-800">Ads Management</h1>
+    <div className="space-y-6">
+      {/* Header */}
+      <div>
+        <h1 className="text-3xl font-bold text-gray-900">Ads Management</h1>
 
-      <div className="bg-white border border-gray-100 rounded-2xl overflow-hidden">
-        <table className="w-full text-sm">
-          <thead className="bg-gray-50 border-b">
-            <tr className="text-xs uppercase tracking-wider text-gray-500">
-              <th className="px-6 py-4">Title</th>
-              <th className="px-6 py-4">Publisher</th>
-              <th className="px-6 py-4">Status</th>
-              <th className="px-6 py-4">Impressions</th>
-              <th className="px-6 py-4">Clicks</th>
-              <th className="px-6 py-4 text-center">Action</th>
-            </tr>
-          </thead>
+        <p className="text-gray-500 mt-1">
+          Monitor, activate and manage advertisement campaigns.
+        </p>
+      </div>
 
-          <tbody>
-            {ads.map((ad) => {
-              const isUpdating = updatingId === ad._id;
+      {/* Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="bg-white rounded-2xl p-5 shadow-sm border">
+          <p className="text-sm text-gray-500">Total Ads</p>
 
-              return (
-                <tr
-                  key={ad._id}
-                  className="border-t hover:bg-gray-50 transition duration-200"
-                >
-                  {/* Title */}
-                  <td className="px-6 py-5 font-medium text-gray-800">
-                    {ad.title}
+          <h3 className="text-3xl font-bold mt-2">{ads.length}</h3>
+        </div>
+
+        <div className="bg-white rounded-2xl p-5 shadow-sm border">
+          <p className="text-sm text-gray-500">Active Ads</p>
+
+          <h3 className="text-3xl font-bold text-green-600 mt-2">
+            {ads.filter((a) => a.status === "active").length}
+          </h3>
+        </div>
+
+        <div className="bg-white rounded-2xl p-5 shadow-sm border">
+          <p className="text-sm text-gray-500">Paused Ads</p>
+
+          <h3 className="text-3xl font-bold text-yellow-600 mt-2">
+            {ads.filter((a) => a.status === "paused").length}
+          </h3>
+        </div>
+      </div>
+
+      {/* Table */}
+      <div className="bg-white border border-gray-100 rounded-2xl overflow-hidden shadow-sm">
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead className="bg-gray-50 border-b">
+              <tr className="text-xs uppercase tracking-wider text-gray-500">
+                <th className="px-6 py-4 text-left">Title</th>
+
+                <th className="px-6 py-4 text-left">Publisher</th>
+
+                <th className="px-6 py-4 text-center">Status</th>
+
+                <th className="px-6 py-4 text-right">Impressions</th>
+
+                <th className="px-6 py-4 text-right">Clicks</th>
+
+                <th className="px-6 py-4 text-center">Action</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              {ads.length === 0 && (
+                <tr>
+                  <td colSpan="6" className="text-center py-12 text-gray-500">
+                    No advertisements found
                   </td>
+                </tr>
+              )}
 
-                  {/* Publisher */}
-                  <td className="px-6 py-5 text-gray-600">
-                    {ad.publisher?.name || "Unknown"}
-                  </td>
+              {ads.map((ad) => {
+                const isUpdating = updatingId === ad._id;
 
-                  {/* Status badge */}
-                  <td className="px-6 py-5 text-center">
-                    <StatusBadge status={ad.status} />
-                  </td>
+                return (
+                  <tr
+                    key={ad._id}
+                    className="border-t hover:bg-gray-50 transition"
+                  >
+                    <td className="px-6 py-5 font-medium text-gray-800">
+                      {ad.title}
+                    </td>
 
-                  {/* Impressions */}
-                  <td className="px-6 py-5 text-gray-600 text-right">
-                    {ad.impressions}
-                  </td>
+                    <td className="px-6 py-5 text-gray-600">
+                      {ad.publisher?.name || "Unknown"}
+                    </td>
 
-                  {/* Clicks */}
-                  <td className="px-6 py-5 text-gray-600 text-right">
-                    {ad.clicks}
-                  </td>
+                    <td className="px-6 py-5 text-center">
+                      <StatusBadge status={ad.status} />
+                    </td>
 
-                  {/* Action button */}
-                  <td className="px-6 py-5 text-center">
-                    <button
-                      onClick={() => handleStatusChange(ad)}
-                      disabled={isUpdating}
-                      className={`rounded-xl px-4 py-2 text-sm font-semibold transition duration-200 active:scale-[0.98]
+                    <td className="px-6 py-5 text-gray-600 text-right">
+                      {ad.impressions ?? 0}
+                    </td>
+
+                    <td className="px-6 py-5 text-gray-600 text-right">
+                      {ad.clicks ?? 0}
+                    </td>
+
+                    <td className="px-6 py-5 text-center">
+                      <button
+                        onClick={() => handleStatusChange(ad)}
+                        disabled={isUpdating}
+                        className={`rounded-xl px-4 py-2 text-sm font-semibold transition active:scale-[0.98]
                         ${
                           ad.status === "active"
                             ? "bg-yellow-50 text-yellow-700 hover:bg-yellow-100"
                             : "bg-green-50 text-green-700 hover:bg-green-100"
                         }
                         disabled:opacity-50`}
-                    >
-                      {isUpdating
-                        ? "Updating..."
-                        : ad.status === "draft"
-                          ? "Activate"
-                          : ad.status === "active"
-                            ? "Pause"
-                            : "Activate"}
-                    </button>
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+                      >
+                        {isUpdating
+                          ? "Updating..."
+                          : ad.status === "draft"
+                            ? "Activate"
+                            : ad.status === "active"
+                              ? "Pause"
+                              : "Activate"}
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );
 };
-
 export default AdminAds;
