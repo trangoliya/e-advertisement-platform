@@ -9,27 +9,43 @@ const MainLayout = () => {
   const { user, loading } = useAuth();
 
   const shouldShowOnboarding =
-    user?.roles?.includes(ROLES.USER) && user?.profileCompleted === false;
+    user?.roles?.includes(ROLES.USER) &&
+    user?.profileCompleted === false;
 
   useEffect(() => {
-    if (shouldShowOnboarding) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "auto";
-    }
+    document.body.style.overflow = shouldShowOnboarding
+      ? "hidden"
+      : "auto";
 
     return () => {
       document.body.style.overflow = "auto";
     };
   }, [shouldShowOnboarding]);
 
-  if (loading) return null;
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-100">
+        <div className="w-12 h-12 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-slate-100">
+
+      {/* Top Navigation */}
       <Topbar />
-      <Outlet />
-      {shouldShowOnboarding && <ViewerOnboardingModal />}
+
+      {/* Main Content */}
+      <main className="max-w-7xl mx-auto w-full px-4 md:px-6 py-6">
+        <Outlet />
+      </main>
+
+      {/* Onboarding Modal */}
+      {shouldShowOnboarding && (
+        <ViewerOnboardingModal />
+      )}
+
     </div>
   );
 };

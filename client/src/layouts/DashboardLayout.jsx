@@ -4,19 +4,19 @@ import Topbar from "../components/layout/Topbar";
 
 const DashboardLayout = () => {
   return (
-    <div className="bg-gray-100 min-h-screen">
+    <div className="min-h-screen bg-slate-100">
 
       {/* Sidebar */}
       <Sidebar />
 
-      {/* Right Content */}
-      <div className="ml-64 flex flex-col min-h-screen">
+      {/* Main Content */}
+      <div className="ml-72 flex flex-col min-h-screen">
 
         {/* Topbar */}
         <Topbar />
 
         {/* Page Content */}
-        <main className="flex-1 p-6 overflow-x-auto overflow-y-auto">
+        <main className="flex-1 p-6 md:p-8 overflow-x-auto">
           <Outlet />
         </main>
 
