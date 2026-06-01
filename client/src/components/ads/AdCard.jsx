@@ -15,16 +15,17 @@ const AdCard = ({
   id,
   title,
   description,
-  impressions,
-  clicks,
+  impressions = 0,
+  clicks = 0,
   mediaUrl,
   mediaType = "image",
   publisherName = "Sponsored",
   publisherAvatar,
-  publisherId, 
+  publisherId,
   template = "standard",
 }) => {
   const hasTracked = useRef(false);
+
   const [liked, setLiked] = useState(false);
   const [saved, setSaved] = useState(false);
 
@@ -39,61 +40,105 @@ const AdCard = ({
 
   useEffect(() => {
     if (hasTracked.current) return;
+
     hasTracked.current = true;
 
-    api.post("/api/ads/track-view", { adId: id }).catch(() => {});
+    api
+      .post("/api/ads/track-view", {
+        adId: id,
+      })
+      .catch(() => {});
   }, [id]);
 
   const handleLike = (e) => {
     e.stopPropagation();
+
     toggleLikeAd(id);
     setLiked((prev) => !prev);
   };
 
   const handleSave = (e) => {
     e.stopPropagation();
+
     toggleSaveAd(id);
     setSaved((prev) => !prev);
   };
 
   const handleAdClick = () => {
     navigate(`/ads/${id}`);
-    api.post("/api/ads/track-click", { adId: id }).catch(() => {});
+
+    api
+      .post("/api/ads/track-click", {
+        adId: id,
+      })
+      .catch(() => {});
   };
 
-  // publisher click
   const handlePublisherClick = (e) => {
     e.stopPropagation();
+
     if (publisherId) {
       navigate(`/publisher/${publisherId}`);
     }
   };
 
   const avatarUrl =
-    publisherAvatar || `https://ui-avatars.com/api/?name=${publisherName}`;
+    publisherAvatar ||
+    `https://ui-avatars.com/api/?name=${encodeURIComponent(
+      publisherName || "Publisher",
+    )}`;
 
   return (
     <div
-      className="bg-white rounded-2xl shadow border overflow-hidden hover:shadow-xl transition cursor-pointer"
       onClick={handleAdClick}
+      className="
+        bg-white
+        rounded-2xl
+        border
+        shadow-sm
+        overflow-hidden
+        cursor-pointer
+        transition-all
+        duration-300
+        hover:-translate-y-1
+        hover:shadow-xl
+      "
     >
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3">
-        
-        {/* CLICKABLE PUBLISHER */}
         <div
-          className="flex items-center gap-3 cursor-pointer hover:opacity-80"
           onClick={handlePublisherClick}
+          className="
+            flex
+            items-center
+            gap-3
+            cursor-pointer
+            hover:opacity-80
+          "
         >
           <img
             src={avatarUrl}
             alt={publisherName}
-            className="w-10 h-10 rounded-full object-cover border"
+            className="
+              w-10
+              h-10
+              rounded-full
+              object-cover
+              border
+            "
           />
-          <p className="text-sm font-semibold">{publisherName}</p>
+
+          <div>
+            <p className="text-sm font-semibold">{publisherName}</p>
+
+            <p className="text-xs text-gray-400">Sponsored</p>
+          </div>
         </div>
 
-        <button onClick={handleSave}>
+        <button
+          onClick={handleSave}
+          className="text-lg text-gray-600 hover:text-blue-600"
+        >
           {saved ? <FaBookmark /> : <FiBookmark />}
         </button>
       </div>
@@ -108,18 +153,20 @@ const AdCard = ({
               autoPlay
               muted
               loop
+              playsInline
             />
           ) : (
             <img
               src={finalMediaUrl}
-              className="w-full h-60 object-cover"
               alt={title}
+              className="w-full h-60 object-cover"
             />
           )}
 
           <div className="p-4">
-            <h3 className="font-semibold text-lg">{title}</h3>
-            <p className="text-sm text-gray-600 line-clamp-2">
+            <h3 className="text-lg font-semibold line-clamp-1">{title}</h3>
+
+            <p className="text-sm text-gray-600 mt-1 line-clamp-2">
               {description}
             </p>
           </div>
@@ -129,42 +176,57 @@ const AdCard = ({
       {/* COMPACT */}
       {template === "compact" && (
         <div className="p-4">
-          <h3 className="font-semibold">{title}</h3>
+          <h3 className="font-semibold text-base">{title}</h3>
+
+          <p className="text-sm text-gray-600 mt-1 line-clamp-2">
+            {description}
+          </p>
         </div>
       )}
 
       {/* BANNER */}
       {template === "banner" && (
         <div className="flex gap-3 p-4">
-          <img
-            src={finalMediaUrl}
-            className="w-28 h-20 object-cover rounded"
-            alt={title}
-          />
-          <div>
-            <h3 className="font-semibold">{title}</h3>
-            <p className="text-sm text-gray-600">{description}</p>
+          {mediaType === "video" ? (
+            <video
+              src={finalMediaUrl}
+              className="w-28 h-20 object-cover rounded-lg"
+              autoPlay
+              muted
+              loop
+              playsInline
+            />
+          ) : (
+            <img
+              src={finalMediaUrl}
+              alt={title}
+              className="w-28 h-20 object-cover rounded-lg"
+            />
+          )}
+
+          <div className="flex-1">
+            <h3 className="font-semibold line-clamp-1">{title}</h3>
+
+            <p className="text-sm text-gray-600 line-clamp-2">{description}</p>
           </div>
         </div>
       )}
 
       {/* Footer */}
       <div className="flex justify-between items-center px-4 pb-4">
-        <div className="flex gap-4 text-sm text-gray-500 items-center">
-          <button onClick={handleLike}>
-            {liked ? (
-              <FaHeart className="text-red-500" />
-            ) : (
-              <FiHeart />
-            )}
+        <div className="flex gap-4 items-center text-sm text-gray-500">
+          <button onClick={handleLike} className="text-lg">
+            {liked ? <FaHeart className="text-red-500" /> : <FiHeart />}
           </button>
 
           <span className="flex items-center gap-1">
-            <FiEye /> {impressions}
+            <FiEye />
+            {impressions}
           </span>
 
           <span className="flex items-center gap-1">
-            <FiMousePointer /> {clicks}
+            <FiMousePointer />
+            {clicks}
           </span>
         </div>
 
@@ -173,7 +235,16 @@ const AdCard = ({
             e.stopPropagation();
             handleAdClick();
           }}
-          className="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700"
+          className="
+            bg-blue-600
+            text-white
+            px-4
+            py-1.5
+            rounded-lg
+            text-sm
+            hover:bg-blue-700
+            transition
+          "
         >
           Learn More
         </button>

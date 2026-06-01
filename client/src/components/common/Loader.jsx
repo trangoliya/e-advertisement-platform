@@ -1,9 +1,23 @@
-const Loader = ({ size = 6 }) => {
+const Loader = ({ size = "md" }) => {
+  const sizes = {
+    sm: "h-5 w-5",
+    md: "h-8 w-8",
+    lg: "h-12 w-12",
+    xl: "h-16 w-16",
+  };
+
   return (
     <div className="flex justify-center items-center py-10">
       <div
-        className={`h-${size} w-${size} border-4 border-gray-300 border-t-blue-500 rounded-full animate-spin`}
-      ></div>
+        className={`
+          ${sizes[size]}
+          border-4
+          border-gray-300
+          border-t-blue-600
+          rounded-full
+          animate-spin
+        `}
+      />
     </div>
   );
 };

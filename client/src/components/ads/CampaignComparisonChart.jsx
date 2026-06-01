@@ -6,38 +6,53 @@ import {
   Tooltip,
   CartesianGrid,
   ResponsiveContainer,
+  Legend,
 } from "recharts";
 
 const CampaignComparisonChart = ({ campaigns = [] }) => {
-  const data = campaigns.map((campaign) => ({
-    name: campaign.name || "Campaign",
-    clicks: campaign.clicks || 0,
+  const data = campaigns.map((ad) => ({
+    name: ad.title || "Advertisement",
+    clicks: ad.clicks || 0,
+    impressions: ad.impressions || 0,
   }));
 
   if (!campaigns.length) {
     return (
-      <div className="bg-white shadow-lg rounded-xl p-5 w-full">
-        <h2 className="text-lg font-semibold mb-4">Campaign Comparison</h2>
-        <p className="text-sm text-gray-500">No campaign data available.</p>
+      <div className="bg-white shadow-lg rounded-2xl p-6 w-full">
+        <h2 className="text-lg font-semibold mb-4">
+          Ad Performance Comparison
+        </h2>
+
+        <p className="text-sm text-gray-500">
+          No advertisement data available.
+        </p>
       </div>
     );
   }
 
   return (
-    <div className="bg-white shadow-lg rounded-xl p-5 w-full">
-      <h2 className="text-lg font-semibold mb-4">Campaign Comparison</h2>
+    <div className="bg-white shadow-lg rounded-2xl p-6 w-full">
+      <h2 className="text-lg font-semibold mb-4">Ad Performance Comparison</h2>
 
-      <div className="w-full min-h-80">
-  <ResponsiveContainer width="100%" height={320}>
-    <BarChart data={data}>
-      <CartesianGrid strokeDasharray="3 3" />
-      <XAxis dataKey="name" />
-      <YAxis />
-      <Tooltip />
-      <Bar dataKey="clicks" fill="#3b82f6" radius={[6,6,0,0]} />
-    </BarChart>
-  </ResponsiveContainer>
-</div>
+      <div className="w-full h-80">
+        <ResponsiveContainer width="100%" height="100%">
+          <BarChart data={data}>
+            <CartesianGrid strokeDasharray="3 3" />
+
+            <XAxis dataKey="name" />
+
+            <YAxis />
+
+            <Tooltip />
+
+            <Legend />
+
+            <Bar dataKey="clicks" fill="#3b82f6" radius={[6, 6, 0, 0]} />
+
+            <Bar dataKey="impressions" fill="#6366f1" radius={[6, 6, 0, 0]} />
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
     </div>
   );
 };

@@ -3,8 +3,8 @@ import { getActiveAds } from "../../services/ad.service";
 import { getPublisherProfile } from "../../services/publisher.service";
 import { useNavigate } from "react-router-dom";
 import AdCard from "../../components/ads/AdCard";
-import PPAvatar from "../../assets/PP_Avatar.png";
 import PublisherOnboardingModal from "../../components/common/PublisherOnboardingModal";
+import { getAvatar } from "../../utils/avatar";
 
 import {
   FiGrid,
@@ -137,7 +137,7 @@ const Home = () => {
               template={ad.template}
               publisherId={ad.createdBy?._id}
               publisherName={ad.createdBy?.name || "Publisher"}
-              publisherAvatar={ad.createdBy?.avatar || PPAvatar}
+              publisherAvatar={getAvatar(ad.createdBy)}
             />
           ))
         )}
