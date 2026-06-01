@@ -31,6 +31,8 @@ import ProtectedRoute from "./ProtectedRoute.jsx";
 import RoleRoute from "./RoleRoute.jsx";
 import { ROLES } from "../context/roles.js";
 
+import NotFound from "../pages/common/NotFound.jsx";
+
 const router = createBrowserRouter([
   {
     path: "/",
@@ -50,7 +52,6 @@ const router = createBrowserRouter([
   {
     element: <ProtectedRoute />,
     children: [
-
       // MAIN LAYOUT (COMMON + USER)
       {
         element: <MainLayout />,
@@ -58,7 +59,7 @@ const router = createBrowserRouter([
           { path: "home", element: <Home /> },
           { path: "ads/:id", element: <AdDetails /> },
           { path: "publisher/:id", element: <PublisherProfile /> },
-          { path: "profile", element: <Profile /> }, 
+          { path: "profile", element: <Profile /> },
         ],
       },
 
@@ -95,6 +96,10 @@ const router = createBrowserRouter([
         ],
       },
     ],
+  },
+  {
+    path: "*",
+    element: <NotFound />,
   },
 ]);
 

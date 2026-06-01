@@ -2,14 +2,14 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import api from "../../services/api";
 import AdCard from "../../components/ads/AdCard";
-
 import {
   FiArrowLeft,
   FiBriefcase,
   FiMapPin,
   FiTag,
+  FiUser,
+  FiLayers,
 } from "react-icons/fi";
-
 const PublisherProfile = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -43,9 +43,8 @@ const PublisherProfile = () => {
     user.avatar || `https://ui-avatars.com/api/?name=${user.name}`;
 
   return (
-    <div className="min-h-screen bg-gray-100 px-4 py-8">
+    <div className="min-h-screen bg-gray-50 px-4 py-8">
       <div className="max-w-5xl mx-auto">
-
         {/* Back */}
         <button
           onClick={() => navigate(-1)}
@@ -55,48 +54,72 @@ const PublisherProfile = () => {
         </button>
 
         {/* PROFILE CARD */}
-        <div className="bg-white rounded-2xl shadow p-6 mb-6 flex flex-col md:flex-row items-center gap-6">
+        <div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-8 mb-8">
+          <div className="flex flex-col md:flex-row items-center gap-6">
+            <img
+              src={avatarUrl}
+              alt={user.name}
+              className="h-28 w-28 rounded-full object-cover border-4 border-indigo-100"
+            />
 
-          <img
-            src={avatarUrl}
-            alt={user.name}
-            className="w-24 h-24 rounded-full object-cover border"
-          />
+            <div className="flex-1 text-center md:text-left">
+              <div className="flex items-center justify-center md:justify-start gap-2">
+                <FiUser className="text-indigo-600" />
 
-          <div className="text-center md:text-left">
-            <h2 className="text-2xl font-bold">{user.name}</h2>
+                <h2 className="text-3xl font-bold text-gray-900">
+                  {user.name}
+                </h2>
+              </div>
 
-            {user.companyName && (
-              <p className="flex items-center justify-center md:justify-start gap-2 text-gray-600 text-sm mt-1">
-                <FiBriefcase /> {user.companyName}
+              {user.companyName && (
+                <p className="mt-2 flex items-center justify-center md:justify-start gap-2 text-gray-600">
+                  <FiBriefcase />
+                  {user.companyName}
+                </p>
+              )}
+
+              {user.city && (
+                <p className="mt-2 flex items-center justify-center md:justify-start gap-2 text-gray-500">
+                  <FiMapPin />
+                  {user.city}
+                </p>
+              )}
+
+              {user.interests && (
+                <p className="mt-2 flex items-center justify-center md:justify-start gap-2 text-gray-500">
+                  <FiTag />
+                  {user.interests}
+                </p>
+              )}
+
+              {user.bio && (
+                <p className="mt-4 text-gray-600 max-w-2xl">{user.bio}</p>
+              )}
+            </div>
+
+            <div className="bg-indigo-50 rounded-2xl px-6 py-4 text-center">
+              <p className="text-xs uppercase tracking-wide text-gray-500">
+                Active Ads
               </p>
-            )}
 
-            {user.city && (
-              <p className="flex items-center justify-center md:justify-start gap-2 text-gray-500 text-sm mt-1">
-                <FiMapPin /> {user.city}
-              </p>
-            )}
-
-            {user.interests && (
-              <p className="flex items-center justify-center md:justify-start gap-2 text-gray-500 text-sm mt-1">
-                <FiTag /> {user.interests}
-              </p>
-            )}
-
-            {user.bio && (
-              <p className="text-gray-600 text-sm mt-3 max-w-md">
-                {user.bio}
-              </p>
-            )}
+              <p className="text-3xl font-bold text-indigo-600">{ads.length}</p>
+            </div>
           </div>
         </div>
 
         {/* ADS HEADER */}
-        <div className="mb-3 flex justify-between items-center">
-          <h3 className="text-lg font-semibold">
-            Active Ads ({ads.length})
-          </h3>
+        <div className="mb-6 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <FiLayers className="text-indigo-600" />
+
+            <h3 className="text-2xl font-bold text-gray-900">
+              Active Advertisements
+            </h3>
+          </div>
+
+          <span className="rounded-xl bg-indigo-50 px-3 py-1 text-sm font-medium text-indigo-600">
+            {ads.length} Ads
+          </span>
         </div>
 
         {/* NO ADS */}
@@ -105,23 +128,16 @@ const PublisherProfile = () => {
             No active ads
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-            {ads.map((ad) => (
-              <AdCard
-                key={ad._id}
-                id={ad._id}
-                title={ad.title}
-                description={ad.description}
-                impressions={ad.impressions}
-                clicks={ad.clicks}
-                mediaUrl={ad.mediaUrl}
-                mediaType={ad.mediaType}
-                template={ad.template}
-                publisherId={user._id}
-                publisherName={user.name}
-                publisherAvatar={user.avatar}
-              />
-            ))}
+          <div className="bg-white border border-gray-100 rounded-3xl p-12 text-center shadow-sm">
+            <FiLayers className="mx-auto text-5xl text-indigo-400 mb-4" />
+
+            <h3 className="text-xl font-bold text-gray-900">
+              No Active Advertisements
+            </h3>
+
+            <p className="text-gray-500 mt-2">
+              This publisher has not published any active advertisements yet.
+            </p>
           </div>
         )}
       </div>

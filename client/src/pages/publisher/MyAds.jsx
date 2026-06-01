@@ -4,6 +4,7 @@ import StatusBadge from "../../components/common/StatusBadge";
 import Loader from "../../components/common/Loader";
 import Button from "../../components/common/Button";
 import { useLocation, useNavigate } from "react-router-dom";
+import { FiAlertCircle, FiCheckCircle, FiPlusCircle } from "react-icons/fi";
 
 const MyAds = () => {
   const [ads, setAds] = useState([]);
@@ -46,41 +47,75 @@ const MyAds = () => {
   return (
     <div className="p-6 space-y-6 min-h-150">
       {/* Header */}
-      <h1 className="text-3xl font-bold text-textPrimary">My Ads</h1>
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div>
+          <h1 className="text-4xl font-bold text-gray-900">
+            My Advertisements
+          </h1>
 
+          <p className="text-gray-500 mt-2">
+            Manage, monitor and update all your advertisements.
+          </p>
+        </div>
+
+        <Button onClick={() => navigate("/publisher/create-ad")}>
+          Create Advertisement
+        </Button>
+      </div>
+
+      {/* Success Message */}
+      {successMessage && (
+        <div className="flex items-center gap-2 rounded-2xl border border-green-200 bg-green-50 p-4 text-green-700">
+          <FiCheckCircle className="text-xl" />
+          {successMessage}
+        </div>
+      )}
+
+      {/* Content */}
       {loading ? (
         <div className="flex justify-center py-20">
           <Loader />
         </div>
       ) : ads.length === 0 ? (
-        <div className="bg-bgSecondary border border-borderColorCustom rounded-2xl p-12 text-center space-y-3">
-          <p className="text-textSecondary font-medium">
-            You haven’t created any ads yet.
+        /* Empty State */
+        <div className="bg-white border border-gray-100 rounded-3xl p-16 text-center shadow-sm">
+          <div className="flex justify-center mb-4">
+            <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-indigo-50">
+              <FiAlertCircle className="text-3xl text-indigo-600" />
+            </div>
+          </div>
+
+          <h3 className="text-2xl font-bold text-gray-900">
+            No Advertisements Yet
+          </h3>
+
+          <p className="text-gray-500 mt-2">
+            Create your first advertisement and start reaching your audience.
           </p>
 
-          <p className="text-xs text-textSecondary/70">
-            Start by launching your first advertisement.
-          </p>
-
-          <div className="pt-3">
+          <div className="mt-6">
             <Button onClick={() => navigate("/publisher/create-ad")}>
-              Create Ad
+              <div className="flex items-center gap-2">
+                <FiPlusCircle />
+                Create Advertisement
+              </div>
             </Button>
           </div>
         </div>
       ) : (
-        <div
-          className="bg-bgSecondary border border-borderColorCustom
-                     rounded-2xl overflow-hidden
-                     transition-all duration-200 hover:shadow-sm"
-        >
+        /* Ads Table */
+        <div className="bg-white border border-gray-100 rounded-3xl overflow-hidden shadow-sm">
           <table className="w-full text-sm">
-            <thead className="bg-bgPrimary border-b border-borderColorCustom">
-              <tr className="text-xs uppercase tracking-wider text-textSecondary">
+            <thead className="bg-gray-50 border-b border-gray-200">
+              <tr className="text-xs uppercase tracking-wider text-gray-500">
                 <th className="px-6 py-4 text-left">Title</th>
+
                 <th className="px-6 py-4 text-center">Status</th>
+
                 <th className="px-6 py-4 text-right">Impressions</th>
+
                 <th className="px-6 py-4 text-right">Clicks</th>
+
                 <th className="px-6 py-4 text-center">Change Status</th>
               </tr>
             </thead>
@@ -89,11 +124,9 @@ const MyAds = () => {
               {ads.map((ad) => (
                 <tr
                   key={ad._id}
-                  className="border-t border-borderColorCustom
-                             hover:bg-bgPrimary
-                             transition duration-200 ease-in-out"
+                  className="border-t border-gray-100 hover:bg-indigo-50/40 transition duration-200"
                 >
-                  <td className="px-6 py-5 font-medium text-textPrimary">
+                  <td className="px-6 py-5 font-medium text-gray-900">
                     {ad.title}
                   </td>
 
@@ -101,11 +134,11 @@ const MyAds = () => {
                     <StatusBadge status={ad.status} />
                   </td>
 
-                  <td className="px-6 py-5 text-textSecondary text-right">
+                  <td className="px-6 py-5 text-right text-gray-600">
                     {ad.impressions || 0}
                   </td>
 
-                  <td className="px-6 py-5 text-textSecondary text-right">
+                  <td className="px-6 py-5 text-right text-gray-600">
                     {ad.clicks || 0}
                   </td>
 
@@ -116,12 +149,12 @@ const MyAds = () => {
                       onChange={(e) =>
                         handleStatusChange(ad._id, e.target.value)
                       }
-                      className="rounded-xl bg-bgPrimary border border-borderColorCustom
-                                 px-3 py-2 text-sm font-medium text-textPrimary
-                                 outline-none transition duration-200
-                                 focus:border-accent focus:ring-2
-                                 focus:ring-accent/30
-                                 disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="rounded-xl border border-gray-300 bg-white
+                  px-3 py-2 text-sm font-medium text-gray-900
+                  outline-none transition
+                  focus:border-indigo-500 focus:ring-2
+                  focus:ring-indigo-500/20
+                  disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       <option value="active">Active</option>
                       <option value="paused">Paused</option>
@@ -137,12 +170,6 @@ const MyAds = () => {
               ))}
             </tbody>
           </table>
-
-          {successMessage && (
-            <div className="bg-green-500/10 border border-green-500/30 text-green-400 rounded-xl p-4">
-              {successMessage}
-            </div>
-          )}
         </div>
       )}
     </div>

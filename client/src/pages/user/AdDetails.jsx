@@ -82,28 +82,23 @@ const AdDetails = () => {
   }
 
   if (ad === "error") {
-    return (
-      <p className="text-center mt-10 text-red-500">
-        Failed to load ad
-      </p>
-    );
+    return <p className="text-center mt-10 text-red-500">Failed to load ad</p>;
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 px-4 py-8">
-      <div className="max-w-3xl mx-auto bg-white rounded-2xl shadow p-6">
-
+    <div className="min-h-screen bg-gray-50 px-4 py-8">
+      <div className="max-w-4xl mx-auto bg-white border border-gray-100 rounded-3xl shadow-sm p-8">
         {/* Back */}
         <button
           onClick={() => navigate(-1)}
-          className="flex items-center gap-2 text-sm text-blue-600 hover:underline mb-4"
+          className="inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 mb-6 transition"
         >
           <FiArrowLeft /> Back
         </button>
 
         {/* MEDIA */}
-        {ad.mediaUrl && (
-          ad.mediaType === "video" ? (
+        {ad.mediaUrl &&
+          (ad.mediaType === "video" ? (
             <video
               src={ad.mediaUrl}
               className="w-full max-h-100 object-cover rounded-xl mb-6"
@@ -115,38 +110,43 @@ const AdDetails = () => {
               alt={ad.title}
               className="w-full max-h-100 object-cover rounded-xl mb-6"
             />
-          )
-        )}
+          ))}
 
         {/* Title */}
-        <h2 className="text-2xl font-bold text-gray-800 mb-2">
-          {ad.title}
-        </h2>
+        <h2 className="text-4xl font-bold text-gray-900 mb-3">{ad.title}</h2>
 
         {/* Description */}
-        <p className="text-gray-600 mb-6">
-          {ad.description}
-        </p>
+        <p className="text-gray-500 leading-relaxed mb-8">{ad.description}</p>
 
         {/* Stats */}
-        <div className="flex items-center gap-6 text-gray-600 mb-6">
-          <span className="flex items-center gap-2">
-            <FiEye /> {ad.impressions}
-          </span>
+        <div className="grid grid-cols-2 gap-4 mb-8">
+          <div className="bg-indigo-50 rounded-2xl p-4">
+            <div className="flex items-center gap-2 text-indigo-600 mb-2">
+              <FiEye />
+              <span className="text-sm font-medium">Impressions</span>
+            </div>
 
-          <span className="flex items-center gap-2">
-            <FiMousePointer /> {ad.clicks}
-          </span>
+            <p className="text-2xl font-bold text-gray-900">
+              {ad.impressions || 0}
+            </p>
+          </div>
+
+          <div className="bg-green-50 rounded-2xl p-4">
+            <div className="flex items-center gap-2 text-green-600 mb-2">
+              <FiMousePointer />
+              <span className="text-sm font-medium">Clicks</span>
+            </div>
+
+            <p className="text-2xl font-bold text-gray-900">{ad.clicks || 0}</p>
+          </div>
         </div>
 
         {/* CTA */}
         <button
           onClick={handleVisit}
           disabled={visiting}
-          className={`w-full flex items-center justify-center gap-2 py-3 rounded-lg font-semibold text-white transition ${
-            visiting
-              ? "bg-gray-400"
-              : "bg-blue-600 hover:bg-blue-700"
+          className={`w-full flex items-center justify-center gap-2 rounded-2xl py-4 text-lg font-semibold text-white transition ${
+            visiting ? "bg-gray-400" : "bg-indigo-600 hover:bg-indigo-700"
           }`}
         >
           <FiExternalLink />
@@ -155,15 +155,15 @@ const AdDetails = () => {
 
         {/* Feedback */}
         <div className="mt-6 border-t pt-4">
-          <p className="font-semibold mb-3 text-gray-800">
-            Was this ad helpful?
+          <p className="text-lg font-semibold text-gray-900 mb-4">
+            Was this advertisement helpful?
           </p>
 
           <div className="flex gap-4">
             <button
               disabled={feedbackSubmitted}
               onClick={() => sendFeedback("yes")}
-              className="flex items-center gap-2 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 disabled:opacity-50"
+              className="flex items-center gap-2 rounded-2xl bg-green-500 px-5 py-3 text-white font-medium hover:bg-green-600 disabled:opacity-50"
             >
               <FiThumbsUp /> Yes
             </button>
@@ -171,19 +171,18 @@ const AdDetails = () => {
             <button
               disabled={feedbackSubmitted}
               onClick={() => sendFeedback("no")}
-              className="flex items-center gap-2 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 disabled:opacity-50"
+              className="flex items-center gap-2 rounded-2xl bg-red-500 px-5 py-3 text-white font-medium hover:bg-red-600 disabled:opacity-50"
             >
               <FiThumbsDown /> No
             </button>
           </div>
 
           {feedbackSubmitted && (
-            <p className="text-sm text-gray-500 mt-2">
+            <p className="mt-4 rounded-xl bg-green-50 border border-green-200 p-3 text-green-700 text-sm">
               Thank you for your feedback!
             </p>
           )}
         </div>
-
       </div>
     </div>
   );

@@ -6,6 +6,7 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
+import { FiPlus, FiX } from "react-icons/fi";
 import { useEffect, useState } from "react";
 import {
   createCampaign,
@@ -21,7 +22,7 @@ const Campaigns = () => {
   const [loading, setLoading] = useState(true);
   const [creating, setCreating] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
-
+  const [showCreateForm, setShowCreateForm] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     description: "",
@@ -48,8 +49,10 @@ const Campaigns = () => {
 
       const campaignsData = await getMyCampaigns();
 
+      const campaignsArray = campaignsData?.data || campaignsData || [];
+
       const campaignsWithAnalytics = await Promise.all(
-        campaignsData.map(async (campaign) => {
+        campaignsArray.map(async (campaign) => {
           const analytics = await getCampaignAnalytics(campaign._id);
 
           return {
@@ -143,7 +146,7 @@ const Campaigns = () => {
       });
 
       await loadCampaigns();
-
+      setShowCreateForm(false);
       document
         .getElementById("campaign-list")
         ?.scrollIntoView({ behavior: "smooth" });
@@ -161,201 +164,277 @@ const Campaigns = () => {
   };
 
   return (
-    <div className="p-6 space-y-8 min-h-150">
-      <div>
-        <h1 className="text-3xl font-bold text-black">Campaigns</h1>
+    <div className="p-6 space-y-8 min-h-screen">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div>
+          <h1 className="text-4xl font-bold text-gray-900">
+            Campaign Management
+          </h1>
 
-        {successMessage && (
-          <div className="bg-green-500/10 border border-green-500/30 text-green-400 rounded-xl p-4 mt-3">
-            {successMessage}
+          <p className="text-gray-500 mt-2">
+            Create, monitor and optimize your advertising campaigns
+          </p>
+
+          {successMessage && (
+            <div className="mt-4 inline-flex items-center gap-2 rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm font-medium text-green-700">
+              {successMessage}
+            </div>
+          )}
+        </div>
+
+        <div className="grid grid-cols-2 gap-3">
+          <div className="bg-white rounded-2xl border border-gray-100 px-5 py-3 shadow-sm">
+            <p className="text-xs uppercase tracking-wide text-gray-500">
+              Total Campaigns
+            </p>
+
+            <p className="text-2xl font-bold text-indigo-600 mt-1">
+              {campaigns.length}
+            </p>
           </div>
-        )}
 
-        <p className="text-gray-400 text-sm">
-          Create and manage your advertising campaigns
-        </p>
+          <div className="bg-white rounded-2xl border border-gray-100 px-5 py-3 shadow-sm">
+            <p className="text-xs uppercase tracking-wide text-gray-500">
+              Active
+            </p>
+
+            <p className="text-2xl font-bold text-green-600 mt-1">
+              {campaigns.filter((c) => c.status === "active").length}
+            </p>
+          </div>
+        </div>
       </div>
-
+      <div className="flex justify-end">
+        <button
+          onClick={() => setShowCreateForm(!showCreateForm)}
+          className="inline-flex items-center gap-2 rounded-2xl bg-indigo-600 px-5 py-3 text-white font-medium hover:bg-indigo-700 transition"
+        >
+          {showCreateForm ? (
+            <>
+              <FiX />
+              Close Form
+            </>
+          ) : (
+            <>
+              <FiPlus />
+              Create Campaign
+            </>
+          )}
+        </button>
+      </div>
       {/* Create Campaign */}
-      <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 shadow-lg">
-        <h2 className="text-lg font-semibold text-white mb-4">
-          Create New Campaign
-        </h2>
+      {showCreateForm && (
+        <div className="bg-white border border-gray-100 rounded-3xl p-8 shadow-sm">
+          <div className="mb-6">
+            <h2 className="text-2xl font-bold text-gray-900">
+              Create New Campaign
+            </h2>
 
-        <form onSubmit={handleSubmit} className="grid md:grid-cols-3 gap-4">
-          <input
-            type="text"
-            name="name"
-            placeholder="Campaign Name"
-            value={formData.name}
-            onChange={handleChange}
-            required
-            className="bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-2 text-white"
-          />
-
-          <input
-            type="text"
-            name="description"
-            placeholder="Description"
-            value={formData.description}
-            onChange={handleChange}
-            className="bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-2 text-white"
-          />
-
-          <input
-            type="number"
-            name="totalBudget"
-            placeholder="Total Budget"
-            value={formData.totalBudget}
-            onChange={handleChange}
-            required
-            className="bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-2 text-white"
-          />
-          <input
-            type="number"
-            name="dailyBudget"
-            placeholder="Daily Budget"
-            value={formData.dailyBudget}
-            onChange={handleChange}
-            min="0"
-            className="bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-2 text-white"
-          />
-          {/* Distribution Channels */}
-          <div className="md:col-span-3">
-            <label className="block text-sm text-gray-300 mb-3">
-              Distribution Channels
-            </label>
-
-            <div className="flex gap-6">
-              {["website", "mobile", "email"].map((channel) => (
-                <label
-                  key={channel}
-                  className="flex items-center gap-2 cursor-pointer text-gray-300"
-                >
-                  <input
-                    type="checkbox"
-                    className="accent-blue-500"
-                    checked={formData.distributionChannels.includes(channel)}
-                    onChange={() => handleChannelChange(channel)}
-                  />
-                  {channel}
-                </label>
-              ))}
-            </div>
+            <p className="text-gray-500 mt-1">
+              Configure campaign settings, budget and audience targeting
+            </p>
           </div>
 
-          {/* TARGET AUDIENCE */}
-          <div className="md:col-span-3 border-t border-zinc-800 pt-6 mt-2">
-            <h3 className="text-white font-semibold mb-4">Target Audience</h3>
-
-            <div className="grid md:grid-cols-2 gap-4 mb-4">
-              <input
-                type="number"
-                name="ageMin"
-                placeholder="Minimum Age"
-                value={formData.ageMin}
-                onChange={handleChange}
-                className="bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-2 text-white"
-              />
-
-              <input
-                type="number"
-                name="ageMax"
-                placeholder="Maximum Age"
-                value={formData.ageMax}
-                onChange={handleChange}
-                className="bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-2 text-white"
-              />
-            </div>
-
+          <form
+            onSubmit={handleSubmit}
+            className="grid md:grid-cols-2 xl:grid-cols-4 gap-5"
+          >
+            {/* Campaign Name */}
             <input
               type="text"
-              name="locations"
-              placeholder="Target Locations (Surat, Ahmedabad, Mumbai)"
-              value={formData.locations}
+              name="name"
+              placeholder="Campaign Name"
+              value={formData.name}
               onChange={handleChange}
-              className="w-full bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-2 text-white mb-4"
+              required
+              className="rounded-2xl border border-gray-300 px-4 py-3 bg-white
+      focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition"
             />
 
-            <div className="flex flex-wrap gap-6">
-              {interestOptions.map((interest) => (
-                <label
-                  key={interest}
-                  className="flex items-center gap-2 text-gray-300 cursor-pointer"
-                >
-                  <input
-                    type="checkbox"
-                    className="accent-blue-500"
-                    checked={formData.interests.includes(interest)}
-                    onChange={() => handleInterestChange(interest)}
-                  />
-                  {interest}
-                </label>
-              ))}
+            {/* Description */}
+            <input
+              type="text"
+              name="description"
+              placeholder="Description"
+              value={formData.description}
+              onChange={handleChange}
+              className="rounded-2xl border border-gray-300 px-4 py-3 bg-white
+      focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition"
+            />
+
+            {/* Total Budget */}
+            <input
+              type="number"
+              name="totalBudget"
+              placeholder="Total Budget (₹)"
+              value={formData.totalBudget}
+              onChange={handleChange}
+              required
+              className="rounded-2xl border border-gray-300 px-4 py-3 bg-white
+      focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition"
+            />
+
+            {/* Daily Budget */}
+            <input
+              type="number"
+              name="dailyBudget"
+              placeholder="Daily Budget (₹)"
+              value={formData.dailyBudget}
+              onChange={handleChange}
+              min="0"
+              className="rounded-2xl border border-gray-300 px-4 py-3 bg-white
+      focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition"
+            />
+
+            {/* Distribution Channels */}
+            <div className="md:col-span-2 xl:col-span-4 border-t border-gray-200 pt-6">
+              <h3 className="font-semibold text-gray-900 mb-4">
+                Distribution Channels
+              </h3>
+
+              <div className="flex flex-wrap gap-4">
+                {["website", "mobile", "email"].map((channel) => (
+                  <label
+                    key={channel}
+                    className="flex items-center gap-2 rounded-xl border border-gray-200 px-4 py-2 cursor-pointer hover:border-indigo-300 transition"
+                  >
+                    <input
+                      type="checkbox"
+                      className="accent-indigo-600"
+                      checked={formData.distributionChannels.includes(channel)}
+                      onChange={() => handleChannelChange(channel)}
+                    />
+                    <span className="capitalize text-gray-700">{channel}</span>
+                  </label>
+                ))}
+              </div>
             </div>
-          </div>
 
-          <div className="md:col-span-3 flex justify-end">
-            <Button type="submit" disabled={creating}>
-              {creating ? "Creating..." : "Create Campaign"}
-            </Button>
-          </div>
-        </form>
-      </div>
+            {/* Target Audience */}
+            <div className="md:col-span-2 xl:col-span-4 border-t border-gray-200 pt-6">
+              <h3 className="font-semibold text-gray-900 mb-5">
+                Target Audience
+              </h3>
 
+              <div className="grid md:grid-cols-2 gap-5 mb-5">
+                <input
+                  type="number"
+                  name="ageMin"
+                  placeholder="Minimum Age"
+                  value={formData.ageMin}
+                  onChange={handleChange}
+                  className="rounded-2xl border border-gray-300 px-4 py-3 bg-white
+          focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition"
+                />
+
+                <input
+                  type="number"
+                  name="ageMax"
+                  placeholder="Maximum Age"
+                  value={formData.ageMax}
+                  onChange={handleChange}
+                  className="rounded-2xl border border-gray-300 px-4 py-3 bg-white
+          focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition"
+                />
+              </div>
+
+              <input
+                type="text"
+                name="locations"
+                placeholder="Target Locations (Surat, Ahmedabad, Mumbai)"
+                value={formData.locations}
+                onChange={handleChange}
+                className="w-full rounded-2xl border border-gray-300 px-4 py-3 bg-white mb-5
+        focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition"
+              />
+
+              <div className="flex flex-wrap gap-4">
+                {interestOptions.map((interest) => (
+                  <label
+                    key={interest}
+                    className="flex items-center gap-2 rounded-xl border border-gray-200 px-4 py-2 cursor-pointer hover:border-indigo-300 transition"
+                  >
+                    <input
+                      type="checkbox"
+                      className="accent-indigo-600"
+                      checked={formData.interests.includes(interest)}
+                      onChange={() => handleInterestChange(interest)}
+                    />
+
+                    <span className="text-gray-700">{interest}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            <div className="md:col-span-2 xl:col-span-4 flex justify-end pt-4">
+              <Button type="submit" disabled={creating}>
+                {creating ? "Creating Campaign..." : "Create Campaign"}
+              </Button>
+            </div>
+          </form>
+        </div>
+      )}
       {/* Campaign List */}
       <div
         id="campaign-list"
-        className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 shadow-lg min-h-75 overflow-hidden"
+        className="bg-white border border-gray-100 rounded-3xl p-6 shadow-sm overflow-hidden"
       >
-        <h2 className="text-lg font-semibold text-white mb-4">My Campaigns</h2>
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h2 className="text-2xl font-bold text-gray-900">My Campaigns</h2>
+
+            <p className="text-sm text-gray-500 mt-1">
+              Monitor and manage all your advertising campaigns
+            </p>
+          </div>
+
+          <div className="bg-indigo-50 text-indigo-600 px-4 py-2 rounded-xl font-semibold">
+            {campaigns.length} Campaigns
+          </div>
+        </div>
 
         {loading ? (
           <div className="flex justify-center py-20">
             <Loader />
           </div>
         ) : campaigns.length === 0 ? (
-          <div className="py-16 text-center space-y-3">
-            <p className="text-gray-400 font-medium">No campaigns available.</p>
-            <p className="text-xs text-gray-500">
-              Create a campaign to start running ads.
+          <div className="py-16 text-center">
+            <div className="text-6xl mb-4">🚀</div>
+
+            <h3 className="text-xl font-semibold text-gray-800">
+              No Campaigns Yet
+            </h3>
+
+            <p className="text-gray-500 mt-2">
+              Create your first campaign and start reaching your audience.
             </p>
           </div>
         ) : (
-          <div className="w-full overflow-x-auto">
+          <div className="overflow-x-auto">
             <table className="min-w-300 w-full text-sm">
-              <thead className="text-gray-400 border-b border-zinc-800 uppercase tracking-wider text-xs">
-                <tr>
-                  <th className="px-6 py-4 text-left">Name</th>
-                  <th className="px-6 py-4 text-center">Total</th>
-                  <th className="px-6 py-4 text-center">Spent</th>
-                  <th className="px-6 py-4 text-center">Remaining</th>
-                  <th className="px-6 py-4 text-center">Daily Budget</th>
-                  <th className="px-6 py-4 text-center">Today Spent</th>
-                  <th className="px-6 py-4 text-center">Today Left</th>
+              <thead className="bg-gray-50 border-b border-gray-200">
+                <tr className="text-xs uppercase tracking-wider text-gray-500">
+                  <th className="px-6 py-4 text-left">Campaign</th>
+
+                  <th className="px-6 py-4 text-center">Budget</th>
+
                   <th className="px-6 py-4 text-center">Status</th>
+
                   <th className="px-6 py-4 text-center">Channels</th>
-                  <th className="px-6 py-4 text-center">Progress</th>
+
                   <th className="px-6 py-4 text-center">Impressions</th>
+
                   <th className="px-6 py-4 text-center">Clicks</th>
-                  <th className="px-6 py-4 text-center">CTR %</th>
+
+                  <th className="px-6 py-4 text-center">CTR</th>
+
                   <th className="px-6 py-4 text-center">Performance</th>
                 </tr>
               </thead>
 
               <tbody>
                 {campaigns.map((campaign) => {
-                  const spent = campaign.spentBudget || 0;
-                  const remaining = campaign.totalBudget - spent;
-                  const dailyBudget = campaign.dailyBudget || 0;
-                  const dailySpent = campaign.dailySpent || 0;
-                  const dailyRemaining = dailyBudget - dailySpent;
-
-                  const percentage =
-                    campaign.totalBudget > 0
-                      ? (spent / campaign.totalBudget) * 100
-                      : 0;
-
                   const chartData = [
                     {
                       name: "Performance",
@@ -367,79 +446,78 @@ const Campaigns = () => {
                   return (
                     <tr
                       key={campaign._id}
-                      className="border-b border-zinc-800 hover:bg-zinc-800/50 transition"
+                      className="border-b border-gray-100 hover:bg-indigo-50/40 transition"
                     >
-                      <td className="px-6 py-6 text-white font-semibold">
-                        {campaign.name}
+                      {/* Campaign */}
+                      <td className="px-6 py-5">
+                        <div>
+                          <p className="font-semibold text-gray-900">
+                            {campaign.name}
+                          </p>
+
+                          <p className="text-xs text-gray-500 mt-1">
+                            {campaign.description || "No description available"}
+                          </p>
+                        </div>
                       </td>
 
-                      <td className="px-6 py-5 text-gray-300 text-right">
-                        ₹ {campaign.totalBudget}
+                      {/* Budget */}
+                      <td className="px-6 py-5 text-center">
+                        <div>
+                          <p className="font-semibold text-gray-900">
+                            ₹{campaign.totalBudget}
+                          </p>
+
+                          <p className="text-xs text-gray-500">
+                            Daily ₹{campaign.dailyBudget || 0}
+                          </p>
+                        </div>
                       </td>
 
-                      <td className="px-6 py-5 text-gray-300 text-right">
-                        ₹ {spent}
-                      </td>
-
-                      <td className="px-6 py-5 text-gray-300 text-right">
-                        ₹ {remaining}
-                      </td>
-                      
-                      <td className="px-6 py-5 text-gray-300 text-right">
-                        ₹ {dailyBudget}
-                      </td>
-
-                      <td className="px-6 py-5 text-gray-300 text-right">
-                        ₹ {dailySpent}
-                      </td>
-
-                      <td className="px-6 py-5 text-gray-300 text-right">
-                        ₹ {dailyRemaining >= 0 ? dailyRemaining : 0}
-                      </td>
-                      
+                      {/* Status */}
                       <td className="px-6 py-5 text-center">
                         <StatusBadge status={campaign.status} />
                       </td>
 
-                      <td className="px-6 py-5 text-center text-gray-300">
-                        {campaign.distributionChannels?.join(", ") || "website"}
+                      {/* Channels */}
+                      <td className="px-6 py-5 text-center text-gray-600">
+                        {campaign.distributionChannels?.join(", ") || "Website"}
                       </td>
 
-                      <td className="px-6 py-5 text-center w-40">
-                        <div className="w-full bg-zinc-800 rounded-full h-2.5">
-                          <div
-                            className={`h-2.5 rounded-full ${
-                              percentage >= 100
-                                ? "bg-red-500"
-                                : percentage >= 70
-                                  ? "bg-yellow-500"
-                                  : "bg-blue-500"
-                            }`}
-                            style={{ width: `${Math.min(percentage, 100)}%` }}
-                          />
-                        </div>
+                      {/* Impressions */}
+                      <td className="px-6 py-5 text-center font-medium text-gray-700">
+                        {campaign.totalImpressions || 0}
                       </td>
 
-                      <td className="px-6 py-5 text-gray-300 text-right">
-                        {campaign.totalImpressions}
+                      {/* Clicks */}
+                      <td className="px-6 py-5 text-center font-medium text-gray-700">
+                        {campaign.totalClicks || 0}
                       </td>
 
-                      <td className="px-6 py-5 text-gray-300 text-right">
-                        {campaign.totalClicks}
+                      {/* CTR */}
+                      <td className="px-6 py-5 text-center">
+                        <span className="inline-flex px-3 py-1 rounded-full bg-green-50 text-green-600 font-medium">
+                          {campaign.CTR || 0}%
+                        </span>
                       </td>
 
-                      <td className="px-6 py-5 text-gray-300 text-right">
-                        {campaign.CTR}%
-                      </td>
-
-                      <td className="px-6 py-5 text-center w-64">
-                        <ResponsiveContainer width="100%" height={100}>
+                      {/* Performance Chart */}
+                      <td className="px-6 py-5 w-64">
+                        <ResponsiveContainer width="100%" height={90}>
                           <BarChart data={chartData}>
-                            <XAxis dataKey="name" hide />
+                            <XAxis hide />
                             <YAxis hide />
                             <Tooltip />
-                            <Bar dataKey="impressions" fill="#3b82f6" />
-                            <Bar dataKey="clicks" fill="#22c55e" />
+                            <Bar
+                              dataKey="impressions"
+                              fill="#6366f1"
+                              radius={[4, 4, 0, 0]}
+                            />
+                            <Bar
+                              dataKey="clicks"
+                              fill="#22c55e"
+                              radius={[4, 4, 0, 0]}
+                            />
                           </BarChart>
                         </ResponsiveContainer>
                       </td>

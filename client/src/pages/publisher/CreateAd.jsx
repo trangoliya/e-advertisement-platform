@@ -4,18 +4,28 @@ import { createAd } from "../../services/ad.service";
 import { useState, useEffect } from "react";
 import Button from "../../components/common/Button";
 import Loader from "../../components/common/Loader";
-
+import {
+  FiTarget,
+  FiType,
+  FiFileText,
+  FiImage,
+  FiLink,
+  FiLayout,
+  FiX,
+  FiPlusCircle,
+  FiEye,
+  FiMonitor,
+  FiSmartphone,
+} from "react-icons/fi";
 const CreateAd = () => {
   const navigate = useNavigate();
   const [campaigns, setCampaigns] = useState([]);
-
   const [formData, setFormData] = useState({
     title: "",
     description: "",
     campaignId: "",
     targetUrl: "",
   });
-
   const [media, setMedia] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
   const [template, setTemplate] = useState("standard");
@@ -25,7 +35,7 @@ const CreateAd = () => {
     const fetchCampaigns = async () => {
       try {
         const res = await getMyCampaigns();
-        setCampaigns(res);
+        setCampaigns(res?.data || res || []);
       } catch (err) {
         console.error("Error fetching campaigns", err);
       }
@@ -43,12 +53,24 @@ const CreateAd = () => {
 
   const handleMediaChange = (e) => {
     const file = e.target.files[0];
+
+    if (previewUrl) {
+      URL.revokeObjectURL(previewUrl);
+    }
+
     setMedia(file);
 
     if (file) {
       setPreviewUrl(URL.createObjectURL(file));
     }
   };
+  useEffect(() => {
+    return () => {
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl);
+      }
+    };
+  }, [previewUrl]); 
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -61,7 +83,7 @@ const CreateAd = () => {
       data.append("description", formData.description);
       data.append("campaignId", formData.campaignId);
       data.append("targetUrl", formData.targetUrl);
-      data.append("template", template); 
+      data.append("template", template);
 
       if (media) {
         data.append("media", media);
@@ -82,25 +104,46 @@ const CreateAd = () => {
   return (
     <div className="p-6 space-y-6 min-h-150">
       {/* Header */}
-      <div className="max-w-3xl">
-        <h1 className="text-3xl font-bold text-textPrimary">Create New Ad</h1>
-        <p className="text-sm text-textSecondary mt-1">
-          Fill in the details below to publish your advertisement
-        </p>
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div>
+          <h1 className="text-4xl font-bold text-gray-900">
+            Create Advertisement
+          </h1>
+
+          <p className="text-gray-500 mt-2">
+            Design, preview and publish advertisements for your campaigns
+          </p>
+        </div>
+
+        <div className="bg-white border border-gray-100 rounded-2xl px-5 py-3 shadow-sm">
+          <div className="flex items-center gap-3">
+            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-indigo-50">
+              <FiTarget className="text-xl text-indigo-600" />
+            </div>
+
+            <div>
+              <p className="text-xs uppercase tracking-wide text-gray-500">
+                Available Campaigns
+              </p>
+
+              <p className="text-2xl font-bold text-indigo-600">
+                {campaigns.length}
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Form Card */}
-      <div
-        className="bg-bgSecondary border border-borderColorCustom
-                   rounded-2xl p-6
-                   transition-all duration-200 hover:shadow-sm"
-      >
-        <form onSubmit={handleSubmit} className="space-y-5 max-w-3xl">
+      <div className="bg-white border border-gray-100 rounded-3xl p-8 shadow-sm">
+        <form onSubmit={handleSubmit} className="space-y-6 max-w-4xl">
           {/* Title */}
           <div>
-            <label className="block text-sm font-medium text-textSecondary mb-1">
+            <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-2">
+              <FiType className="text-indigo-600" />
               Ad Title
             </label>
+
             <input
               type="text"
               name="title"
@@ -108,18 +151,20 @@ const CreateAd = () => {
               onChange={handleChange}
               required
               placeholder="Summer Sale Campaign"
-              className="w-full rounded-xl bg-bgPrimary border border-borderColorCustom
-                         px-4 py-2.5 text-textPrimary placeholder:text-textSecondary
-                         outline-none transition-all duration-200
-                         focus:border-accent focus:ring-2 focus:ring-accent/30"
+              className="w-full rounded-2xl border border-gray-300 bg-white
+    px-4 py-3 text-gray-900 placeholder:text-gray-400
+    outline-none transition
+    focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
             />
           </div>
 
           {/* Description */}
           <div>
-            <label className="block text-sm font-medium text-textSecondary mb-1">
+            <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-2">
+              <FiFileText className="text-indigo-600" />
               Description
             </label>
+
             <textarea
               name="description"
               value={formData.description}
@@ -127,16 +172,17 @@ const CreateAd = () => {
               required
               rows={4}
               placeholder="Describe your ad and what users should know..."
-              className="w-full rounded-xl bg-bgPrimary border border-borderColorCustom
-                         px-4 py-2.5 text-textPrimary placeholder:text-textSecondary
-                         outline-none resize-none transition-all duration-200
-                         focus:border-accent focus:ring-2 focus:ring-accent/30"
+              className="w-full rounded-2xl border border-gray-300 bg-white
+    px-4 py-3 text-gray-900 placeholder:text-gray-400
+    outline-none resize-none transition
+    focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
             />
           </div>
 
           {/* Upload Media */}
-          <div>
-            <label className="block text-sm font-medium text-textSecondary mb-1">
+          <div className="rounded-2xl border-2 border-dashed border-gray-300 bg-gray-50 p-6 hover:border-indigo-400 transition">
+            <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-3">
+              <FiImage className="text-indigo-600" />
               Upload Image / Video
             </label>
 
@@ -144,19 +190,24 @@ const CreateAd = () => {
               type="file"
               accept="image/*,video/*"
               onChange={handleMediaChange}
-              className="w-full rounded-xl bg-bgPrimary border border-borderColorCustom
-                         px-4 py-2.5 text-textPrimary
-                         outline-none transition-all duration-200
-                         focus:border-accent focus:ring-2 focus:ring-accent/30"
+              className="block w-full text-sm text-gray-600
+    file:mr-4 file:rounded-xl file:border-0
+    file:bg-indigo-50 file:px-4 file:py-2
+    file:text-indigo-600 file:font-medium
+    hover:file:bg-indigo-100 cursor-pointer"
             />
+
+            <p className="mt-3 text-xs text-gray-500">
+              Supported formats: JPG, PNG, JPEG, MP4
+            </p>
           </div>
 
-            {/* Target URL */}
+          {/* Target URL */}
           <div>
-            <label className="block text-sm font-medium text-textSecondary mb-1">
+            <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-2">
+              <FiLink className="text-indigo-600" />
               Advertisement URL
             </label>
-
             <input
               type="url"
               name="targetUrl"
@@ -164,16 +215,21 @@ const CreateAd = () => {
               onChange={handleChange}
               required
               placeholder="https://example.com"
-              className="w-full rounded-xl bg-bgPrimary border border-borderColorCustom
-               px-4 py-2.5 text-textPrimary
-               outline-none transition duration-200
-               focus:border-accent focus:ring-2 focus:ring-accent/30"
+              className="w-full rounded-2xl border border-gray-300 bg-white
+    px-4 py-3 text-gray-900 placeholder:text-gray-400
+    outline-none transition
+    focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
             />
+
+            <p className="mt-2 text-xs text-gray-500">
+              Enter the destination URL users will visit after clicking the ad.
+            </p>
           </div>
 
           {/* Campaign Selection */}
           <div>
-            <label className="block text-sm font-medium text-textSecondary mb-1">
+            <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-2">
+              <FiTarget className="text-indigo-600" />
               Select Campaign
             </label>
 
@@ -182,52 +238,61 @@ const CreateAd = () => {
               value={formData.campaignId}
               onChange={handleChange}
               required
-              className="w-full rounded-xl bg-bgPrimary border border-borderColorCustom
-               px-4 py-2.5 text-textPrimary
-               outline-none transition duration-200
-               focus:border-accent focus:ring-2 focus:ring-accent/30"
+              className="w-full rounded-2xl border border-gray-300 bg-white
+    px-4 py-3 text-gray-900
+    outline-none transition
+    focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
             >
-              <option value="">Select Campaign</option>
+              <option value="">Choose a Campaign</option>
+
               {campaigns.map((campaign) => (
                 <option key={campaign._id} value={campaign._id}>
                   {campaign.name}
                 </option>
               ))}
             </select>
+
+            <p className="mt-2 text-xs text-gray-500">
+              Associate this advertisement with an existing campaign.
+            </p>
           </div>
 
           {/* Template Selection */}
           <div>
-            <label className="block text-sm font-medium text-textSecondary mb-1">
+            <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-2">
+              <FiLayout className="text-indigo-600" />
               Ad Template
             </label>
 
             <select
               value={template}
               onChange={(e) => setTemplate(e.target.value)}
-              className="w-full rounded-xl bg-bgPrimary border border-borderColorCustom
-              px-4 py-2.5 text-textPrimary
-              outline-none transition duration-200
-              focus:border-accent focus:ring-2 focus:ring-accent/30"
+              className="w-full rounded-2xl border border-gray-300 bg-white
+    px-4 py-3 text-gray-900
+    outline-none transition
+    focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
             >
               <option value="standard">Standard Ad</option>
+
               <option value="banner">Banner Style</option>
+
               <option value="compact">Compact Card</option>
             </select>
+
+            <p className="mt-2 text-xs text-gray-500">
+              Choose how your advertisement will be displayed to users.
+            </p>
           </div>
 
           {/* Actions */}
-          <div className="flex items-center justify-end gap-4 pt-4">
+          <div className="flex flex-col sm:flex-row sm:justify-end gap-4 pt-6 border-t border-gray-100">
             <button
               type="button"
               disabled={loading}
               onClick={() => navigate("/publisher/my-ads")}
-              className="rounded-xl border border-borderColorCustom
-                         px-5 py-2.5 text-textSecondary font-medium
-                         transition-all duration-200
-                         hover:bg-bgPrimary
-                         disabled:opacity-50 disabled:cursor-not-allowed"
+              className="inline-flex items-center justify-center gap-2 rounded-2xl border border-gray-300 px-6 py-3 text-gray-700 font-medium hover:bg-gray-50 transition disabled:opacity-50 disabled:cursor-not-allowed"
             >
+              <FiX />
               Cancel
             </button>
 
@@ -235,10 +300,13 @@ const CreateAd = () => {
               {loading ? (
                 <div className="flex items-center gap-2">
                   <Loader />
-                  Creating...
+                  Creating Advertisement...
                 </div>
               ) : (
-                "Create Ad"
+                <div className="flex items-center gap-2">
+                  <FiPlusCircle />
+                  Create Advertisement
+                </div>
               )}
             </Button>
           </div>
@@ -247,74 +315,147 @@ const CreateAd = () => {
 
       {/* Live Preview */}
       <div className="max-w-3xl">
-        <h2 className="text-xl font-semibold text-textPrimary mb-3">
-          Ad Preview
-        </h2>
+        <div className="flex items-center gap-2 mb-4">
+          <FiEye className="text-indigo-600 text-xl" />
+
+          <h2 className="text-2xl font-bold text-gray-900">Live Preview</h2>
+        </div>
+        <p className="text-sm text-gray-500 mb-6">
+          Preview how your advertisement will appear to users.
+        </p>
 
         {/* Standard Template */}
         {template === "standard" && (
-          <div className="bg-bgSecondary border border-borderColorCustom rounded-2xl p-4">
-            {previewUrl &&
-              (media?.type?.startsWith("video") ? (
+          <div className="bg-white border border-gray-100 rounded-3xl p-5 shadow-sm">
+            <div className="mb-4 flex items-center gap-2">
+              <FiMonitor className="text-indigo-600" />
+
+              <span className="text-sm font-medium text-gray-600">
+                Standard Template
+              </span>
+            </div>
+
+            {previewUrl ? (
+              media?.type?.startsWith("video") ? (
                 <video
                   src={previewUrl}
                   controls
-                  className="rounded-xl mb-3 max-h-60 w-full object-cover"
+                  className="w-full max-h-72 rounded-2xl object-cover mb-4"
                 />
               ) : (
                 <img
                   src={previewUrl}
                   alt="Ad Preview"
-                  className="rounded-xl mb-3 max-h-60 w-full object-cover"
+                  className="w-full max-h-72 rounded-2xl object-cover mb-4"
                 />
-              ))}
+              )
+            ) : (
+              <div className="h-52 rounded-2xl bg-gray-100 flex items-center justify-center text-gray-400 mb-4">
+                No media selected
+              </div>
+            )}
 
-            <h3 className="text-lg font-semibold text-textPrimary">
+            <h3 className="text-xl font-bold text-gray-900">
               {formData.title || "Ad Title Preview"}
             </h3>
 
-            <p className="text-sm text-textSecondary mt-1">
-              {formData.description || "Your ad description will appear here"}
+            <p className="text-gray-500 mt-2">
+              {formData.description ||
+                "Your advertisement description will appear here."}
             </p>
+
+            {formData.targetUrl && (
+              <div className="mt-4 flex items-center gap-2 text-sm text-indigo-600">
+                <FiLink />
+                <span className="truncate">{formData.targetUrl}</span>
+              </div>
+            )}
           </div>
         )}
 
         {/* Banner Template */}
         {template === "banner" && (
-          <div className="bg-bgSecondary border border-borderColorCustom rounded-xl p-4 flex items-center gap-4">
-            {previewUrl && (
-              <img
-                src={previewUrl}
-                alt="Banner"
-                className="w-32 h-20 object-cover rounded-lg"
-              />
-            )}
+          <div className="bg-white border border-gray-100 rounded-3xl p-5 shadow-sm">
+            <div className="mb-4 flex items-center gap-2">
+              <FiLayout className="text-indigo-600" />
 
-            <div>
-              <h3 className="font-semibold text-textPrimary">
-                {formData.title || "Banner Title"}
-              </h3>
-              <p className="text-sm text-textSecondary">
-                {formData.description || "Banner description"}
-              </p>
+              <span className="text-sm font-medium text-gray-600">
+                Banner Template
+              </span>
+            </div>
+
+            <div className="flex flex-col md:flex-row items-center gap-5">
+              {previewUrl ? (
+                <img
+                  src={previewUrl}
+                  alt="Banner Preview"
+                  className="w-full md:w-56 h-36 object-cover rounded-2xl"
+                />
+              ) : (
+                <div className="w-full md:w-56 h-36 rounded-2xl bg-gray-100 flex items-center justify-center text-gray-400">
+                  No media selected
+                </div>
+              )}
+
+              <div className="flex-1">
+                <h3 className="text-xl font-bold text-gray-900">
+                  {formData.title || "Banner Title"}
+                </h3>
+
+                <p className="text-gray-500 mt-2">
+                  {formData.description ||
+                    "Banner description will appear here."}
+                </p>
+
+                {formData.targetUrl && (
+                  <div className="mt-4 flex items-center gap-2 text-sm text-indigo-600">
+                    <FiLink />
+                    <span className="truncate">{formData.targetUrl}</span>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         )}
 
         {/* Compact Template */}
         {template === "compact" && (
-          <div className="bg-bgSecondary border border-borderColorCustom rounded-lg p-3 max-w-sm">
-            {previewUrl && (
+          <div className="bg-white border border-gray-100 rounded-3xl p-4 shadow-sm max-w-sm">
+            <div className="mb-3 flex items-center gap-2">
+              <FiSmartphone className="text-indigo-600" />
+
+              <span className="text-sm font-medium text-gray-600">
+                Compact Template
+              </span>
+            </div>
+
+            {previewUrl ? (
               <img
                 src={previewUrl}
-                alt="Compact"
-                className="rounded-lg mb-2 w-full h-32 object-cover"
+                alt="Compact Preview"
+                className="w-full h-40 object-cover rounded-2xl mb-3"
               />
+            ) : (
+              <div className="h-40 rounded-2xl bg-gray-100 flex items-center justify-center text-gray-400 mb-3">
+                No media selected
+              </div>
             )}
 
-            <h3 className="text-sm font-semibold text-textPrimary">
+            <h3 className="text-base font-bold text-gray-900">
               {formData.title || "Compact Ad"}
             </h3>
+
+            <p className="text-sm text-gray-500 mt-2 line-clamp-2">
+              {formData.description ||
+                "Compact advertisement preview will appear here."}
+            </p>
+
+            {formData.targetUrl && (
+              <div className="mt-3 flex items-center gap-2 text-xs text-indigo-600">
+                <FiLink />
+                <span className="truncate">{formData.targetUrl}</span>
+              </div>
+            )}
           </div>
         )}
       </div>

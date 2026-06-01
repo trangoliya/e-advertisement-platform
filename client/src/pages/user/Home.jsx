@@ -6,6 +6,11 @@ import AdCard from "../../components/ads/AdCard";
 import PPAvatar from "../../assets/PP_Avatar.png";
 import PublisherOnboardingModal from "../../components/common/PublisherOnboardingModal";
 
+import {
+  FiGrid,
+  FiBriefcase,
+} from "react-icons/fi";
+
 const Home = () => {
   const [ads, setAds] = useState([]);
   const [showPublisherModal, setShowPublisherModal] = useState(false);
@@ -14,10 +19,8 @@ const Home = () => {
 
   const navigate = useNavigate();
 
-  // Detect device type
   const isMobile = window.innerWidth < 768;
 
-  // Fetch ads
   useEffect(() => {
     const fetchAds = async () => {
       try {
@@ -31,7 +34,6 @@ const Home = () => {
     fetchAds();
   }, []);
 
-  // Check publisher profile
   useEffect(() => {
     const checkPublisher = async () => {
       try {
@@ -50,7 +52,6 @@ const Home = () => {
     checkPublisher();
   }, []);
 
-  // Filter ads based on distribution channel
   const filteredAds = ads.filter((ad) => {
     const channels = ad.campaign?.distributionChannels || ["website"];
 
@@ -62,31 +63,65 @@ const Home = () => {
   });
 
   return (
-    <div className="min-h-screen bg-gray-100">
-      {/* Publisher Button */}
-      <div className="max-w-xl mx-auto pt-6 flex justify-end">
+    <div className="min-h-screen bg-gray-50">
+
+      {/* Publisher Action */}
+      <div className="max-w-2xl mx-auto pt-6 flex justify-end px-4">
         {loadingPublisher ? null : isPublisher ? (
           <button
             onClick={() => navigate("/publisher/dashboard")}
-            className="bg-green-600 text-white px-4 py-2 rounded-lg"
+            className="inline-flex items-center gap-2 rounded-2xl bg-green-600 px-5 py-3 text-white font-medium hover:bg-green-700 transition"
           >
-            Go to Publisher Dashboard
+            <FiGrid />
+            Publisher Dashboard
           </button>
         ) : (
           <button
             onClick={() => setShowPublisherModal(true)}
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg"
+            className="inline-flex items-center gap-2 rounded-2xl bg-indigo-600 px-5 py-3 text-white font-medium hover:bg-indigo-700 transition"
           >
-            Switch to Publisher
+            <FiBriefcase />
+            Become a Publisher
           </button>
         )}
       </div>
 
+      {/* Header */}
+      <div className="max-w-2xl mx-auto px-4 pt-8 pb-4">
+        <h1 className="text-4xl font-bold text-gray-900">
+          Advertisement Feed
+        </h1>
+
+        <p className="text-gray-500 mt-2">
+          Discover sponsored content tailored for you.
+        </p>
+      </div>
+
+      {/* Feed Stats */}
+      <div className="max-w-2xl mx-auto px-4">
+        <div className="bg-white border border-gray-100 rounded-2xl p-4 shadow-sm">
+          <p className="text-xs uppercase tracking-wide text-gray-500">
+            Available Advertisements
+          </p>
+
+          <p className="text-3xl font-bold text-indigo-600 mt-1">
+            {filteredAds.length}
+          </p>
+        </div>
+      </div>
+
       {/* Ads Feed */}
-      <div className="max-w-xl mx-auto py-8 space-y-8">
+      <div className="max-w-2xl mx-auto px-4 py-8 space-y-8">
         {filteredAds.length === 0 ? (
-          <div className="text-center text-gray-500 py-20">
-            No ads available
+          <div className="bg-white border border-gray-100 rounded-3xl p-16 text-center shadow-sm">
+            <h3 className="text-2xl font-bold text-gray-900">
+              No Advertisements Available
+            </h3>
+
+            <p className="text-gray-500 mt-2">
+              New advertisements will appear here once publishers start
+              promoting content.
+            </p>
           </div>
         ) : (
           filteredAds.map((ad) => (
