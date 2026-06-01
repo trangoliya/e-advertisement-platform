@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { saveViewerProfile } from "../../services/viewer.service";
 import { useAuth } from "../../context/AuthContext";
+import { IoClose } from "react-icons/io5";
 
 const interestsList = [
   "Technology",
@@ -11,7 +12,7 @@ const interestsList = [
   "Education",
 ];
 
-const ViewerOnboardingModal = () => {
+const ViewerOnboardingModal = ({ onClose }) => {
   const { setUser } = useAuth();
 
   const [age, setAge] = useState("");
@@ -24,7 +25,7 @@ const ViewerOnboardingModal = () => {
     setInterests((prev) =>
       prev.includes(interest)
         ? prev.filter((i) => i !== interest)
-        : [...prev, interest]
+        : [...prev, interest],
     );
   };
 
@@ -48,15 +49,17 @@ const ViewerOnboardingModal = () => {
         interests,
       });
 
-      // FULL USER UPDATE
       if (response?.data?.data) {
         setSuccessMessage("Profile saved successfully!");
 
         setTimeout(() => {
-          setUser(response.data.data); 
+          setUser(response.data.data);
+
+          if (onClose) {
+            onClose();
+          }
         }, 800);
       }
-
     } catch (error) {
       console.error("Profile save error:", error);
       alert("Something went wrong");
@@ -66,18 +69,38 @@ const ViewerOnboardingModal = () => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
-      <div className="w-full max-w-md p-6 bg-white shadow-xl rounded-2xl">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
+      onClick={onClose}
+    >
+      <div
+        className="w-full max-w-md p-6 bg-white shadow-xl rounded-2xl"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Header */}
+        <div className="flex items-center justify-between mb-5">
+          <h2 className="text-xl font-semibold">Complete Your Profile</h2>
 
-        <h2 className="mb-4 text-xl font-semibold">
-          Complete Your Profile
-        </h2>
+          {onClose && (
+            <button
+              onClick={onClose}
+              className="
+                text-gray-500
+                hover:text-red-500
+                transition
+                text-2xl
+              "
+            >
+              <IoClose />
+            </button>
+          )}
+        </div>
 
         {/* Age */}
         <input
           type="number"
           placeholder="Age"
-          className="w-full p-2 mb-3 border rounded-lg"
+          className="w-full p-3 mb-3 border rounded-lg"
           value={age}
           onChange={(e) => setAge(e.target.value)}
           disabled={loading}
@@ -87,32 +110,55 @@ const ViewerOnboardingModal = () => {
         <input
           type="text"
           placeholder="City"
-          className="w-full p-2 mb-3 border rounded-lg"
+          className="w-full p-3 mb-4 border rounded-lg"
           value={city}
           onChange={(e) => setCity(e.target.value)}
           disabled={loading}
         />
 
         {/* Interests */}
-        <div className="mb-4">
-          <p className="mb-2 font-medium">Interests</p>
+        <div className="mb-5">
+          <p className="mb-3 font-medium">Select Your Interests</p>
 
-          {interestsList.map((interest) => (
-            <label key={interest} className="block mb-1 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={interests.includes(interest)}
-                onChange={() => handleInterestChange(interest)}
-                disabled={loading}
-              />
-              <span className="ml-2">{interest}</span>
-            </label>
-          ))}
+          <div className="flex flex-wrap">
+            {interestsList.map((interest) => (
+              <label
+                key={interest}
+                className={`
+                  inline-flex
+                  items-center
+                  px-3
+                  py-2
+                  rounded-full
+                  border
+                  cursor-pointer
+                  mr-2
+                  mb-2
+                  transition
+                  ${
+                    interests.includes(interest)
+                      ? "bg-blue-600 text-white border-blue-600"
+                      : "bg-white text-gray-700 border-gray-300 hover:border-blue-400"
+                  }
+                `}
+              >
+                <input
+                  type="checkbox"
+                  className="hidden"
+                  checked={interests.includes(interest)}
+                  onChange={() => handleInterestChange(interest)}
+                  disabled={loading}
+                />
+
+                {interest}
+              </label>
+            ))}
+          </div>
         </div>
 
-        {/* Success */}
+        {/* Success Message */}
         {successMessage && (
-          <p className="mb-3 text-sm text-green-600">
+          <p className="mb-4 text-sm font-medium text-green-600">
             {successMessage}
           </p>
         )}
@@ -121,11 +167,21 @@ const ViewerOnboardingModal = () => {
         <button
           onClick={handleSubmit}
           disabled={loading}
-          className="w-full py-2 text-white bg-black rounded-lg hover:bg-gray-800 disabled:opacity-50"
+          className="
+            w-full
+            py-2.5
+            bg-blue-600
+            text-white
+            rounded-lg
+            font-medium
+            hover:bg-blue-700
+            transition
+            disabled:opacity-50
+            disabled:cursor-not-allowed
+          "
         >
           {loading ? "Saving..." : "Save & Continue"}
         </button>
-
       </div>
     </div>
   );

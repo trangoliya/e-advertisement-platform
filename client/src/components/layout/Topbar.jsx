@@ -67,7 +67,7 @@ const Topbar = () => {
   return (
     <div className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-6 shadow-sm">
       {/* Brand */}
-      <div>
+      <div onClick={() => navigate("/")} className="cursor-pointer">
         <h3 className="text-lg font-bold text-gray-900">AdPlatform</h3>
         <p className="text-xs text-gray-500">Digital Advertising System</p>
       </div>
@@ -94,7 +94,7 @@ const Topbar = () => {
           )}
 
           {open && (
-            <div className="absolute right-0 mt-3 w-72 bg-white border border-gray-200 rounded-xl shadow-xl p-3 z-50">
+            <div className="absolute right-0 mt-3 w-72 bg-white border border-gray-200 rounded-xl shadow-xl p-3 z-50 max-h-96 overflow-y-auto">
               <h4 className="font-semibold text-sm mb-3">Notifications</h4>
 
               {alerts.length === 0 && (
@@ -123,6 +123,9 @@ const Topbar = () => {
           <p className="text-sm font-semibold text-gray-800">{user?.name}</p>
 
           <p className="text-xs text-gray-500">{user?.email}</p>
+          <p className="text-[11px] text-indigo-600 font-medium capitalize">
+            {user?.roles?.[0]}
+          </p>
         </div>
 
         {/* Avatar */}
@@ -139,7 +142,7 @@ const Topbar = () => {
           />
 
           {profileOpen && (
-            <div className="absolute right-0 mt-3 w-48 bg-white border border-gray-200 rounded-xl shadow-xl z-50 overflow-hidden">
+            <div className="absolute right-0 mt-3 w-48bg-white border border-gray-200 * rounded-xl shadow-xl z-50 overflow-hidden animate-in fade-in zoom-in-95">
               <button
                 onClick={() => {
                   navigate("/profile");
