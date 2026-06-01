@@ -3,7 +3,6 @@ import express from "express";
 import fs from "fs";
 
 import authRoutes from "./routes/auth.routers.js";
-import testRoutes from "./routes/test.routers.js";
 import adRoutes from "./routes/ad.routes.js";
 import viewerRoutes from "./routes/viewer.routes.js";
 import adminRoutes from "./routes/admin.routes.js";
@@ -32,7 +31,6 @@ fs.mkdirSync("uploads", { recursive: true });
 app.use("/uploads", express.static("uploads"));
 
 app.use("/api/auth", authRoutes);
-app.use("/api/test", testRoutes);
 app.use("/api/ads", adRoutes);
 app.use("/api/viewer", viewerRoutes);
 app.use("/api/publisher", publisherProfileRoutes);

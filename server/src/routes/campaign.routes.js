@@ -3,43 +3,34 @@ import {
   createCampaign,
   getMyCampaigns,
   getCampaignAnalytics,
-  exportCampaignAnalytics
+  exportCampaignAnalytics,
 } from "../controllers/campaign.controller.js";
 
 import authMiddleware from "../middlewares/auth.middleware.js";
-import  authorizeRoles  from "../middlewares/role.middleware.js";
+import roleMiddleware from "../middlewares/role.middleware.js";
 
 const router = express.Router();
 
-// POST /api/campaigns
-router.post(
-  "/",
-  authMiddleware,
-  authorizeRoles("publisher"),
-  createCampaign
-);
+// Create Campaign
+router.post("/", authMiddleware, roleMiddleware("publisher"), createCampaign);
 
-// GET /api/campaigns/my
-router.get(
-  "/my",
-  authMiddleware,
-  authorizeRoles("publisher"),
-  getMyCampaigns
-);
+// My Campaigns
+router.get("/my", authMiddleware, roleMiddleware("publisher"), getMyCampaigns);
 
-// GET /api/campaigns/:id/analytics
-router.get(
-  "/:id/analytics",
-  authMiddleware, // or protect (based on what you're using)
-  authorizeRoles("publisher"),
-  getCampaignAnalytics
-);
-
-// GET /api/campaigns/export
+// Export Analytics
 router.get(
   "/export",
   authMiddleware,
-  authorizeRoles("publisher"),
-  exportCampaignAnalytics
+  roleMiddleware("publisher"),
+  exportCampaignAnalytics,
 );
+
+// Campaign Analytics
+router.get(
+  "/:id/analytics",
+  authMiddleware,
+  roleMiddleware("publisher"),
+  getCampaignAnalytics,
+);
+
 export default router;
