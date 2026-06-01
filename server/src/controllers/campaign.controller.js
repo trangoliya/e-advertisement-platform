@@ -4,63 +4,65 @@ import Alert from "../models/Alert.js";
 import { Parser } from "json2csv";
 
 // Create Campaign
-export const createCampaign = async (req, res) => {
+export const createCampaign = async (req, res, next) => {
   try {
-    const { name, description, totalBudget, distributionChannels } = req.body;
+    const { name, description, category, totalBudget, distributionChannels } =
+      req.body;
 
-    if (!name || !totalBudget) {
+    if (!name || !totalBudget || !category) {
       return res.status(400).json({
-        message: "Name and total budget are required",
+        success: false,
+        message: "Name, category and total budget are required",
       });
     }
 
-    // if no channel selected → default website
     const channels =
-      distributionChannels && distributionChannels.length > 0
-        ? distributionChannels
-        : ["website"];
+      distributionChannels?.length > 0 ? distributionChannels : ["website"];
 
     const campaign = await Campaign.create({
       name,
       description,
+      category,
       totalBudget,
       distributionChannels: channels,
       createdBy: req.user.id,
     });
 
-    res.status(201).json({
+    return res.status(201).json({
+      success: true,
       message: "Campaign created successfully",
-      campaign,
+      data: campaign,
     });
   } catch (error) {
-    res.status(500).json({
-      message: "Error creating campaign",
-      error: error.message,
-    });
+    next(error);
   }
 };
 // Get My Campaigns (Publisher only)
-export const getMyCampaigns = async (req, res) => {
+export const getMyCampaigns = async (req, res, next) => {
   try {
     const campaigns = await Campaign.find({
       createdBy: req.user.id,
-    }).sort({ createdAt: -1 });
+    })
+      .sort({ createdAt: -1 })
+      .lean();
 
-    res.status(200).json(campaigns);
-  } catch (error) {
-    res.status(500).json({
-      message: "Error fetching campaigns",
-      error: error.message,
+    return res.status(200).json({
+      success: true,
+      count: campaigns.length,
+      data: campaigns,
     });
+  } catch (error) {
+    next(error);
   }
 };
 
+// Get Campaign Analytics
 export const getCampaignAnalytics = async (req, res, next) => {
   try {
     const { id } = req.params;
 
-    // Validate campaign
-    const campaign = await Campaign.findById(id);
+    const campaign = await Campaign.findById(id).lean();
+
     if (!campaign) {
       return res.status(404).json({
         success: false,
@@ -68,11 +70,11 @@ export const getCampaignAnalytics = async (req, res, next) => {
       });
     }
 
-    // Get ads
-    const ads = await Ad.find({ campaign: id });
+    const ads = await Ad.find({
+      campaign: id,
+    }).lean();
 
-    // No ads case
-    if (!ads.length) {
+    if (ads.length === 0) {
       return res.status(200).json({
         success: true,
         data: {
@@ -84,7 +86,6 @@ export const getCampaignAnalytics = async (req, res, next) => {
       });
     }
 
-    // Use reduce (clean)
     const totals = ads.reduce(
       (acc, ad) => {
         acc.totalClicks += ad.clicks || 0;
@@ -92,7 +93,11 @@ export const getCampaignAnalytics = async (req, res, next) => {
         acc.totalConversions += ad.conversions || 0;
         return acc;
       },
-      { totalClicks: 0, totalImpressions: 0, totalConversions: 0 }
+      {
+        totalClicks: 0,
+        totalImpressions: 0,
+        totalConversions: 0,
+      },
     );
 
     const CTR =
@@ -100,7 +105,6 @@ export const getCampaignAnalytics = async (req, res, next) => {
         ? (totals.totalClicks / totals.totalImpressions) * 100
         : 0;
 
-    // Optimization alert (safe)
     if (CTR < 1 && totals.totalImpressions > 50) {
       const existingAlert = await Alert.findOne({
         campaignId: id,
@@ -130,13 +134,14 @@ export const getCampaignAnalytics = async (req, res, next) => {
   }
 };
 
+// Export Campaign Analytics as CSV
 export const exportCampaignAnalytics = async (req, res, next) => {
   try {
     const campaigns = await Campaign.find({
       createdBy: req.user.id,
-    });
+    }).lean();
 
-    if (!campaigns) {
+    if (campaigns.length === 0) {
       return res.status(200).json({
         success: true,
         message: "No campaigns found",
@@ -146,7 +151,9 @@ export const exportCampaignAnalytics = async (req, res, next) => {
     const data = [];
 
     for (const campaign of campaigns) {
-      const ads = await Ad.find({ campaign: campaign._id });
+      const ads = await Ad.find({
+        campaign: campaign._id,
+      }).lean();
 
       let totalClicks = 0;
       let totalImpressions = 0;
@@ -173,15 +180,13 @@ export const exportCampaignAnalytics = async (req, res, next) => {
       });
     }
 
-    // Convert JSON to CSV
     const parser = new Parser();
     const csv = parser.parse(data);
 
-    // Send CSV file
     res.header("Content-Type", "text/csv");
     res.attachment("campaign_analytics.csv");
 
-    res.send(csv);
+    return res.send(csv);
   } catch (error) {
     next(error);
   }

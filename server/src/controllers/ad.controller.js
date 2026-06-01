@@ -2,6 +2,7 @@ import Ad from "../models/Ad.js";
 import mongoose from "mongoose";
 import UserAdInteraction from "../models/UserAdInteraction.js";
 
+// Create New Ad
 export const createAd = async (req, res, next) => {
   try {
     const { title, description, targetUrl, status, campaignId, template } =
@@ -54,12 +55,14 @@ export const createAd = async (req, res, next) => {
     next(error);
   }
 };
-
+// Get My Ads
 export const getMyAds = async (req, res, next) => {
   try {
     const ads = await Ad.find({
       createdBy: req.user.id,
-    }).populate("createdBy", "name avatar");
+    })
+      .populate("createdBy", "name avatar")
+      .lean();
 
     return res.status(200).json({
       success: true,
@@ -71,30 +74,20 @@ export const getMyAds = async (req, res, next) => {
   }
 };
 
-  // increment function for Impression - how many user see your add
-  export const incrementImpression = async (req, res, next) => {
-    try {
-      const ad = await Ad.findByIdAndUpdate(
-        req.params._id,
-        { $inc: { impressions: 1 } },
-        { new: true },
-      );
-
-      if (!ad) {
-        return res.status(404).json({
-          message: "Ad not found",
-        });
-      }
-      res.status(200).json(ad);
-    } catch (error) {
-      next(error);
-    }
-  };
-
-// update status in Ad
+// Update Ad Status
 export const updateAdStatus = async (req, res, next) => {
   try {
     const { status } = req.body;
+
+    const allowedStatuses = ["active", "paused", "draft"];
+
+    if (!allowedStatuses.includes(status)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid status",
+      });
+    }
+
     const ad = await Ad.findByIdAndUpdate(
       req.params.id,
       { status },
@@ -102,14 +95,22 @@ export const updateAdStatus = async (req, res, next) => {
     );
 
     if (!ad) {
-      return res.status(404).json("Ad not found");
+      return res.status(404).json({
+        success: false,
+        message: "Ad not found",
+      });
     }
-    res.status(200).json(ad);
+
+    return res.status(200).json({
+      success: true,
+      ad,
+    });
   } catch (error) {
     next(error);
   }
 };
 
+// Get Active Ads (with basic personalization)
 export const getActiveAds = async (req, res, next) => {
   try {
     const userId = req.user?.id;
@@ -120,14 +121,18 @@ export const getActiveAds = async (req, res, next) => {
       const interactions = await UserAdInteraction.find({ userId })
         .populate({
           path: "adId",
-          populate: { path: "campaign" },
+          populate: {
+            path: "campaign",
+          },
         })
-        .limit(50);
+        .limit(50)
+        .lean();
 
       const interestMap = {};
 
       interactions.forEach((item) => {
         const category = item.adId?.campaign?.category;
+
         if (!category) return;
 
         interestMap[category] = (interestMap[category] || 0) + 1;
@@ -138,19 +143,22 @@ export const getActiveAds = async (req, res, next) => {
       );
     }
 
-    const ads = await Ad.find({ status: "active" })
+    const ads = await Ad.find({
+      status: "active",
+    })
       .populate("createdBy", "name avatar")
       .populate("campaign")
       .lean();
 
     ads.sort((a, b) => {
       const aScore = userInterests.includes(a.campaign?.category) ? 1 : 0;
+
       const bScore = userInterests.includes(b.campaign?.category) ? 1 : 0;
 
       return bScore - aScore;
     });
 
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
       count: ads.length,
       data: ads,
@@ -160,32 +168,31 @@ export const getActiveAds = async (req, res, next) => {
   }
 };
 
+// Get Ad By ID
 export const getAdById = async (req, res, next) => {
   try {
     const { id } = req.params;
-    // validate objectId
-    console.log("before update id: ", id);
+
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).json({
         success: false,
-        message: "Invalid Ad Id",
+        message: "Invalid Ad ID",
       });
     }
-    // increment impression and return updated ad
-    const ad = await Ad.findByIdAndUpdate(
-      id,
-      { $inc: { impressions: 1 } },
-      { new: true },
-    );
-    console.log("update ad: ", ad);
+
+    const ad = await Ad.findById(id)
+      .populate("createdBy", "name avatar")
+      .populate("campaign")
+      .lean();
 
     if (!ad) {
       return res.status(404).json({
         success: false,
-        message: "ad not found",
+        message: "Ad not found",
       });
     }
-    res.status(200).json({
+
+    return res.status(200).json({
       success: true,
       ad,
     });
@@ -194,19 +201,22 @@ export const getAdById = async (req, res, next) => {
   }
 };
 
-export const trackAdView = async (req, res) => {
+// Track Ad View (Impression)
+export const trackAdView = async (req, res, next) => {
   try {
     const { adId } = req.body;
 
     if (!adId) {
       return res.status(400).json({
         success: false,
-        message: "Ad ID required",
+        message: "Ad ID is required",
       });
     }
 
     await Ad.findByIdAndUpdate(adId, {
-      $inc: { impressions: 1 },
+      $inc: {
+        impressions: 1,
+      },
     });
 
     if (req.user?.id) {
@@ -216,40 +226,32 @@ export const trackAdView = async (req, res) => {
           adId,
           action: "view",
         });
-      } catch (err) {
-        console.warn("View tracking skipped");
+      } catch {
+        // Skip duplicate / analytics errors
       }
     }
 
     return res.status(200).json({
       success: true,
-      message: "View tracked",
+      message: "View tracked successfully",
     });
   } catch (error) {
-    console.error("🔥 TRACK VIEW ERROR:", error);
-
-    return res.status(500).json({
-      success: false,
-      message: "Internal server error",
-    });
+    next(error);
   }
 };
 
-export const trackAdClick = async (req, res) => {
+// Track Ad Click
+export const trackAdClick = async (req, res, next) => {
   try {
-    console.log("BODY:", req.body);
-
     const { adId } = req.body;
 
-    //validate input
     if (!adId) {
       return res.status(400).json({
         success: false,
-        message: "Ad ID required",
+        message: "Ad ID is required",
       });
     }
 
-    // find ad + campaign
     const ad = await Ad.findById(adId).populate("campaign");
 
     if (!ad) {
@@ -268,7 +270,6 @@ export const trackAdClick = async (req, res) => {
 
     const campaign = ad.campaign;
 
-    // campaign must be active
     if (campaign.status !== "active") {
       return res.status(400).json({
         success: false,
@@ -278,7 +279,6 @@ export const trackAdClick = async (req, res) => {
 
     const CPC = 2;
 
-    // budget check
     if (
       campaign.dailyBudget > 0 &&
       campaign.dailySpent + CPC > campaign.dailyBudget
@@ -289,12 +289,10 @@ export const trackAdClick = async (req, res) => {
       });
     }
 
-    // update values
     ad.clicks += 1;
     campaign.dailySpent += CPC;
     campaign.spentBudget += CPC;
 
-    // auto pause
     if (campaign.spentBudget >= campaign.totalBudget) {
       campaign.status = "paused";
     }
@@ -302,7 +300,6 @@ export const trackAdClick = async (req, res) => {
     await ad.save();
     await campaign.save();
 
-    // SAFE tracking (no crash)
     if (req.user?.id) {
       try {
         await UserAdInteraction.create({
@@ -310,8 +307,8 @@ export const trackAdClick = async (req, res) => {
           adId,
           action: "click",
         });
-      } catch (err) {
-        console.warn("User tracking skipped");
+      } catch {
+        // Skip analytics tracking errors
       }
     }
 
@@ -321,11 +318,6 @@ export const trackAdClick = async (req, res) => {
       clicks: ad.clicks,
     });
   } catch (error) {
-    console.error(" TRACK CLICK ERROR:", error);
-
-    return res.status(500).json({
-      success: false,
-      message: "Internal server error",
-    });
+    next(error);
   }
 };

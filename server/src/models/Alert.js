@@ -21,7 +21,7 @@ const alertSchema = new mongoose.Schema(
 
     type: {
       type: String,
-      enum: ["info", "warning", "critical"],
+      enum: ["info", "warning", "critical", "optimization"],
       default: "info",
     },
 
@@ -30,12 +30,15 @@ const alertSchema = new mongoose.Schema(
       default: false,
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 alertSchema.index({ userId: 1 });
 alertSchema.index({ userId: 1, isRead: 1 });
-
+alertSchema.index({
+  campaignId: 1,
+  type: 1,
+});
 const Alert = mongoose.model("Alert", alertSchema);
 
 export default Alert;

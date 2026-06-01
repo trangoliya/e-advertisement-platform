@@ -1,13 +1,19 @@
 import AdFeedback from "../models/AdFeedback.js";
 
-export const submitFeedback = async (req, res) => {
+export const submitFeedback = async (req, res, next) => {
   try {
-    const { id } = req.params; // adId
+    const { id } = req.params;
     const { response } = req.body;
 
     const userId = req.user.id;
 
-    // check if user already submitted feedback
+    if (!["yes", "no"].includes(response)) {
+      return res.status(400).json({
+        success: false,
+        message: "Response must be yes or no",
+      });
+    }
+
     const existingFeedback = await AdFeedback.findOne({
       userId,
       adId: id,
@@ -20,23 +26,18 @@ export const submitFeedback = async (req, res) => {
       });
     }
 
-    // save feedback
     const feedback = await AdFeedback.create({
       userId,
       adId: id,
       response,
     });
 
-    res.status(201).json({
+    return res.status(201).json({
       success: true,
       message: "Feedback submitted successfully",
       data: feedback,
     });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({
-      success: false,
-      message: "Server Error",
-    });
+    next(error);
   }
 };

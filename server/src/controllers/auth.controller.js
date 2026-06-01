@@ -7,22 +7,31 @@ export const register = async (req, res, next) => {
   try {
     const { name, email, password } = req.body;
 
-    const userExists = await User.findOne({ email });
-
-    if (userExists) {
+    if (!name || !email || !password) {
       return res.status(400).json({
-        message: "User exists",
+        success: false,
+        message: "All fields are required",
       });
     }
 
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
+    const userExists = await User.findOne({
+      email: email.toLowerCase(),
+    });
+
+    if (userExists) {
+      return res.status(400).json({
+        success: false,
+        message: "User already exists",
+      });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
 
     const user = await User.create({
       name,
-      email,
+      email: email.toLowerCase(),
       password: hashedPassword,
-      roles: ["user"], // default role
+      roles: ["user"],
       profileCompleted: false,
     });
 
@@ -32,10 +41,13 @@ export const register = async (req, res, next) => {
         roles: user.roles,
       },
       process.env.JWT_SECRET,
-      { expiresIn: "1d" }
+      {
+        expiresIn: "1d",
+      },
     );
 
     return res.status(201).json({
+      success: true,
       token,
       user: {
         id: user._id,
@@ -57,14 +69,18 @@ export const login = async (req, res, next) => {
 
     if (!email || !password) {
       return res.status(400).json({
+        success: false,
         message: "Email and password are required",
       });
     }
 
-    const user = await User.findOne({ email });
+    const user = await User.findOne({
+      email: email.toLowerCase(),
+    }).select("+password");
 
     if (!user) {
       return res.status(400).json({
+        success: false,
         message: "Invalid email or password",
       });
     }
@@ -73,6 +89,7 @@ export const login = async (req, res, next) => {
 
     if (!isMatch) {
       return res.status(400).json({
+        success: false,
         message: "Invalid email or password",
       });
     }
@@ -83,10 +100,13 @@ export const login = async (req, res, next) => {
         roles: user.roles,
       },
       process.env.JWT_SECRET,
-      { expiresIn: "1d" }
+      {
+        expiresIn: "1d",
+      },
     );
 
     return res.status(200).json({
+      success: true,
       token,
       user: {
         id: user._id,

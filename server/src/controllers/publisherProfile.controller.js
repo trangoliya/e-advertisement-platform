@@ -2,15 +2,26 @@ import PublisherProfile from "../models/publisherProfile.model.js";
 import User from "../models/user.model.js";
 import jwt from "jsonwebtoken";
 
-export const createPublisherProfile = async (req, res) => {
+export const createPublisherProfile = async (req, res, next) => {
   try {
     const userId = req.user.id;
+
     const { businessName, website, category } = req.body;
 
-    const existing = await PublisherProfile.findOne({ userId });
+    if (!businessName) {
+      return res.status(400).json({
+        success: false,
+        message: "Business name is required",
+      });
+    }
+
+    const existing = await PublisherProfile.findOne({
+      userId,
+    });
 
     if (existing) {
       return res.status(400).json({
+        success: false,
         message: "Publisher profile already exists",
       });
     }
@@ -22,53 +33,53 @@ export const createPublisherProfile = async (req, res) => {
       category,
     });
 
-    // add publisher role
     const user = await User.findByIdAndUpdate(
       userId,
-      { $addToSet: { roles: "publisher" } },
-      { new: true }
+      {
+        $addToSet: {
+          roles: "publisher",
+        },
+      },
+      {
+        new: true,
+      },
     );
 
-    // new token with updated roles
     const token = jwt.sign(
       {
         id: user._id,
         roles: user.roles,
       },
       process.env.JWT_SECRET,
-      { expiresIn: "1d" }
+      {
+        expiresIn: "1d",
+      },
     );
 
-    res.status(201).json({
+    return res.status(201).json({
+      success: true,
       message: "Publisher profile created",
       token,
       user,
       profile,
     });
-
   } catch (error) {
-    res.status(500).json({
-      message: "Error creating publisher profile",
-      error: error.message,
-    });
+    next(error);
   }
 };
 
-export const getPublisherProfile = async (req, res) => {
+export const getPublisherProfile = async (req, res, next) => {
   try {
     const profile = await PublisherProfile.findOne({
       userId: req.user.id,
-    });
+    }).lean();
 
-    res.status(200).json({
+    return res.status(200).json({
+      success: true,
       isPublisher: !!profile,
       profile,
     });
-
   } catch (error) {
-    res.status(500).json({
-      message: "Error fetching publisher profile",
-      error: error.message,
-    });
+    next(error);
   }
 };
