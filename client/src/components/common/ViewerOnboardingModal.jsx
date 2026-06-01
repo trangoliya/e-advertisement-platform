@@ -50,14 +50,15 @@ const ViewerOnboardingModal = ({ onClose }) => {
       });
 
       if (response?.data?.user) {
+        setUser(response.data.user);
+
+        localStorage.setItem("user", JSON.stringify(response.data.user));
+
         setSuccessMessage("Profile saved successfully!");
 
         setTimeout(() => {
-          setUser(response.data.user);
-          if (onClose) {
-            onClose();
-          }
-        }, 800);
+          window.location.reload();
+        }, 500);
       }
     } catch (error) {
       console.error("Profile save error:", error);
