@@ -8,83 +8,55 @@ import {
   trackAdView,
   trackAdClick,
 } from "../controllers/ad.controller.js";
+
 import authMiddleware from "../middlewares/auth.middleware.js";
 import roleMiddleware from "../middlewares/role.middleware.js";
 import upload from "../middlewares/uploadMiddleware.js";
 
 const router = express.Router();
 
-// Post&get only when publisher login
+// Create Ad
 router.post(
   "/",
   authMiddleware,
   roleMiddleware("publisher"),
   upload.single("media"),
-  (err, req, res, next) => {
-    if (err) {
-      console.error("UPLOAD ERROR:", err);
-      return res.status(500).json({ message: err.message });
-    }
-    next();
-  },
-  createAd,
+  createAd
 );
 
-router.get("/my-ads", authMiddleware, roleMiddleware("publisher"), getMyAds);
+// My Ads
+router.get(
+  "/my-ads",
+  authMiddleware,
+  roleMiddleware("publisher"),
+  getMyAds
+);
+
+// Change Ad Status
 router.patch(
   "/:id/status",
   authMiddleware,
-  roleMiddleware("admin"), // better practice
-  updateAdStatus,
+  roleMiddleware("publisher", "admin"),
+  updateAdStatus
 );
 
-// Viewer feed
+// Active Ads Feed
 router.get("/active", getActiveAds);
 
-// Get Ad Details
+// Ad Details
 router.get("/:id", getAdById);
 
-router.post("/track-view", authMiddleware, trackAdView);
-router.post("/track-click", authMiddleware, trackAdClick);
+// Analytics Tracking
+router.post(
+  "/track-view",
+  authMiddleware,
+  trackAdView
+);
+
+router.post(
+  "/track-click",
+  authMiddleware,
+  trackAdClick
+);
 
 export default router;
-// check in postman
-// 1)
-// new registration [POST] - http://localhost:5000/api/auth/register
-// body -> raw -> JSON
-// {
-//    "name": "Publisher Test",
-//    "email": "publisher2@gmail.com",
-//    "password": "123456",
-//    "role": "publisher"
-// }
-
-// 2)
-// for login [POST] - http://localhost:5000/api/auth/login
-// body -> raw -> JSON
-// {
-//    "email": "publisher2@gmail.com",   // same as your registration
-//    "password": "123456"
-// }
-//  copy the token from response.
-
-// 3) set token in postman
-// Authorization --> Bearer {token - paste token}
-
-// 4) create new add
-// [POST] - http://localhost:5000/api/ads
-// body -> raw -> JSON
-// {
-//    "title": "Test Ad",
-//    "description": "Testing",
-//    "imageUrl": "https://test.com/img.jpg",
-//    "targetUrl": "https://test.com"
-// }
-// copy _id from this response.
-
-// 5) update status
-// [PATCH] - http://localhost:5000/api/ads/{_id}/status
-// body -> raw -> JSON
-// {
-//    "status": "active"
-// }

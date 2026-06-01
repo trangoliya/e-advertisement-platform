@@ -1,29 +1,22 @@
 import api from "./api";
 
-/**
- Save or update viewer profile
- POST /api/viewer/profile
- */
+// Save or Update Viewer Profile
 export const saveViewerProfile = async (data) => {
-  try {
-    const res = await api.post("/api/viewer/profile", data);
-    return res.data;
-  } catch (error) {
-    console.error("Error saving viewer profile:", error);
-    throw error;
-  }
+  const res = await api.post("/api/viewer/profile", data);
+
+  return res.data;
 };
 
-/**
-  Get current viewer profile
-  GET /api/viewer/profile
- */
+// Get Current Viewer Profile
 export const getViewerProfile = async () => {
-  try {
-    const response = await api.get("/api/viewer/profile");
-    return response.data;
-  } catch (error) {
-    console.error("Error fetching viewer profile:", error);
-    throw error;
-  }
+  const res = await api.get("/api/viewer/profile");
+
+  return res.data;
+};
+
+// Update Viewer Profile
+export const updateViewerProfile = async (data) => {
+  const res = await api.put("/api/viewer/profile", data);
+
+  return res.data;
 };

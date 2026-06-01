@@ -2,11 +2,22 @@ import mongoose from "mongoose";
 
 const adSchema = new mongoose.Schema(
   {
-    title: String,
+    title: {
+      type: String,
+      required: true,
+      trim: true,
+    },
 
-    description: String,
+    description: {
+      type: String,
+      required: true,
+      trim: true,
+    },
 
-    mediaUrl: String,
+    mediaUrl: {
+      type: String,
+      required: true,
+    },
 
     mediaType: {
       type: String,
@@ -18,7 +29,7 @@ const adSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
-    
+
     template: {
       type: String,
       enum: ["standard", "banner", "compact"],
@@ -33,6 +44,7 @@ const adSchema = new mongoose.Schema(
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
+      required: true,
     },
 
     impressions: {
@@ -60,5 +72,7 @@ const adSchema = new mongoose.Schema(
 );
 
 const Ad = mongoose.model("Ad", adSchema);
-
+adSchema.index({ createdBy: 1 });
+adSchema.index({ campaign: 1 });
+adSchema.index({ status: 1 });
 export default Ad;

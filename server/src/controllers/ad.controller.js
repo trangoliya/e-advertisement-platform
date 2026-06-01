@@ -1,14 +1,9 @@
 import Ad from "../models/Ad.js";
 import mongoose from "mongoose";
-import Campaign from "../models/Campaign.js";
-import Alert from "../models/Alert.js";
 import UserAdInteraction from "../models/UserAdInteraction.js";
 
-// use for create a Ad
 export const createAd = async (req, res, next) => {
   try {
-    console.log("BODY:", req.body);
-    console.log("FILE:", req.file);
     const { title, description, targetUrl, status, campaignId, template } =
       req.body;
 
@@ -29,9 +24,8 @@ export const createAd = async (req, res, next) => {
     let mediaUrl = null;
     let mediaType = null;
 
-  
     if (req.file) {
-      mediaUrl = req.file.path; 
+      mediaUrl = req.file.path;
 
       if (req.file.mimetype.startsWith("image")) {
         mediaType = "image";
@@ -43,7 +37,6 @@ export const createAd = async (req, res, next) => {
     const ad = await Ad.create({
       title,
       description,
-      publisher: req.user.id,
       targetUrl,
       status,
       campaign: campaignId,
@@ -53,22 +46,22 @@ export const createAd = async (req, res, next) => {
       template,
     });
 
-    res.status(201).json({
+    return res.status(201).json({
       success: true,
       ad,
     });
   } catch (error) {
-    console.error("CREATE AD ERROR:", error); 
     next(error);
   }
 };
-// For get Ad
+
 export const getMyAds = async (req, res, next) => {
   try {
     const ads = await Ad.find({
       createdBy: req.user.id,
     }).populate("createdBy", "name avatar");
-    res.status(200).json({
+
+    return res.status(200).json({
       success: true,
       count: ads.length,
       data: ads,
@@ -78,25 +71,25 @@ export const getMyAds = async (req, res, next) => {
   }
 };
 
-// increment function for Impression - how many user see your add
-export const incrementImpression = async (req, res, next) => {
-  try {
-    const ad = await Ad.findByIdAndUpdate(
-      req.params._id,
-      { $inc: { impressions: 1 } },
-      { new: true },
-    );
+  // increment function for Impression - how many user see your add
+  export const incrementImpression = async (req, res, next) => {
+    try {
+      const ad = await Ad.findByIdAndUpdate(
+        req.params._id,
+        { $inc: { impressions: 1 } },
+        { new: true },
+      );
 
-    if (!ad) {
-      return res.status(404).json({
-        message: "Ad not found",
-      });
+      if (!ad) {
+        return res.status(404).json({
+          message: "Ad not found",
+        });
+      }
+      res.status(200).json(ad);
+    } catch (error) {
+      next(error);
     }
-    res.status(200).json(ad);
-  } catch (error) {
-    next(error);
-  }
-};
+  };
 
 // update status in Ad
 export const updateAdStatus = async (req, res, next) => {

@@ -30,8 +30,13 @@ const publisherProfileSchema = new mongoose.Schema(
       default: false,
     },
   },
-  { timestamps: true }
+  {
+    timestamps: true,
+  }
 );
+
+// Performance Index
+publisherProfileSchema.index({ userId: 1 });
 
 const PublisherProfile = mongoose.model(
   "PublisherProfile",

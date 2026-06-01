@@ -5,18 +5,27 @@ import {
   updateAdStatusByAdmin,
 } from "../controllers/admin.controller.js";
 
-import protect from "../middlewares/auth.middleware.js";
+import authMiddleware from "../middlewares/auth.middleware.js";
 import roleMiddleware from "../middlewares/role.middleware.js";
 
 const router = express.Router();
 
-router.use(protect, roleMiddleware("admin"));
+// Admin Only Routes
+router.use(
+  authMiddleware,
+  roleMiddleware("admin")
+);
 
-// get all user and ads
+// Users
 router.get("/users", getAllUsers);
+
+// Ads
 router.get("/ads", getAllAds);
 
-// PATCH ad status
-router.patch("/ads/:id/status", updateAdStatusByAdmin);
+// Update Ad Status
+router.patch(
+  "/ads/:id/status",
+  updateAdStatusByAdmin
+);
 
 export default router;

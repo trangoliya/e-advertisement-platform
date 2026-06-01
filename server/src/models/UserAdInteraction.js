@@ -22,12 +22,16 @@ const userAdInteractionSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
-  }
+  },
 );
+
+userAdInteractionSchema.index({ userId: 1 });
+userAdInteractionSchema.index({ adId: 1 });
+userAdInteractionSchema.index({ adId: 1, action: 1 });
 
 const UserAdInteraction = mongoose.model(
   "UserAdInteraction",
-  userAdInteractionSchema
+  userAdInteractionSchema,
 );
 
 export default UserAdInteraction;

@@ -1,6 +1,13 @@
 import api from "./api";
 
-export const getAlerts = () => api.get("/api/alerts");
+// Get All Alerts
+export const getAlerts = async () => {
+  const res = await api.get("/api/alerts");
+  return res.data;
+};
 
-export const markAlertRead = (id) =>
-  api.patch(`/alerts/${id}/read`);
+// Mark Alert As Read
+export const markAlertRead = async (id) => {
+  const res = await api.patch(`/api/alerts/${id}/read`);
+  return res.data;
+};

@@ -6,11 +6,13 @@ const viewerProfileSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
-      unique: true, // for unique profile per user  
+      unique: true, // for unique profile per user
     },
     age: {
       type: Number,
       required: true,
+      min: 13,
+      max: 100,
     },
     city: {
       type: String,
@@ -24,7 +26,7 @@ const viewerProfileSchema = new mongoose.Schema(
   },
   {
     timestamps: true, // adds createdAt & updatedAt automatically
-  }
+  },
 );
 
 const ViewerProfile = mongoose.model("ViewerProfile", viewerProfileSchema);
