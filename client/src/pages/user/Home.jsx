@@ -1,30 +1,31 @@
 import { useEffect, useState } from "react";
 import { getActiveAds } from "../../services/ad.service";
-import { getPublisherProfile } from "../../services/publisher.service";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
+
 import AdCard from "../../components/ads/AdCard";
 import PublisherOnboardingModal from "../../components/common/PublisherOnboardingModal";
+
 import { getAvatar } from "../../utils/avatar";
 
-import {
-  FiGrid,
-  FiBriefcase,
-} from "react-icons/fi";
+import { FiGrid, FiBriefcase } from "react-icons/fi";
 
 const Home = () => {
   const [ads, setAds] = useState([]);
   const [showPublisherModal, setShowPublisherModal] = useState(false);
-  const [isPublisher, setIsPublisher] = useState(false);
-  const [loadingPublisher, setLoadingPublisher] = useState(true);
 
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   const isMobile = window.innerWidth < 768;
+
+  const isPublisher = user?.roles?.includes("publisher");
 
   useEffect(() => {
     const fetchAds = async () => {
       try {
         const res = await getActiveAds();
+
         setAds(res.data || []);
       } catch (error) {
         console.error("Error fetching ads:", error);
@@ -32,24 +33,6 @@ const Home = () => {
     };
 
     fetchAds();
-  }, []);
-
-  useEffect(() => {
-    const checkPublisher = async () => {
-      try {
-        const res = await getPublisherProfile();
-
-        if (res?.isPublisher) {
-          setIsPublisher(true);
-        }
-      } catch {
-        setIsPublisher(false);
-      } finally {
-        setLoadingPublisher(false);
-      }
-    };
-
-    checkPublisher();
   }, []);
 
   const filteredAds = ads.filter((ad) => {
@@ -64,13 +47,17 @@ const Home = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-
       {/* Publisher Action */}
       <div className="max-w-2xl mx-auto pt-6 flex justify-end px-4">
-        {loadingPublisher ? null : isPublisher ? (
+        {isPublisher ? (
           <button
             onClick={() => navigate("/publisher/dashboard")}
-            className="inline-flex items-center gap-2 rounded-2xl bg-green-600 px-5 py-3 text-white font-medium hover:bg-green-700 transition"
+            className="
+              inline-flex items-center gap-2
+              rounded-2xl bg-green-600
+              px-5 py-3 text-white font-medium
+              hover:bg-green-700 transition
+            "
           >
             <FiGrid />
             Publisher Dashboard
@@ -78,7 +65,12 @@ const Home = () => {
         ) : (
           <button
             onClick={() => setShowPublisherModal(true)}
-            className="inline-flex items-center gap-2 rounded-2xl bg-indigo-600 px-5 py-3 text-white font-medium hover:bg-indigo-700 transition"
+            className="
+              inline-flex items-center gap-2
+              rounded-2xl bg-indigo-600
+              px-5 py-3 text-white font-medium
+              hover:bg-indigo-700 transition
+            "
           >
             <FiBriefcase />
             Become a Publisher
@@ -88,9 +80,7 @@ const Home = () => {
 
       {/* Header */}
       <div className="max-w-2xl mx-auto px-4 pt-8 pb-4">
-        <h1 className="text-4xl font-bold text-gray-900">
-          Advertisement Feed
-        </h1>
+        <h1 className="text-4xl font-bold text-gray-900">Advertisement Feed</h1>
 
         <p className="text-gray-500 mt-2">
           Discover sponsored content tailored for you.
