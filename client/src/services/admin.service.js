@@ -13,7 +13,7 @@ export const getAllAds = async () => {
 };
 
 // Update Ad Status
-export const updateAdminAdStatus = async (id, status) => {
+export const updateAdStatus = async (id, status) => {
   const res = await api.patch(
     `/api/admin/ads/${id}/status`,
     { status }
