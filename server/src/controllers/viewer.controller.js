@@ -17,15 +17,12 @@ export const createOrUpdateProfile = async (req, res, next) => {
       });
     }
 
-    let profile = await ViewerProfile.findOne({
-      userId,
-    });
+    let profile = await ViewerProfile.findOne({ userId });
 
     if (profile) {
       profile.age = age;
       profile.city = city;
       profile.interests = interests || [];
-
       await profile.save();
     } else {
       profile = await ViewerProfile.create({
@@ -40,10 +37,13 @@ export const createOrUpdateProfile = async (req, res, next) => {
       profileCompleted: true,
     });
 
+    const updatedUser = await User.findById(userId).select("-password");
+
     return res.status(200).json({
       success: true,
       message: "Profile saved successfully",
-      data: profile,
+      profile,
+      user: updatedUser,
     });
   } catch (error) {
     next(error);

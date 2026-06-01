@@ -49,12 +49,11 @@ const ViewerOnboardingModal = ({ onClose }) => {
         interests,
       });
 
-      if (response?.data?.data) {
+      if (response?.data?.user) {
         setSuccessMessage("Profile saved successfully!");
 
         setTimeout(() => {
-          setUser(response.data.data);
-
+          setUser(response.data.user);
           if (onClose) {
             onClose();
           }
