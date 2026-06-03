@@ -10,14 +10,36 @@ const campaignSchema = new mongoose.Schema(
 
     description: {
       type: String,
+      default: "",
+      trim: true,
+    },
+
+    category: {
+      type: String,
+      required: true,
       trim: true,
     },
 
     targeting: {
-      ageMin: Number,
-      ageMax: Number,
-      locations: [String],
-      interests: [String],
+      ageMin: {
+        type: Number,
+        default: null,
+      },
+
+      ageMax: {
+        type: Number,
+        default: null,
+      },
+
+      locations: {
+        type: [String],
+        default: [],
+      },
+
+      interests: {
+        type: [String],
+        default: [],
+      },
     },
 
     totalBudget: {
@@ -38,27 +60,23 @@ const campaignSchema = new mongoose.Schema(
       min: 0,
     },
 
-    dailySpent: {
-      type: Number,
-      default: 0,
-      min: 0,
-    },
-
-    lastResetDate: {
-      type: Date,
-      default: Date.now,
-    },
-
     status: {
       type: String,
       enum: ["active", "paused", "completed"],
       default: "active",
     },
 
-    distributionChannels: {
+    platforms: {
       type: [String],
-      enum: ["website", "mobile", "email"],
-      default: ["website"],
+      enum: [
+        "Facebook",
+        "Instagram",
+        "WhatsApp",
+        "LinkedIn",
+        "YouTube",
+        "Website",
+      ],
+      default: ["Website"],
     },
 
     createdBy: {
@@ -71,8 +89,10 @@ const campaignSchema = new mongoose.Schema(
     timestamps: true,
   },
 );
+
 campaignSchema.index({ createdBy: 1 });
 campaignSchema.index({ status: 1 });
 
 const Campaign = mongoose.model("Campaign", campaignSchema);
+
 export default Campaign;

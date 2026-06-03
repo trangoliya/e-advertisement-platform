@@ -1,8 +1,8 @@
 import api from "./api";
 
 // Create Campaign
-export const createCampaign = async (data) => {
-  const response = await api.post("/api/campaigns", data);
+export const createCampaign = async (campaignData) => {
+  const response = await api.post("/api/campaigns", campaignData);
   return response.data;
 };
 
@@ -12,23 +12,23 @@ export const getMyCampaigns = async () => {
   return response.data;
 };
 
-// Campaign Analytics
-export const getCampaignAnalytics = async (id) => {
-  const response = await api.get(`/api/campaigns/${id}/analytics`);
+// Get Campaign Analytics
+export const getCampaignAnalytics = async (campaignId) => {
+  const response = await api.get(`/api/campaigns/${campaignId}/analytics`);
 
   return response.data;
 };
 
 // Update Campaign
-export const updateCampaign = async (id, data) => {
-  const response = await api.put(`/api/campaigns/${id}`, data);
+export const updateCampaign = async (campaignId, campaignData) => {
+  const response = await api.put(`/api/campaigns/${campaignId}`, campaignData);
 
   return response.data;
 };
 
 // Delete Campaign
-export const deleteCampaign = async (id) => {
-  const response = await api.delete(`/api/campaigns/${id}`);
+export const deleteCampaign = async (campaignId) => {
+  const response = await api.delete(`/api/campaigns/${campaignId}`);
 
   return response.data;
 };

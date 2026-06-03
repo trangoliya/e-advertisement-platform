@@ -6,24 +6,31 @@ import { Parser } from "json2csv";
 // Create Campaign
 export const createCampaign = async (req, res, next) => {
   try {
-    const { name, description, totalBudget, distributionChannels } = req.body;
+    const {
+      name,
+      description,
+      category,
+      totalBudget,
+      dailyBudget,
+      targeting,
+      platforms,
+    } = req.body;
 
-    if (!name || !totalBudget) {
+    if (!name || !category || !totalBudget) {
       return res.status(400).json({
         success: false,
-        message: "Name and total budget are required",
+        message: "Name, category and total budget are required",
       });
     }
-
-    const channels =
-      distributionChannels?.length > 0 ? distributionChannels : ["website"];
 
     const campaign = await Campaign.create({
       name,
       description,
       category,
       totalBudget,
-      distributionChannels: channels,
+      dailyBudget,
+      targeting,
+      platforms: platforms?.length > 0 ? platforms : ["Website"],
       createdBy: req.user.id,
     });
 
@@ -66,6 +73,13 @@ export const getCampaignAnalytics = async (req, res, next) => {
       return res.status(404).json({
         success: false,
         message: "Campaign not found",
+      });
+    }
+
+    if (campaign.createdBy.toString() !== req.user.id) {
+      return res.status(403).json({
+        success: false,
+        message: "Access denied",
       });
     }
 
@@ -186,6 +200,78 @@ export const exportCampaignAnalytics = async (req, res, next) => {
     res.attachment("campaign_analytics.csv");
 
     return res.send(csv);
+  } catch (error) {
+    next(error);
+  }
+};
+
+// Update Campaign
+export const updateCampaign = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+
+    const campaign = await Campaign.findById(id);
+
+    if (!campaign) {
+      return res.status(404).json({
+        success: false,
+        message: "Campaign not found",
+      });
+    }
+
+    if (campaign.createdBy.toString() !== req.user.id) {
+      return res.status(403).json({
+        success: false,
+        message: "Access denied",
+      });
+    }
+
+    const updatedCampaign = await Campaign.findByIdAndUpdate(
+      id,
+      req.body,
+      {
+        new: true,
+        runValidators: true,
+      }
+    );
+
+    return res.status(200).json({
+      success: true,
+      message: "Campaign updated successfully",
+      data: updatedCampaign,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// Delete Campaign
+export const deleteCampaign = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+
+    const campaign = await Campaign.findById(id);
+
+    if (!campaign) {
+      return res.status(404).json({
+        success: false,
+        message: "Campaign not found",
+      });
+    }
+
+    if (campaign.createdBy.toString() !== req.user.id) {
+      return res.status(403).json({
+        success: false,
+        message: "Access denied",
+      });
+    }
+
+    await Campaign.findByIdAndDelete(id);
+
+    return res.status(200).json({
+      success: true,
+      message: "Campaign deleted successfully",
+    });
   } catch (error) {
     next(error);
   }

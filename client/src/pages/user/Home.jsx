@@ -36,13 +36,22 @@ const Home = () => {
   }, []);
 
   const filteredAds = ads.filter((ad) => {
-    const channels = ad.campaign?.distributionChannels || ["website"];
+    const platforms = ad.campaign?.platforms || ["Website"];
 
     if (isMobile) {
-      return channels.includes("mobile");
+      return (
+        platforms.includes("Website") ||
+        platforms.includes("Instagram") ||
+        platforms.includes("Facebook") ||
+        platforms.includes("WhatsApp")
+      );
     }
 
-    return channels.includes("website");
+    return (
+      platforms.includes("Website") ||
+      platforms.includes("LinkedIn") ||
+      platforms.includes("YouTube")
+    );
   });
 
   return (

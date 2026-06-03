@@ -4,6 +4,8 @@ import {
   getMyCampaigns,
   getCampaignAnalytics,
   exportCampaignAnalytics,
+  updateCampaign,
+  deleteCampaign,
 } from "../controllers/campaign.controller.js";
 
 import authMiddleware from "../middlewares/auth.middleware.js";
@@ -33,4 +35,12 @@ router.get(
   getCampaignAnalytics,
 );
 
+router.put("/:id", authMiddleware, roleMiddleware("publisher"), updateCampaign);
+
+router.delete(
+  "/:id",
+  authMiddleware,
+  roleMiddleware("publisher"),
+  deleteCampaign,
+);
 export default router;

@@ -12,6 +12,8 @@ import {
   createCampaign,
   getMyCampaigns,
   getCampaignAnalytics,
+  updateCampaign,
+  deleteCampaign,
 } from "../../services/campaign.service";
 import StatusBadge from "../../components/common/StatusBadge";
 import Button from "../../components/common/Button";
@@ -23,12 +25,14 @@ const Campaigns = () => {
   const [creating, setCreating] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
   const [showCreateForm, setShowCreateForm] = useState(false);
+  const [editingCampaign, setEditingCampaign] = useState(null);
   const [formData, setFormData] = useState({
     name: "",
     description: "",
+    category: "",
     totalBudget: "",
     dailyBudget: "",
-    distributionChannels: [],
+    platforms: [],
     ageMin: "",
     ageMax: "",
     locations: "",
@@ -41,6 +45,11 @@ const Campaigns = () => {
     "Finance",
     "Travel",
     "Sports",
+    "Education",
+    "Shopping",
+    "Food",
+    "Business",
+    "Entertainment",
   ];
 
   const loadCampaigns = async () => {
@@ -57,9 +66,9 @@ const Campaigns = () => {
 
           return {
             ...campaign,
-            totalClicks: analytics?.totalClicks || 0,
-            totalImpressions: analytics?.totalImpressions || 0,
-            CTR: analytics?.CTR || 0,
+            totalClicks: analytics?.data?.totalClicks || 0,
+            totalImpressions: analytics?.data?.totalImpressions || 0,
+            CTR: analytics?.data?.CTR || 0,
           };
         }),
       );
@@ -83,15 +92,15 @@ const Campaigns = () => {
     });
   };
 
-  const handleChannelChange = (channel) => {
+  const handlePlatformChange = (platform) => {
     setFormData((prev) => {
-      const exists = prev.distributionChannels.includes(channel);
+      const exists = prev.platforms.includes(platform);
 
       return {
         ...prev,
-        distributionChannels: exists
-          ? prev.distributionChannels.filter((c) => c !== channel)
-          : [...prev.distributionChannels, channel],
+        platforms: exists
+          ? prev.platforms.filter((p) => p !== platform)
+          : [...prev.platforms, platform],
       };
     });
   };
@@ -116,42 +125,53 @@ const Campaigns = () => {
       setCreating(true);
 
       const targeting = {
-        ageMin: Number(formData.ageMin),
-        ageMax: Number(formData.ageMax),
+        ageMin: formData.ageMin ? Number(formData.ageMin) : null,
+        ageMax: formData.ageMax ? Number(formData.ageMax) : null,
         locations: formData.locations
           ? formData.locations.split(",").map((l) => l.trim())
           : [],
         interests: formData.interests,
       };
 
-      await createCampaign({
+      const payload = {
         name: formData.name,
         description: formData.description,
-        totalBudget: formData.totalBudget,
-        dailyBudget: formData.dailyBudget,
-        distributionChannels: formData.distributionChannels,
+        category: formData.category,
+        totalBudget: Number(formData.totalBudget),
+        dailyBudget: Number(formData.dailyBudget),
+        platforms: formData.platforms,
         targeting,
-      });
+      };
+      const isEditing = !!editingCampaign;
+      if (editingCampaign) {
+        await updateCampaign(editingCampaign._id, payload);
+      } else {
+        await createCampaign(payload);
+      }
+      setEditingCampaign(null);
 
+      setSuccessMessage(
+        isEditing
+          ? "Campaign updated successfully."
+          : "Campaign created successfully.",
+      );
       setFormData({
         name: "",
         description: "",
+        category: "",
         totalBudget: "",
         dailyBudget: "",
-        distributionChannels: [],
+        platforms: [],
         ageMin: "",
         ageMax: "",
         locations: "",
         interests: [],
       });
-
       await loadCampaigns();
       setShowCreateForm(false);
       document
         .getElementById("campaign-list")
         ?.scrollIntoView({ behavior: "smooth" });
-
-      setSuccessMessage("Campaign created successfully.");
 
       setTimeout(() => {
         setSuccessMessage("");
@@ -162,7 +182,42 @@ const Campaigns = () => {
       setCreating(false);
     }
   };
+  const handleDelete = async (campaignId) => {
+    if (!window.confirm("Delete this campaign?")) return;
 
+    try {
+      await deleteCampaign(campaignId);
+      await loadCampaigns();
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleEdit = (campaign) => {
+    setEditingCampaign(campaign);
+
+    setFormData({
+      name: campaign.name,
+      description: campaign.description,
+      category: campaign.category,
+      totalBudget: campaign.totalBudget,
+      dailyBudget: campaign.dailyBudget,
+      platforms: campaign.platforms || [],
+      ageMin: campaign.targeting?.ageMin || "",
+      ageMax: campaign.targeting?.ageMax || "",
+      locations: campaign.targeting?.locations?.join(", ") || "",
+      interests: campaign.targeting?.interests || [],
+    });
+
+    setShowCreateForm(true);
+  };
+  const handleToggleForm = () => {
+    if (showCreateForm) {
+      setEditingCampaign(null);
+    }
+
+    setShowCreateForm(!showCreateForm);
+  };
   return (
     <div className="p-6 space-y-8 min-h-screen">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
@@ -206,7 +261,7 @@ const Campaigns = () => {
       </div>
       <div className="flex justify-end">
         <button
-          onClick={() => setShowCreateForm(!showCreateForm)}
+          onClick={handleToggleForm}
           className="inline-flex items-center gap-2 rounded-2xl bg-indigo-600 px-5 py-3 text-white font-medium hover:bg-indigo-700 transition"
         >
           {showCreateForm ? (
@@ -227,7 +282,7 @@ const Campaigns = () => {
         <div className="bg-white border border-gray-100 rounded-3xl p-8 shadow-sm">
           <div className="mb-6">
             <h2 className="text-2xl font-bold text-gray-900">
-              Create New Campaign
+              {editingCampaign ? "Update Campaign" : "Create New Campaign"}
             </h2>
 
             <p className="text-gray-500 mt-1">
@@ -262,6 +317,25 @@ const Campaigns = () => {
       focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition"
             />
 
+            {/* Category */}
+            <select
+              name="category"
+              value={formData.category}
+              onChange={handleChange}
+              required
+              className="rounded-2xl border border-gray-300 px-4 py-3"
+            >
+              <option value="">Select Category</option>
+              <option value="Technology">Technology</option>
+              <option value="Education">Education</option>
+              <option value="Business">Business</option>
+              <option value="Healthcare">Healthcare</option>
+              <option value="Entertainment">Entertainment</option>
+              <option value="Food">Food</option>
+              <option value="Fashion">Fashion</option>
+              <option value="Real Estate">Real Estate</option>
+            </select>
+
             {/* Total Budget */}
             <input
               type="number"
@@ -285,31 +359,36 @@ const Campaigns = () => {
               className="rounded-2xl border border-gray-300 px-4 py-3 bg-white
       focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition"
             />
-
-            {/* Distribution Channels */}
             <div className="md:col-span-2 xl:col-span-4 border-t border-gray-200 pt-6">
+              {/* Advertising Platforms */}
               <h3 className="font-semibold text-gray-900 mb-4">
-                Distribution Channels
+                Advertising Platforms
               </h3>
 
               <div className="flex flex-wrap gap-4">
-                {["website", "mobile", "email"].map((channel) => (
+                {[
+                  "Facebook",
+                  "Instagram",
+                  "WhatsApp",
+                  "LinkedIn",
+                  "YouTube",
+                  "Website",
+                ].map((platform) => (
                   <label
-                    key={channel}
-                    className="flex items-center gap-2 rounded-xl border border-gray-200 px-4 py-2 cursor-pointer hover:border-indigo-300 transition"
+                    key={platform}
+                    className="flex items-center gap-2 rounded-xl border border-gray-200 px-4 py-2 cursor-pointer"
                   >
                     <input
                       type="checkbox"
-                      className="accent-indigo-600"
-                      checked={formData.distributionChannels.includes(channel)}
-                      onChange={() => handleChannelChange(channel)}
+                      checked={formData.platforms.includes(platform)}
+                      onChange={() => handlePlatformChange(platform)}
                     />
-                    <span className="capitalize text-gray-700">{channel}</span>
+
+                    <span>{platform}</span>
                   </label>
                 ))}
               </div>
             </div>
-
             {/* Target Audience */}
             <div className="md:col-span-2 xl:col-span-4 border-t border-gray-200 pt-6">
               <h3 className="font-semibold text-gray-900 mb-5">
@@ -369,7 +448,13 @@ const Campaigns = () => {
 
             <div className="md:col-span-2 xl:col-span-4 flex justify-end pt-4">
               <Button type="submit" disabled={creating}>
-                {creating ? "Creating Campaign..." : "Create Campaign"}
+                {creating
+                  ? editingCampaign
+                    ? "Updating Campaign..."
+                    : "Creating Campaign..."
+                  : editingCampaign
+                    ? "Update Campaign"
+                    : "Create Campaign"}
               </Button>
             </div>
           </form>
@@ -421,7 +506,9 @@ const Campaigns = () => {
 
                   <th className="px-6 py-4 text-center">Status</th>
 
-                  <th className="px-6 py-4 text-center">Channels</th>
+                  <th className="px-6 py-4 text-center">Category</th>
+
+                  <th className="px-6 py-4 text-center">Platforms</th>
 
                   <th className="px-6 py-4 text-center">Impressions</th>
 
@@ -430,6 +517,8 @@ const Campaigns = () => {
                   <th className="px-6 py-4 text-center">CTR</th>
 
                   <th className="px-6 py-4 text-center">Performance</th>
+
+                  <th className="px-6 py-4 text-center">Actions</th>
                 </tr>
               </thead>
 
@@ -479,9 +568,16 @@ const Campaigns = () => {
                         <StatusBadge status={campaign.status} />
                       </td>
 
-                      {/* Channels */}
+                      {/* Category */}
+                      <td className="px-6 py-5 text-center">
+                        <span className="inline-flex px-3 py-1 rounded-full bg-blue-50 text-blue-600 font-medium">
+                          {campaign.category}
+                        </span>
+                      </td>
+
+                      {/* Platforms */}
                       <td className="px-6 py-5 text-center text-gray-600">
-                        {campaign.distributionChannels?.join(", ") || "Website"}
+                        {campaign.platforms?.join(", ") || "Website"}
                       </td>
 
                       {/* Impressions */}
@@ -520,6 +616,25 @@ const Campaigns = () => {
                             />
                           </BarChart>
                         </ResponsiveContainer>
+                      </td>
+
+                      {/* Actions */}
+                      <td className="px-6 py-5">
+                        <div className="flex items-center justify-center gap-2">
+                          <button
+                            onClick={() => handleEdit(campaign)}
+                            className="px-3 py-1 rounded-lg bg-blue-100 text-blue-600 hover:bg-blue-200"
+                          >
+                            Edit
+                          </button>
+
+                          <button
+                            onClick={() => handleDelete(campaign._id)}
+                            className="px-3 py-1 rounded-lg bg-red-100 text-red-600 hover:bg-red-200"
+                          >
+                            Delete
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   );
