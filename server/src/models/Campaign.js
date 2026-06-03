@@ -13,18 +13,13 @@ const campaignSchema = new mongoose.Schema(
       trim: true,
     },
 
-    category: {
-      type: String,
-      required: true,
-      trim: true,
-    },
     targeting: {
       ageMin: Number,
       ageMax: Number,
       locations: [String],
       interests: [String],
     },
-    
+
     totalBudget: {
       type: Number,
       required: true,
