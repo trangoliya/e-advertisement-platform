@@ -6,13 +6,12 @@ import { Parser } from "json2csv";
 // Create Campaign
 export const createCampaign = async (req, res, next) => {
   try {
-    const { name, description, category, totalBudget, distributionChannels } =
-      req.body;
+    const { name, description, totalBudget, distributionChannels } = req.body;
 
-    if (!name || !totalBudget || !category) {
+    if (!name || !totalBudget) {
       return res.status(400).json({
         success: false,
-        message: "Name, category and total budget are required",
+        message: "Name and total budget are required",
       });
     }
 
