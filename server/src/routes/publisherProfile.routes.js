@@ -9,12 +9,7 @@ import roleMiddleware from "../middlewares/role.middleware.js";
 
 const router = express.Router();
 
-router.post(
-  "/profile",
-  authMiddleware,
-  roleMiddleware("publisher"),
-  createPublisherProfile,
-);
+router.post("/profile", authMiddleware, createPublisherProfile);
 
 router.get(
   "/profile",
